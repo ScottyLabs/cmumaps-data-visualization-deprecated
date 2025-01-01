@@ -9,7 +9,7 @@ import { PDFCoordinate } from "../shared/types";
 const PDFViewer = dynamic(() => import("./PDFViewer"), { ssr: false });
 
 // import FloorDisplay from "./FloorDisplay";
-const FloorDisplay = dynamic(() => import("./FloorDisplay"), {
+const FloorDisplay = dynamic(() => import("../floor-display/FloorDisplay"), {
   ssr: false,
 });
 

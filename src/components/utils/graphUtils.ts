@@ -1,5 +1,7 @@
 import { PriorityQueue } from "@datastructures-js/priority-queue";
 
+import { toast } from "react-toastify";
+
 import { Graph } from "../shared/types";
 
 // calculate mst for each connected components of the graph
@@ -59,4 +61,8 @@ export const calcMst = (nodes: Graph) => {
 
   console.log(Object.keys(nodes).length);
   console.log(mst);
+};
+
+export const addDoorNodeErrToast = () => {
+  toast.error("Click on a purple door to add a door node!");
 };

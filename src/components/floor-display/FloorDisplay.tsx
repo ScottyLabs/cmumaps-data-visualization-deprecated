@@ -10,7 +10,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { Stage, Layer, Line } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
 import {
@@ -29,7 +29,6 @@ import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
@@ -50,8 +49,8 @@ import DoorsDisplay from "./DoorsDisplay";
 import EdgesDisplay from "./EdgesDisplay";
 import LabelsDisplay from "./LabelsDisplay";
 import NodesDisplay from "./NodesDisplay";
-import PolygonEditor from "./PolygonEditor";
 import PolygonsDisplay from "./PolygonsDisplay";
+import SelectedPolygonDisplay from "./SelectedPolygonDisplay";
 import WallsDisplay from "./WallsDisplay";
 
 interface Props {
@@ -99,11 +98,10 @@ const FloorDisplay = ({
   const setSaveStatus = useContext(SaveStatusContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
-  const { idSelected } = useContext(IdEventsContext);
-  const { nodeSize } = useContext(NodeSizeContext);
 
   const [nodeIdOnDrag, setNodeIdOnDrag] = useState<ID>("");
 
+  const { idSelected } = useContext(IdEventsContext);
   const roomIdSelected = getRoomId(nodes, idSelected);
   const { editPolygon, setEditPolygon, setEditRoomLabel } = useContext(
     DisplaySettingsContext
@@ -217,34 +215,6 @@ const FloorDisplay = ({
         newGraph: JSON.stringify(newNodes),
       }),
       setSaveStatus
-    );
-  };
-
-  const renderPolygonEditor = () => {
-    const polygon = rooms[roomIdSelected].polygon;
-
-    if (!polygon) {
-      return;
-    }
-
-    if (!editPolygon) {
-      return polygon.coordinates.map((coords, index) => (
-        <Line
-          key={index}
-          points={coords.flat()}
-          stroke="orange"
-          strokeWidth={nodeSize / 2}
-        />
-      ));
-    }
-
-    return (
-      <PolygonEditor
-        floorCode={floorCode}
-        roomId={roomIdSelected}
-        polygon={polygon}
-        nodeSize={nodeSize}
-      />
     );
   };
 
@@ -390,7 +360,13 @@ const FloorDisplay = ({
             />
           )}
 
-          {roomIdSelected && renderPolygonEditor()}
+          {roomIdSelected && (
+            <SelectedPolygonDisplay
+              floorCode={floorCode}
+              roomIdSelected={roomIdSelected}
+              polygon={rooms[roomIdSelected].polygon}
+            />
+          )}
 
           {<LabelsDisplay floorCode={floorCode} addNewNode={addNewNode} />}
 

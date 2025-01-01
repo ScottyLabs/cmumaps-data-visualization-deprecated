@@ -148,7 +148,10 @@ const GraphTab = ({ floorCode }: Props) => {
 
   const renderMstRow = () => (
     <div className="flex items-center gap-5">
-      <SidePanelButton text="Calculate MST" onClick={() => calcMst(nodes)} />
+      <SidePanelButton
+        text="Calculate MST"
+        onClick={() => calcMst(nodes, dispatch)}
+      />
       <QuestionCircle
         url="https://en.wikipedia.org/wiki/Minimum_spanning_tree"
         style="text-blue-900"

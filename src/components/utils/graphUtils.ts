@@ -2,14 +2,15 @@ import { PriorityQueue } from "@datastructures-js/priority-queue";
 
 import { toast } from "react-toastify";
 
-import { Edge, Graph, Mst } from "../shared/types";
+import { setMst } from "../../lib/features/mstSlice";
+import { Graph, Mst } from "../shared/types";
 
 // calculate mst for each connected components of the graph
-export const calcMst = (nodes: Graph) => {
+export const calcMst = (nodes: Graph, dispatch) => {
   // MST is a set of edges (inNodeId, outNodeId)
-  const mst: Mst = new Set();
+  const mst: Mst = {};
   const visited = new Set();
-  const pq = new PriorityQueue<{ value: Edge; priority: number }>(
+  const pq = new PriorityQueue<{ value: [string, string]; priority: number }>(
     (a, b) => a.priority - b.priority
   );
 
@@ -48,7 +49,10 @@ export const calcMst = (nodes: Graph) => {
     }
 
     // Add edge to MST
-    mst.add([inNodeId, outNodeId]);
+    if (!mst[inNodeId]) {
+      mst[inNodeId] = {};
+    }
+    mst[inNodeId][outNodeId] = true;
     visited.add(outNodeId);
 
     // Add edges from the newly added node to the priority queue
@@ -57,8 +61,7 @@ export const calcMst = (nodes: Graph) => {
 
   // return the closest node to the MST if there is any
 
-  console.log(Object.keys(nodes).length);
-  console.log(mst);
+  dispatch(setMst(mst));
 };
 
 export const addDoorNodeErrToast = () => {

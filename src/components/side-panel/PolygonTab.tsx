@@ -182,22 +182,19 @@ const PolygonTab = ({ floorCode }: Props) => {
         />
       </div>
 
-      <div>
-        <SidePanelButton
-          text="Simplify Polygon"
-          onClick={() => simplifyPolygon()}
-        />
-      </div>
+      <SidePanelButton
+        text="Simplify Polygon"
+        onClick={() => simplifyPolygon()}
+        style="block"
+      />
 
       <NodeSizeSlider text="Vertex" />
 
-      <div>
-        <SidePanelButton
-          text="Delete Polygon"
-          onClick={() => deletePolygon()}
-          style={RED_BUTTON_STYLE}
-        />
-      </div>
+      <SidePanelButton
+        text="Delete Polygon"
+        onClick={() => deletePolygon()}
+        style={RED_BUTTON_STYLE + " block"}
+      />
     </div>
   );
 };

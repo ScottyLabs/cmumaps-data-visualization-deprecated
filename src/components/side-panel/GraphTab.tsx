@@ -148,19 +148,17 @@ const GraphTab = ({ floorCode }: Props) => {
         />
       </div>
 
-      <div>
-        <SidePanelButton
-          text="Relink Rooms and Doors"
-          onClick={relinkDoorsAndRooms}
-        />
-      </div>
+      <SidePanelButton
+        text="Relink Rooms and Doors"
+        onClick={relinkDoorsAndRooms}
+        style="block"
+      />
 
-      <div>
-        <SidePanelButton
-          text="Remove Overlapping Nodes"
-          onClick={removeOverlappingsNodes}
-        />
-      </div>
+      <SidePanelButton
+        text="Remove Overlapping Nodes"
+        onClick={removeOverlappingsNodes}
+        style="block"
+      />
 
       <NodeSizeSlider text="Node" />
     </div>

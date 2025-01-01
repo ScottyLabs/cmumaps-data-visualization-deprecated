@@ -47,6 +47,7 @@ import { deleteNode } from "../shared/keyboardShortcuts";
 import { ID, Node, RoomInfo, DoorInfo, WalkwayTypeList } from "../shared/types";
 // components
 import SidePanel from "../side-panel/SidePanel";
+import { calcMst } from "../utils/graphUtils";
 import {
   getNodeIdByRoomId,
   getNodeIdSelected,
@@ -288,6 +289,8 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
         } else {
           toastNodeNotSelectedErr();
         }
+      } else if (event.key === "m") {
+        calcMst(nodes);
       } else if (
         event.key === "Backspace" ||
         event.key === "Delete" ||

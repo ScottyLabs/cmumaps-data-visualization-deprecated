@@ -1,7 +1,6 @@
 import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
-import { toast } from "react-toastify";
 
 import {
   AsEdge,
@@ -17,6 +16,7 @@ import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import QuestionCircle from "../shared/QuestionCircle";
+import { calcMst } from "../utils/graphUtils";
 import { addDoorsToGraph, dist, savingHelper } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
@@ -146,12 +146,9 @@ const GraphTab = ({ floorCode }: Props) => {
     </div>
   );
 
-  const renderMSTRow = () => (
+  const renderMstRow = () => (
     <div className="flex items-center gap-5">
-      <SidePanelButton
-        text="Calculate MST"
-        onClick={() => toast.error("Not Implemented!")}
-      />
+      <SidePanelButton text="Calculate MST" onClick={() => calcMst(nodes)} />
       <QuestionCircle
         url="https://en.wikipedia.org/wiki/Minimum_spanning_tree"
         style="text-blue-900"
@@ -163,7 +160,7 @@ const GraphTab = ({ floorCode }: Props) => {
     <div className="ml-2 mr-2 space-y-4">
       {renderAddNodeButtonsRow()}
       {renderDoorAsGraphRow()}
-      {renderMSTRow()}
+      {renderMstRow()}
       <SidePanelButton
         text="Relink Rooms and Doors"
         onClick={relinkDoorsAndRooms}

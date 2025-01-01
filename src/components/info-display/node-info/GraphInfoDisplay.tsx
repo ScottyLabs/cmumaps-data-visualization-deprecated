@@ -6,7 +6,7 @@ import React, { useContext, useMemo } from "react";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { IdEventsContext } from "../../contexts/IdEventsProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
-import { Node, Edge, EdgeTypeList } from "../../shared/types";
+import { Node, EdgeInfo, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { getNodeIdSelected, savingHelper } from "../../utils/utils";
 import EditTypeRow from "../SelectTypeCell";
@@ -48,7 +48,7 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
   }, [neighbors]);
 
   const renderSameFloorNeighbors = (
-    sameFloorNeighbors: Record<string, Edge>
+    sameFloorNeighbors: Record<string, EdgeInfo>
   ) => {
     const deleteEdge = (nodeId, neighborID) => {
       setNodeIdHovered("");
@@ -103,7 +103,7 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
   };
 
   const renderDifferentFloorNeighbors = (
-    differentFloorNeighbors: Record<string, Edge>
+    differentFloorNeighbors: Record<string, EdgeInfo>
   ) => {
     const calculatePath = (neighborId) => {
       const toFloorInfo = neighbors[neighborId].toFloorInfo;

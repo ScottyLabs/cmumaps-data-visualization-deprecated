@@ -38,7 +38,7 @@ export interface ToFloorInfo {
 /**
  * Graph types
  */
-export interface Edge {
+export interface EdgeInfo {
   /**
    * distance between the two nodes this edge connects or the floor to floor info
    */
@@ -58,7 +58,7 @@ export interface Node {
   /**
    * (neighbor's id to the edge) for each neighbor of the node
    */
-  neighbors: Record<ID, Edge>;
+  neighbors: Record<ID, EdgeInfo>;
 
   /**
    * the ID of the Room the node belongs to
@@ -160,3 +160,6 @@ export interface RoomInfo {
 
 export type Rooms = Record<ID, RoomInfo>;
 export type Graph = Record<ID, Node>;
+
+export type Edge = [ID, ID];
+export type Mst = Set<Edge>;

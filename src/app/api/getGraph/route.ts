@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { Edge, Graph, ID } from "../../../components/shared/types";
+import { EdgeInfo, Graph, ID } from "../../../components/shared/types";
 import { dist } from "../../../components/utils/utils";
 import prisma from "../../../lib/prisma";
 import { extractBuildingCode, extractFloorLevel } from "../apiUtils";
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     const graph: Graph = {};
 
     for (const node of nodes) {
-      const neighbors: Record<ID, Edge> = {};
+      const neighbors: Record<ID, EdgeInfo> = {};
 
       // Process outNeighbors
       for (const neighbor of node.outNeighbors) {

@@ -2,14 +2,12 @@ import { PriorityQueue } from "@datastructures-js/priority-queue";
 
 import { toast } from "react-toastify";
 
-import { Graph } from "../shared/types";
+import { Edge, Graph, Mst } from "../shared/types";
 
 // calculate mst for each connected components of the graph
 export const calcMst = (nodes: Graph) => {
   // MST is a set of edges (inNodeId, outNodeId)
-  type Edge = [string, string];
-  type MST = Set<[string, string]>;
-  const mst: MST = new Set();
+  const mst: Mst = new Set();
   const visited = new Set();
   const pq = new PriorityQueue<{ value: Edge; priority: number }>(
     (a, b) => a.priority - b.priority

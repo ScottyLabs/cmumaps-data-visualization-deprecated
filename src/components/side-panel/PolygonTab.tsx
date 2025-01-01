@@ -14,9 +14,10 @@ import {
   setModePolygonAddVertex,
   setModePolygonDeleteVertex,
 } from "../shared/keyboardShortcuts";
-import { RED_BUTTON_STYLE, renderSidePanelButton } from "../utils/displayUtils";
+import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { getRoomId } from "../utils/utils";
+import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
 
 interface Props {
@@ -90,20 +91,20 @@ const PolygonTab = ({ floorCode }: Props) => {
     };
 
     if (coordsIndex == 0) {
-      return renderSidePanelButton(
-        "Add Hole",
-        () => {
-          addHole();
-        },
-        "px-2 py-1"
+      return (
+        <SidePanelButton
+          text="Add Hole"
+          onClick={() => addHole()}
+          style="px-2 py-1"
+        />
       );
     } else {
-      return renderSidePanelButton(
-        "Delete Hole",
-        () => {
-          deleteHole();
-        },
-        "px-2 py-1"
+      return (
+        <SidePanelButton
+          text="Delete Hole"
+          onClick={() => deleteHole()}
+          style="px-2 py-1"
+        />
       );
     }
   };
@@ -171,30 +172,31 @@ const PolygonTab = ({ floorCode }: Props) => {
       </div>
 
       <div className="space-x-2">
-        {renderSidePanelButton("Add Vertex", () =>
-          setModePolygonAddVertex(setMode)
-        )}
-        {renderSidePanelButton("Delete Vertex", () =>
-          setModePolygonDeleteVertex(setMode)
-        )}
+        <SidePanelButton
+          text="Add Vertex"
+          onClick={() => setModePolygonAddVertex(setMode)}
+        />
+        <SidePanelButton
+          text="Delete Vertex"
+          onClick={() => setModePolygonDeleteVertex(setMode)}
+        />
       </div>
 
       <div>
-        {renderSidePanelButton("Simplify Polygon", () => {
-          simplifyPolygon();
-        })}
+        <SidePanelButton
+          text="Simplify Polygon"
+          onClick={() => simplifyPolygon()}
+        />
       </div>
 
       <NodeSizeSlider text="Vertex" />
 
       <div>
-        {renderSidePanelButton(
-          "Delete Polygon",
-          () => {
-            deletePolygon();
-          },
-          RED_BUTTON_STYLE
-        )}
+        <SidePanelButton
+          text="Delete Polygon"
+          onClick={() => deletePolygon()}
+          style={RED_BUTTON_STYLE}
+        />
       </div>
     </div>
   );

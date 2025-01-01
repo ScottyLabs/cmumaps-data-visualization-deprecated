@@ -18,8 +18,8 @@ import {
   setModeAddDoorNode,
   setModeAddNode,
 } from "../shared/keyboardShortcuts";
-import { renderSidePanelButton } from "../utils/displayUtils";
 import { addDoorsToGraph, dist, savingHelper } from "../utils/utils";
+import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
 
 interface Props {
@@ -119,39 +119,47 @@ const GraphTab = ({ floorCode }: Props) => {
 
   return (
     <div className="ml-2 mr-2 space-y-4">
-      <div>
-        {renderSidePanelButton("Add Node", () => setModeAddNode(setMode))}
-      </div>
-
-      <div>
-        {renderSidePanelButton("Add Door Node", () =>
-          setModeAddDoorNode(setMode)
-        )}
+      <div className="flex gap-2">
+        <SidePanelButton
+          text="Add Node"
+          onClick={() => setModeAddNode(setMode)}
+        />
+        <SidePanelButton
+          text="Add Door Node"
+          onClick={() => setModeAddDoorNode(setMode)}
+        />
       </div>
 
       <div className="flex">
         <p className="py-1">Doors are</p>
-        {renderSidePanelButton(
-          "Nodes!",
-          () => addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes),
-          "ml-2 px-2 py-1 border"
-        )}
-        {renderSidePanelButton(
-          "Edges!",
-          () => addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes),
-          "ml-2 px-2 py-1 border"
-        )}
+        <SidePanelButton
+          text="Nodes"
+          onClick={() =>
+            addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes)
+          }
+          style="ml-2 px-2 py-1 border"
+        />
+        <SidePanelButton
+          text="Edges"
+          onClick={() =>
+            addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes)
+          }
+          style="ml-2 px-2 py-1 border"
+        />
       </div>
 
       <div>
-        {renderSidePanelButton("Relink Rooms and Doors", relinkDoorsAndRooms)}
+        <SidePanelButton
+          text="Relink Rooms and Doors"
+          onClick={relinkDoorsAndRooms}
+        />
       </div>
 
       <div>
-        {renderSidePanelButton(
-          "Remove Overlapping Nodes",
-          removeOverlappingsNodes
-        )}
+        <SidePanelButton
+          text="Remove Overlapping Nodes"
+          onClick={removeOverlappingsNodes}
+        />
       </div>
 
       <NodeSizeSlider text="Node" />

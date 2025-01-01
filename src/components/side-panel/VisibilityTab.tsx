@@ -6,7 +6,8 @@ import { SHOW_REGENERATE_BUTTON } from "../../settings";
 import ToggleSwitch from "../common/ToggleSwitch";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
-import { RED_BUTTON_STYLE, renderSidePanelButton } from "../utils/displayUtils";
+import { RED_BUTTON_STYLE } from "../utils/displayUtils";
+import SidePanelButton from "./SidePanelButton";
 
 interface Props {
   floorCode: string;
@@ -70,13 +71,13 @@ const VisibilityTab = ({ floorCode, parsePDF }: Props) => {
         setShowPolygons(!showPolygons)
       )}
 
-      {SHOW_REGENERATE_BUTTON &&
-        !editPolygon &&
-        renderSidePanelButton(
-          "Regenerate",
-          handleRegenerate,
-          RED_BUTTON_STYLE + " text-base"
-        )}
+      {SHOW_REGENERATE_BUTTON && !editPolygon && (
+        <SidePanelButton
+          text="Regenerate"
+          onClick={handleRegenerate}
+          style={RED_BUTTON_STYLE + " text-base"}
+        />
+      )}
     </div>
   );
 };

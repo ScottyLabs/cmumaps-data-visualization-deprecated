@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, createContext } from "react";
+import { createSlice } from "@reduxjs/toolkit";
 
 export type Mode =
   | "Graph Select"
@@ -20,25 +20,23 @@ export const POLYGON_SELECT: Mode = "Polygon Select";
 export const POLYGON_ADD_VERTEX: Mode = "Polygon Add Vertex";
 export const POLYGON_DELETE_VERTEX: Mode = "Polygon Delete Vertex";
 
-export interface ModeData {
+interface DataState {
   mode: Mode;
-  setMode: Dispatch<SetStateAction<Mode>>;
 }
 
-export const ModeContext = createContext<ModeData>({
+const initialState: DataState = {
   mode: GRAPH_SELECT,
-  setMode: () => {},
-});
-
-interface Props {
-  children: React.ReactNode;
-  modeData: ModeData;
-}
-
-export const ModeProvider = ({ children, modeData }: Props) => {
-  return (
-    <ModeContext.Provider value={modeData}>{children}</ModeContext.Provider>
-  );
 };
 
-export default ModeProvider;
+const modeSlice = createSlice({
+  name: "mode",
+  initialState,
+  reducers: {
+    setMode(state, action) {
+      state.mode = action.payload;
+    },
+  },
+});
+
+export const { setMode } = modeSlice.actions;
+export default modeSlice.reducer;

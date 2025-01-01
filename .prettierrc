@@ -1,0 +1,13 @@
+{
+  "trailingComma": "es5",
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": [
+    "^react(.*)",
+    "@/(.*)",
+    "^[./]"
+  ],
+  "importOrderSeparation": true
+}

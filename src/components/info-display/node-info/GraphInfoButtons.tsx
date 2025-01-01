@@ -1,0 +1,100 @@
+import { useRouter } from "next/navigation";
+import { twMerge } from "tailwind-merge";
+
+import React, { useContext } from "react";
+import { toast } from "react-toastify";
+
+import { GraphContext } from "../../contexts/GraphProvider";
+import { IdEventsContext } from "../../contexts/IdEventsProvider";
+import { ModeContext } from "../../contexts/ModeProvider";
+import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
+import {
+  deleteNode,
+  setModeAddEdge,
+  setModeDeleteEdge,
+} from "../../shared/keyboardShortcuts";
+import { RED_BUTTON_STYLE } from "../../utils/displayUtils";
+import { getNodeIdSelected } from "../../utils/utils";
+
+interface Props {
+  floorCode: string;
+}
+
+const GraphInfoButtons = ({ floorCode }: Props) => {
+  const router = useRouter();
+
+  const setSaveStatus = useContext(SaveStatusContext);
+
+  const { setMode } = useContext(ModeContext);
+  const { idSelected, setIdSelected } = useContext(IdEventsContext);
+
+  const { nodes, setNodes } = useContext(GraphContext);
+
+  const nodeId = getNodeIdSelected(idSelected);
+
+  const renderButton = (text, handleClick, style?) => {
+    return (
+      <div>
+        <button
+          className={twMerge(
+            "mb-2 rounded bg-slate-500 px-2 py-1 text-sm text-white hover:bg-slate-700",
+            style
+          )}
+          onClick={handleClick}
+        >
+          {text}
+        </button>
+      </div>
+    );
+  };
+
+  const renderCopyNodeIdButton = () => {
+    const copyId = () => {
+      navigator.clipboard.writeText(nodeId);
+      toast.success("Copied!");
+    };
+
+    return renderButton("Copy Node ID", copyId);
+  };
+
+  const renderDeleteNodeButton = () => {
+    const deleteNodeHelper = () =>
+      deleteNode(
+        nodes,
+        nodeId,
+        setNodes,
+        floorCode,
+        setMode,
+        setSaveStatus,
+        setIdSelected,
+        router
+      );
+
+    return renderButton("Delete Node", deleteNodeHelper, RED_BUTTON_STYLE);
+  };
+
+  const renderAddEdgeByClickingButton = () => {
+    const addEdge = () => setModeAddEdge(setMode);
+    return renderButton("Add Edge", addEdge);
+  };
+
+  const renderDeleteEdgeButton = () => {
+    const deleteEdge = () => setModeDeleteEdge;
+    return renderButton("Delete Edge", deleteEdge);
+  };
+
+  return (
+    <div>
+      <div className="flex space-x-4">
+        {renderCopyNodeIdButton()}
+        {renderDeleteNodeButton()}
+      </div>
+      <div className="flex space-x-4">
+        {renderAddEdgeByClickingButton()}
+        {renderDeleteEdgeButton()}
+      </div>
+    </div>
+  );
+};
+
+export default GraphInfoButtons;

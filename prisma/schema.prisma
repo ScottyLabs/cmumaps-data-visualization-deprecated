@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// generator pyClient {
+//   provider = "prisma-client-py"
+// }
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  buildingCode String
+  name         String
+
+  floorLevel   String
+  type         String
+  displayAlias String?
+  aliases      Alias[]
+
+  updatedAt DateTime @updatedAt
+
+  node Node[]
+
+  labelPosX Float
+  labelPosY Float
+
+  polygon Json
+
+  @@id([buildingCode, name])
+  @@index([buildingCode, floorLevel])
+}
+
+model Node {
+  id   String @id @default(uuid())
+  posX Float
+  posY Float
+
+  buildingCode String
+  roomName     String
+  room         Room?  @relation(fields: [buildingCode, roomName], references: [buildingCode, name], onUpdate: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  outNeighbors Neighbor[] @relation("OutNeighbors")
+  inNeighbors  Neighbor[] @relation("InNeighbors")
+
+  @@index([buildingCode])
+}
+
+model Neighbor {
+  inNodeId String
+  inNode   Node   @relation("OutNeighbors", fields: [inNodeId], references: [id])
+
+  outNodeId String
+  outNode   Node   @relation("InNeighbors", fields: [outNodeId], references: [id])
+
+  @@id([inNodeId, outNodeId])
+}
+
+model Alias {
+  buildingCode String
+  roomName     String
+  alias        String
+
+  room Room @relation(fields: [buildingCode, roomName], references: [buildingCode, name])
+
+  @@id([buildingCode, roomName, alias])
+}

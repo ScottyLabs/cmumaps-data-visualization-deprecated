@@ -13,6 +13,15 @@ import {
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
+import {
+  ADD_DOOR_NODE,
+  ADD_EDGE,
+  ADD_NODE,
+  DELETE_EDGE,
+  GRAPH_SELECT,
+  setMode,
+} from "../../lib/features/modeSlice";
+import { useAppDispatch } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import DisplaySettingsProvider from "../contexts/DisplaySettingsProvider";
 import GraphProvider from "../contexts/GraphProvider";
@@ -25,7 +34,6 @@ import {
 } from "../contexts/IdEventsTypes";
 // context providers
 import { LoadingContext } from "../contexts/LoadingProvider";
-import { GRAPH_SELECT, ModeContext } from "../contexts/ModeProvider";
 import NodeSizeProvider from "../contexts/NodeSizeProvider";
 import OutlineProvider from "../contexts/OutlineProvider";
 import PolygonProvider from "../contexts/PolygonProvider";
@@ -35,13 +43,7 @@ import { SaveStatus } from "../contexts/SaveStatusType";
 import ShortcutsStatusProvider from "../contexts/ShortcutsStatusProvider";
 import VisibilitySettingsProvider from "../contexts/VisibilitySettingsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
-import {
-  deleteNode,
-  setModeAddDoorNode,
-  setModeAddEdge,
-  setModeAddNode,
-  setModeDeleteEdge,
-} from "../shared/keyboardShortcuts";
+import { deleteNode } from "../shared/keyboardShortcuts";
 import { ID, Node, RoomInfo, DoorInfo, WalkwayTypeList } from "../shared/types";
 // components
 import SidePanel from "../side-panel/SidePanel";
@@ -62,10 +64,10 @@ interface Props {
 
 const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const { loadingText, setLoadingText, setLoadingFailed } =
     useContext(LoadingContext);
-  const { mode, setMode } = useContext(ModeContext);
   const setSaveStatus = useContext(SaveStatusContext);
 
   const [shortcutsDisabled, setShortcutsDisabled] = useState<boolean>(false);
@@ -84,8 +86,8 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
   // visibility settings
   const [showFile, setShowFile] = useState(false);
   const [showOutline, setShowOutline] = useState(true);
-  const [showNodes, setShowNodes] = useState(false);
-  const [showEdges, setShowEdges] = useState(false);
+  const [showNodes, setShowNodes] = useState(true);
+  const [showEdges, setShowEdges] = useState(true);
   const [showLabels, setShowLabels] = useState(false);
   const [showPolygons, setShowPolygons] = useState(false);
 
@@ -263,7 +265,7 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
 
       // quit
       else if (event.key === "q") {
-        setMode(GRAPH_SELECT);
+        dispatch(setMode(GRAPH_SELECT));
       }
 
       // disable graph shortcuts in edit polygon mode
@@ -273,16 +275,16 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
 
       // graph
       else if (event.key === "n") {
-        setModeAddNode(setMode);
+        dispatch(setMode(ADD_NODE));
       } else if (event.key === "e") {
         if (nodeIdSelected) {
-          setModeAddEdge(setMode);
+          dispatch(setMode(ADD_EDGE));
         } else {
           toastNodeNotSelectedErr();
         }
       } else if (event.key === "d") {
         if (nodeIdSelected) {
-          setModeDeleteEdge(setMode);
+          dispatch(setMode(DELETE_EDGE));
         } else {
           toastNodeNotSelectedErr();
         }
@@ -297,16 +299,16 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
             nodeIdSelected,
             setNodes,
             floorCode,
-            setMode,
             setSaveStatus,
             setIdSelected,
-            router
+            router,
+            dispatch
           );
         } else {
           toastNodeNotSelectedErr();
         }
       } else if (event.key === "w") {
-        setModeAddDoorNode(setMode);
+        dispatch(setMode(ADD_DOOR_NODE));
       }
     };
 
@@ -317,10 +319,8 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
     };
   }, [
     floorCode,
-    mode,
     idSelected,
     nodes,
-    setMode,
     shortcutsDisabled,
     editPolygon,
     showFile,
@@ -332,6 +332,7 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
     setIdSelected,
     showPolygons,
     setSaveStatus,
+    dispatch,
   ]);
 
   // select node, door, or room based on searchParams

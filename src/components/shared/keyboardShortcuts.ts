@@ -1,62 +1,22 @@
-import { toast } from "react-toastify";
-
+import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { DefaultIdSelected } from "../contexts/IdEventsTypes";
-import {
-  ADD_DOOR_NODE,
-  ADD_EDGE,
-  ADD_NODE,
-  DELETE_EDGE,
-  GRAPH_SELECT,
-  POLYGON_ADD_VERTEX,
-  POLYGON_DELETE_VERTEX,
-} from "../contexts/ModeProvider";
 import { dist, savingHelper } from "../utils/utils";
 import { Edge } from "./types";
-
-export const setModePolygonDeleteVertex = (setMode) => {
-  setMode(POLYGON_DELETE_VERTEX);
-  toast.info("Click on vertex to delete it!");
-};
-
-export const setModePolygonAddVertex = (setMode) => {
-  setMode(POLYGON_ADD_VERTEX);
-  toast.info("Click to add a vertex!");
-};
-
-export const setModeAddNode = (setMode) => {
-  setMode(ADD_NODE);
-  toast.info("Click to add a node!");
-};
-
-export const setModeAddDoorNode = (setMode) => {
-  setMode(ADD_DOOR_NODE);
-  toast.info("Click on a purple door to add a door node!");
-};
-
-export const setModeAddEdge = (setMode) => {
-  setMode(ADD_EDGE);
-  toast.info("Click on another node to add an edge!");
-};
-
-export const setModeDeleteEdge = (setMode) => {
-  setMode(DELETE_EDGE);
-  toast.info("Click on another node to delete an edge!");
-};
 
 export const deleteNode = async (
   nodes,
   nodeId,
   setNodes,
   floorCode,
-  setMode,
   setSaveStatus,
   setIdSelected,
-  router
+  router,
+  dispatch
 ) => {
   router.push(floorCode);
 
   setIdSelected(DefaultIdSelected);
-  setMode(GRAPH_SELECT);
+  dispatch(setMode(GRAPH_SELECT));
 
   const newNodes = { ...nodes };
 

@@ -10,12 +10,8 @@ import { toast } from "react-toastify";
 import MyToastContainer from "../components/shared/MyToastContainer";
 import { buildingCodeToName } from "../components/shared/buildings";
 import { getBuildingCodes } from "../lib/apiRoutes";
-import { setMode } from "../lib/features/modeSlice";
-import { useAppDispatch } from "../lib/hooks";
 
 const App: React.FC = () => {
-  const dispatch = useAppDispatch();
-
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
 
   // fetch building codes
@@ -62,9 +58,6 @@ const App: React.FC = () => {
           size={40}
         />
       </Link>
-      <button onClick={() => dispatch(setMode("Graph Add Door Node"))}>
-        Test
-      </button>
       <div>
         <UserButton />
       </div>

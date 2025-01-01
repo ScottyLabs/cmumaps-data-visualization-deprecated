@@ -5,18 +5,16 @@ import { Circle, Line } from "react-konva";
 import { toast } from "react-toastify";
 
 import {
-  ModeContext,
+  POLYGON_ADD_VERTEX,
   POLYGON_DELETE_VERTEX,
   POLYGON_SELECT,
-} from "../contexts/ModeProvider";
+  setMode,
+} from "../../lib/features/modeSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { ShortcutsStatusContext } from "../contexts/ShortcutsStatusProvider";
-import {
-  setModePolygonAddVertex,
-  setModePolygonDeleteVertex,
-} from "../shared/keyboardShortcuts";
 import { ID } from "../shared/types";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { setCursor } from "../utils/utils";
@@ -29,9 +27,11 @@ interface Props {
 }
 
 const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
-  const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
+  const dispatch = useAppDispatch();
 
-  const { mode, setMode } = useContext(ModeContext);
+  const mode = useAppSelector((state) => state.mode.mode);
+
+  const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
   const { rooms, setRooms } = useContext(RoomsContext);
   const setSaveStatus = useContext(SaveStatusContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
@@ -97,9 +97,9 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
           undo();
         }
       } else if (event.key === "d") {
-        setModePolygonDeleteVertex(setMode);
+        dispatch(setMode(POLYGON_DELETE_VERTEX));
       } else if (event.key === "v") {
-        setModePolygonAddVertex(setMode);
+        dispatch(setMode(POLYGON_ADD_VERTEX));
       }
     };
 
@@ -109,11 +109,11 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [
+    dispatch,
     history,
     historyIndex,
     saveToRoomsHelper,
     setHistoryIndex,
-    setMode,
     shortcutsDisabled,
   ]);
 
@@ -152,7 +152,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
       }
 
       saveNewPolygonEdit(newPolygon);
-      setMode(POLYGON_SELECT);
+      dispatch(setMode(POLYGON_SELECT));
     }
   };
 

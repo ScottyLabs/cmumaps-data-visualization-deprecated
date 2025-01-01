@@ -17,22 +17,23 @@ import { Stage, Layer, Line, Circle, Path, Rect, Group } from "react-konva";
 import { toast } from "react-toastify";
 
 import { AsNode } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
+import {
+  ADD_DOOR_NODE,
+  ADD_EDGE,
+  ADD_NODE,
+  DELETE_EDGE,
+  GRAPH_SELECT,
+  POLYGON_ADD_VERTEX,
+  POLYGON_SELECT,
+  setMode,
+} from "../../lib/features/modeSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
 import { DOOR, NODE } from "../contexts/IdEventsTypes";
-import {
-  ADD_EDGE,
-  ADD_NODE,
-  DELETE_EDGE,
-  ModeContext,
-  GRAPH_SELECT,
-  POLYGON_ADD_VERTEX,
-  POLYGON_SELECT,
-  ADD_DOOR_NODE,
-} from "../contexts/ModeProvider";
 import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
@@ -116,6 +117,9 @@ const FloorDisplay = ({
   const router = useRouter();
   const { user } = useUser();
   const { session } = useSession();
+  const dispatch = useAppDispatch();
+
+  const mode = useAppSelector((state) => state.mode.mode);
 
   const { showOutline, showNodes, showEdges, showLabels, showPolygons } =
     useContext(VisibilitySettingsContext);
@@ -126,7 +130,6 @@ const FloorDisplay = ({
   const { showRoomSpecific, setShowRoomSpecific, editRoomLabel } = useContext(
     DisplaySettingsContext
   );
-  const { mode, setMode } = useContext(ModeContext);
   const setSaveStatus = useContext(SaveStatusContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
@@ -275,7 +278,7 @@ const FloorDisplay = ({
       if (!editPolygon) {
         if (mode == ADD_DOOR_NODE) {
           addDoorsToGraph(floorCode, [doors[doorId]], AsNode, setNodes);
-          setMode(GRAPH_SELECT);
+          dispatch(setMode(GRAPH_SELECT));
         } else {
           router.push(`${floorCode}?doorId=${doorId}`);
         }
@@ -431,7 +434,7 @@ const FloorDisplay = ({
           setSaveStatus
         );
 
-        setMode(GRAPH_SELECT);
+        dispatch(setMode(GRAPH_SELECT));
       } else if (mode == DELETE_EDGE) {
         const nodeIdSelected = getNodeIdSelected(idSelected);
 
@@ -466,7 +469,7 @@ const FloorDisplay = ({
           setSaveStatus
         );
 
-        setMode(GRAPH_SELECT);
+        dispatch(setMode(GRAPH_SELECT));
       } else if (mode == ADD_DOOR_NODE) {
         addDoorNodeErrToast();
       }
@@ -781,7 +784,7 @@ const FloorDisplay = ({
         roomId: findRoomId(rooms, pos),
       };
       addNewNode(newNode);
-      setMode(GRAPH_SELECT);
+      dispatch(setMode(GRAPH_SELECT));
     } else if (mode == POLYGON_ADD_VERTEX) {
       const pos = adjustPosition(e.target.getPointerPosition(), offset, scale);
       const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
@@ -830,7 +833,7 @@ const FloorDisplay = ({
         setSaveStatus
       );
 
-      setMode(POLYGON_SELECT);
+      dispatch(setMode(POLYGON_SELECT));
     }
     // click to unselect a room or exit polygon editing or room label editing
     else if (e.target === e.target.getStage()) {
@@ -838,7 +841,7 @@ const FloorDisplay = ({
       setShowRoomSpecific(false);
       setEditPolygon(false);
       setEditRoomLabel(false);
-      setMode(GRAPH_SELECT);
+      dispatch(setMode(GRAPH_SELECT));
     }
   };
 

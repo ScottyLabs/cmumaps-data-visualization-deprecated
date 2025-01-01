@@ -6,18 +6,15 @@ import {
   AsEdge,
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
+import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
+import { useAppDispatch } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
 import { DefaultIdSelected } from "../contexts/IdEventsTypes";
 import { LoadingContext } from "../contexts/LoadingProvider";
-import { ModeContext } from "../contexts/ModeProvider";
 import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
-import {
-  setModeAddDoorNode,
-  setModeAddNode,
-} from "../shared/keyboardShortcuts";
 import { addDoorsToGraph, dist, savingHelper } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
@@ -28,7 +25,8 @@ interface Props {
 
 const GraphTab = ({ floorCode }: Props) => {
   const router = useRouter();
-  const { setMode } = useContext(ModeContext);
+  const dispatch = useAppDispatch();
+
   const { doors, setDoors, setRoomlessDoors } = useContext(OutlineContext);
   const { nodes, setNodes } = useContext(GraphContext);
   const { setLoadingText } = useContext(LoadingContext);
@@ -122,11 +120,11 @@ const GraphTab = ({ floorCode }: Props) => {
       <div className="flex gap-2">
         <SidePanelButton
           text="Add Node"
-          onClick={() => setModeAddNode(setMode)}
+          onClick={() => dispatch(setMode(ADD_NODE))}
         />
         <SidePanelButton
           text="Add Door Node"
-          onClick={() => setModeAddDoorNode(setMode)}
+          onClick={() => dispatch(setMode(ADD_DOOR_NODE))}
         />
       </div>
 

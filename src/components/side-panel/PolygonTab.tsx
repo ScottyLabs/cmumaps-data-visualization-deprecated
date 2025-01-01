@@ -4,16 +4,17 @@ import { Polygon } from "geojson";
 import React, { useContext } from "react";
 
 import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
+import {
+  POLYGON_ADD_VERTEX,
+  POLYGON_DELETE_VERTEX,
+  setMode,
+} from "../../lib/features/modeSlice";
+import { useAppDispatch } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
-import { ModeContext } from "../contexts/ModeProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
-import {
-  setModePolygonAddVertex,
-  setModePolygonDeleteVertex,
-} from "../shared/keyboardShortcuts";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { getRoomId } from "../utils/utils";
@@ -26,8 +27,8 @@ interface Props {
 
 const PolygonTab = ({ floorCode }: Props) => {
   const { session } = useSession();
+  const dispatch = useAppDispatch();
 
-  const { setMode } = useContext(ModeContext);
   const { rooms, setRooms } = useContext(RoomsContext);
   const setSaveStatus = useContext(SaveStatusContext);
   const {
@@ -174,11 +175,11 @@ const PolygonTab = ({ floorCode }: Props) => {
       <div className="space-x-2">
         <SidePanelButton
           text="Add Vertex"
-          onClick={() => setModePolygonAddVertex(setMode)}
+          onClick={() => dispatch(setMode(POLYGON_ADD_VERTEX))}
         />
         <SidePanelButton
           text="Delete Vertex"
-          onClick={() => setModePolygonDeleteVertex(setMode)}
+          onClick={() => dispatch(setMode(POLYGON_DELETE_VERTEX))}
         />
       </div>
 

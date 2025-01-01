@@ -5,20 +5,21 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import { DEFAULT_DENSITY } from "../../../app/api/detectWalkway/detectWalkway";
 import { AWS_API_INVOKE_URL } from "../../../lib/apiRoutes";
+import {
+  GRAPH_SELECT,
+  POLYGON_ADD_VERTEX,
+  POLYGON_SELECT,
+  setMode,
+} from "../../../lib/features/modeSlice";
+import { useAppDispatch } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { DisplaySettingsContext } from "../../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { IdEventsContext } from "../../contexts/IdEventsProvider";
 import { LoadingContext } from "../../contexts/LoadingProvider";
-import {
-  GRAPH_SELECT,
-  ModeContext,
-  POLYGON_SELECT,
-} from "../../contexts/ModeProvider";
 import { PolygonContext } from "../../contexts/PolygonProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
-import { setModePolygonAddVertex } from "../../shared/keyboardShortcuts";
 import { WalkwayTypeList } from "../../shared/types";
 import { getRoomId } from "../../utils/utils";
 
@@ -28,8 +29,8 @@ interface Props {
 
 const RoomInfoTable = ({ floorCode }: Props) => {
   const router = useRouter();
-
   const { session } = useSession();
+  const dispatch = useAppDispatch();
 
   const { setLoadingText } = useContext(LoadingContext);
 
@@ -38,8 +39,6 @@ const RoomInfoTable = ({ floorCode }: Props) => {
   );
 
   const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
-
-  const { setMode } = useContext(ModeContext);
 
   const { editPolygon, setEditPolygon, setEditRoomLabel } = useContext(
     DisplaySettingsContext
@@ -59,21 +58,21 @@ const RoomInfoTable = ({ floorCode }: Props) => {
 
     if (editPolygon) {
       setEditPolygon(false);
-      setMode(GRAPH_SELECT);
+      dispatch(setMode(GRAPH_SELECT));
     } else {
       setEditPolygon(true);
-      setMode(POLYGON_SELECT);
+      dispatch(setMode(POLYGON_SELECT));
       setHistory([curPolygon]);
       setCoordsIndex(0);
     }
   }, [
+    dispatch,
     editPolygon,
     roomId,
     rooms,
     setCoordsIndex,
     setEditPolygon,
     setHistory,
-    setMode,
   ]);
 
   useEffect(() => {
@@ -86,7 +85,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
       if (event.key === "v") {
         if (!editPolygon) {
           handleEditPolygonModeClick();
-          setModePolygonAddVertex(setMode);
+          dispatch(setMode(POLYGON_ADD_VERTEX));
         }
       }
     };
@@ -96,7 +95,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [editPolygon, handleEditPolygonModeClick, setMode, shortcutsDisabled]);
+  }, [dispatch, editPolygon, handleEditPolygonModeClick, shortcutsDisabled]);
 
   const renderSetEditPolygonButton = () => {
     return (

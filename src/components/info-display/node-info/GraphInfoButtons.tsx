@@ -4,15 +4,16 @@ import { twMerge } from "tailwind-merge";
 import React, { useContext } from "react";
 import { toast } from "react-toastify";
 
+import {
+  ADD_EDGE,
+  DELETE_EDGE,
+  setMode,
+} from "../../../lib/features/modeSlice";
+import { useAppDispatch } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { IdEventsContext } from "../../contexts/IdEventsProvider";
-import { ModeContext } from "../../contexts/ModeProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
-import {
-  deleteNode,
-  setModeAddEdge,
-  setModeDeleteEdge,
-} from "../../shared/keyboardShortcuts";
+import { deleteNode } from "../../shared/keyboardShortcuts";
 import { RED_BUTTON_STYLE } from "../../utils/displayUtils";
 import { getNodeIdSelected } from "../../utils/utils";
 
@@ -22,10 +23,10 @@ interface Props {
 
 const GraphInfoButtons = ({ floorCode }: Props) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const setSaveStatus = useContext(SaveStatusContext);
 
-  const { setMode } = useContext(ModeContext);
   const { idSelected, setIdSelected } = useContext(IdEventsContext);
 
   const { nodes, setNodes } = useContext(GraphContext);
@@ -64,22 +65,22 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
         nodeId,
         setNodes,
         floorCode,
-        setMode,
         setSaveStatus,
         setIdSelected,
-        router
+        router,
+        dispatch
       );
 
     return renderButton("Delete Node", deleteNodeHelper, RED_BUTTON_STYLE);
   };
 
   const renderAddEdgeByClickingButton = () => {
-    const addEdge = () => setModeAddEdge(setMode);
+    const addEdge = () => dispatch(setMode(ADD_EDGE));
     return renderButton("Add Edge", addEdge);
   };
 
   const renderDeleteEdgeButton = () => {
-    const deleteEdge = () => setModeDeleteEdge;
+    const deleteEdge = () => dispatch(setMode(DELETE_EDGE));
     return renderButton("Delete Edge", deleteEdge);
   };
 

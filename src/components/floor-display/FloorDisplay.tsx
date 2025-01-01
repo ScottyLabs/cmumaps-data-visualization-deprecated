@@ -28,7 +28,6 @@ import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
-import { IdEventsContext } from "../contexts/IdEventsProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
@@ -101,7 +100,7 @@ const FloorDisplay = ({
 
   const [nodeIdOnDrag, setNodeIdOnDrag] = useState<ID>("");
 
-  const { idSelected } = useContext(IdEventsContext);
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const roomIdSelected = getRoomId(nodes, idSelected);
   const { editPolygon, setEditPolygon, setEditRoomLabel } = useContext(
     DisplaySettingsContext

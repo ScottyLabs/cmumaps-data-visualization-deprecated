@@ -1,5 +1,5 @@
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
-import { DefaultIdSelected } from "../contexts/IdEventsTypes";
+import { deselect } from "../../lib/features/mouseEventSlice";
 import { dist, savingHelper } from "../utils/utils";
 import { Edge } from "./types";
 
@@ -9,13 +9,12 @@ export const deleteNode = async (
   setNodes,
   floorCode,
   setSaveStatus,
-  setIdSelected,
   router,
   dispatch
 ) => {
   router.push(floorCode);
 
-  setIdSelected(DefaultIdSelected);
+  dispatch(deselect());
   dispatch(setMode(GRAPH_SELECT));
 
   const newNodes = { ...nodes };

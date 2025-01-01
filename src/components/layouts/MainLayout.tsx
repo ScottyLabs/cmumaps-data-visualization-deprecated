@@ -5,10 +5,6 @@ import { useState } from "react";
 
 import Loader from "../../components/common/Loader";
 import FloorLevelsProvider from "../../components/contexts/FloorLevelsProvider";
-import {
-  DefaultIdSelected,
-  IdSelectedInfo,
-} from "../../components/contexts/IdEventsTypes";
 import LoadingProvider from "../../components/contexts/LoadingProvider";
 import SaveStatusProvider from "../../components/contexts/SaveStatusProvider";
 import { SaveStatus, SAVED } from "../../components/contexts/SaveStatusType";
@@ -34,9 +30,6 @@ interface Props {
 
 const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   const dispatch = useAppDispatch();
-
-  const [idSelected, setIdSelected] =
-    useState<IdSelectedInfo>(DefaultIdSelected);
 
   const [loadingText, setLoadingText] = useState<string>("Loading");
   const [loadingFailed, setLoadingFailed] = useState<boolean>(false);
@@ -96,8 +89,6 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
                 <MainDisplay
                   floorCode={buildingCode + "-" + floorLevel}
                   saveStatus={saveStatus}
-                  idSelected={idSelected}
-                  setIdSelected={setIdSelected}
                 />
               </SaveStatusProvider>
             </LoadingProvider>

@@ -2,14 +2,7 @@ import { Polygon } from "geojson";
 import { useRouter, useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
@@ -21,17 +14,15 @@ import {
   GRAPH_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
-import { useAppDispatch } from "../../lib/hooks";
+import {
+  deselect,
+  selectDoor,
+  selectNode,
+} from "../../lib/features/mouseEventSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import DisplaySettingsProvider from "../contexts/DisplaySettingsProvider";
 import GraphProvider from "../contexts/GraphProvider";
-import IdEventsProvider from "../contexts/IdEventsProvider";
-import {
-  DefaultIdSelected,
-  DOOR,
-  IdSelectedInfo,
-  NODE,
-} from "../contexts/IdEventsTypes";
 // context providers
 import { LoadingContext } from "../contexts/LoadingProvider";
 import OutlineProvider from "../contexts/OutlineProvider";
@@ -58,29 +49,19 @@ import ZoomPanWrapper from "../zoom-pan/ZoomPanWrapper";
 interface Props {
   floorCode: string;
   saveStatus: SaveStatus;
-  idSelected: IdSelectedInfo;
-  setIdSelected: Dispatch<SetStateAction<IdSelectedInfo>>;
 }
 
-const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
+const MainDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
 
   const { loadingText, setLoadingText, setLoadingFailed } =
     useContext(LoadingContext);
   const setSaveStatus = useContext(SaveStatusContext);
 
   const [shortcutsDisabled, setShortcutsDisabled] = useState<boolean>(false);
-
-  // id events data
-  const [nodeIdHovered, setNodeIdHovered] = useState<ID>("");
-
-  const idEventsData = {
-    idSelected,
-    setIdSelected,
-    nodeIdHovered,
-    setNodeIdHovered,
-  };
 
   // visibility settings
   const [showFile, setShowFile] = useState(false);
@@ -301,7 +282,6 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
             setNodes,
             floorCode,
             setSaveStatus,
-            setIdSelected,
             router,
             dispatch
           );
@@ -330,7 +310,6 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
     showEdges,
     showLabels,
     router,
-    setIdSelected,
     showPolygons,
     setSaveStatus,
     dispatch,
@@ -387,13 +366,13 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
     const doorId = searchParams.get("doorId");
 
     if (nodeId) {
-      setIdSelected({ id: nodeId, type: NODE });
+      dispatch(selectNode(nodeId));
     } else if (doorId) {
-      setIdSelected({ id: doorId, type: DOOR });
+      dispatch(selectDoor(doorId));
     } else {
-      setIdSelected(DefaultIdSelected);
+      dispatch(deselect());
     }
-  }, [floorCode, nodes, rooms, searchParams, setIdSelected, setSaveStatus]);
+  }, [floorCode, nodes, rooms, searchParams, setSaveStatus]);
 
   return (
     !loadingText && (
@@ -401,29 +380,27 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
         <ShortcutsStatusProvider
           shortcutsStatusData={{ shortcutsDisabled, setShortcutsDisabled }}
         >
-          <IdEventsProvider idEventsData={idEventsData}>
-            <PolygonProvider polygonData={polygonData}>
-              <RoomsProvider roomsData={{ rooms, setRooms }}>
-                <OutlineProvider outlineData={outlineData}>
-                  <GraphProvider graphData={{ nodes, setNodes }}>
-                    <VisibilitySettingsProvider
-                      visibilitySettingsData={visibilitySettings}
-                    >
-                      <div className="fixed top-1/2 z-50 -translate-y-1/2">
-                        <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+          <PolygonProvider polygonData={polygonData}>
+            <RoomsProvider roomsData={{ rooms, setRooms }}>
+              <OutlineProvider outlineData={outlineData}>
+                <GraphProvider graphData={{ nodes, setNodes }}>
+                  <VisibilitySettingsProvider
+                    visibilitySettingsData={visibilitySettings}
+                  >
+                    <div className="fixed top-1/2 z-50 -translate-y-1/2">
+                      <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+                    </div>
+                    <ZoomPanWrapper floorCode={floorCode} />
+                    {getNodeIdSelected(idSelected) && (
+                      <div className="absolute right-4 top-28 z-50">
+                        <InfoDisplay floorCode={floorCode} />
                       </div>
-                      <ZoomPanWrapper floorCode={floorCode} />
-                      {getNodeIdSelected(idSelected) && (
-                        <div className="absolute right-4 top-28 z-50">
-                          <InfoDisplay floorCode={floorCode} />
-                        </div>
-                      )}
-                    </VisibilitySettingsProvider>
-                  </GraphProvider>
-                </OutlineProvider>
-              </RoomsProvider>
-            </PolygonProvider>
-          </IdEventsProvider>
+                    )}
+                  </VisibilitySettingsProvider>
+                </GraphProvider>
+              </OutlineProvider>
+            </RoomsProvider>
+          </PolygonProvider>
         </ShortcutsStatusProvider>
       </DisplaySettingsProvider>
     )

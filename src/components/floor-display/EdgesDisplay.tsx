@@ -4,7 +4,6 @@ import { Line } from "react-konva";
 import { useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
-import { IdEventsContext } from "../contexts/IdEventsProvider";
 import { ID } from "../shared/types";
 import { getNodeIdSelected, getRoomId } from "../utils/utils";
 
@@ -15,10 +14,10 @@ interface Props {
 const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
   const mst = useAppSelector((state) => state.mst.mst);
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
 
   const { nodes } = useContext(GraphContext);
   const { showRoomSpecific } = useContext(DisplaySettingsContext);
-  const { idSelected } = useContext(IdEventsContext);
   const roomIdSelected = getRoomId(nodes, idSelected);
 
   const includedNodes = new Set();

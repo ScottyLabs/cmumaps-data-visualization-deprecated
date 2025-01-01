@@ -4,10 +4,10 @@ import React, { useContext } from "react";
 import { TfiLocationPin } from "react-icons/tfi";
 import { Group, Path, Rect } from "react-konva";
 
+import { DOOR } from "../../lib/features/mouseEventSlice";
+import { useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
-import { IdEventsContext } from "../contexts/IdEventsProvider";
-import { DOOR } from "../contexts/IdEventsTypes";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
@@ -28,9 +28,10 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const { rooms, setRooms } = useContext(RoomsContext);
   const { editRoomLabel } = useContext(DisplaySettingsContext);
   const { nodes } = useContext(GraphContext);
-  const { idSelected } = useContext(IdEventsContext);
-  const roomIdSelected = getRoomId(nodes, idSelected);
   const setSaveStatus = useContext(SaveStatusContext);
+
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
+  const roomIdSelected = getRoomId(nodes, idSelected);
 
   const path = TfiLocationPin({}).props.children[1].props.d;
   const viewBox = TfiLocationPin({}).props.attr.viewBox.split(" ");

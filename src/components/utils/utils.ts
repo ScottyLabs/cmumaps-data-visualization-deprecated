@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
-import { IdSelectedInfo } from "../contexts/IdEventsTypes";
+import { IdSelectedInfo } from "../../lib/features/mouseEventSlice";
 import { FAILED, SAVED, SaveStatus, SAVING } from "../contexts/SaveStatusType";
 import { Graph, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
 

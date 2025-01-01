@@ -9,9 +9,8 @@ import {
   POLYGON_DELETE_VERTEX,
   setMode,
 } from "../../lib/features/modeSlice";
-import { useAppDispatch } from "../../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
-import { IdEventsContext } from "../contexts/IdEventsProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
@@ -41,7 +40,7 @@ const PolygonTab = ({ floorCode }: Props) => {
   } = useContext(PolygonContext);
 
   const { nodes } = useContext(GraphContext);
-  const { idSelected } = useContext(IdEventsContext);
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const roomIdSelected = getRoomId(nodes, idSelected);
 
   const roomId = getRoomId(nodes, idSelected);

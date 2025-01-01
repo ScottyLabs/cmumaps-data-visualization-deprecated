@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import React, { useContext } from "react";
 
+import { useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { IdEventsContext } from "../../contexts/IdEventsProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Node, RoomInfo, RoomTypeList } from "../../shared/types";
@@ -29,7 +29,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
 
-  const { idSelected } = useContext(IdEventsContext);
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeId = getNodeIdSelected(idSelected);
 
   const roomId = getRoomId(nodes, idSelected);

@@ -3,8 +3,12 @@ import { useRouter } from "next/navigation";
 
 import React, { useContext, useMemo } from "react";
 
+import {
+  setNodeIdHovered,
+  unHoverNode,
+} from "../../../lib/features/mouseEventSlice";
+import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { IdEventsContext } from "../../contexts/IdEventsProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Node, Edge, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
@@ -19,10 +23,11 @@ interface Props {
 
 const GraphInfoDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const setSaveStatus = useContext(SaveStatusContext);
 
-  const { idSelected, setNodeIdHovered } = useContext(IdEventsContext);
+  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
 
   const { nodes, setNodes } = useContext(GraphContext);
 
@@ -51,7 +56,7 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
     sameFloorNeighbors: Record<string, Edge>
   ) => {
     const deleteEdge = (nodeId, neighborID) => {
-      setNodeIdHovered("");
+      dispatch(unHoverNode());
 
       const newNodes = { ...nodes };
       const newNode = JSON.parse(JSON.stringify(newNodes[nodeId]));
@@ -81,8 +86,8 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
             onClick={() => {
               router.push(`${floorCode}?nodeId=${neighborID}`);
             }}
-            onMouseEnter={() => setNodeIdHovered(neighborID)}
-            onMouseLeave={() => setNodeIdHovered("")}
+            onMouseEnter={() => dispatch(setNodeIdHovered(neighborID))}
+            onMouseLeave={() => dispatch(unHoverNode())}
           >
             select
           </button>
@@ -92,8 +97,8 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
           <button
             className="whitespace-nowrap border px-1 text-sm hover:bg-sky-700"
             onClick={() => deleteEdge(nodeId, neighborID)}
-            onMouseEnter={() => setNodeIdHovered(neighborID)}
-            onMouseLeave={() => setNodeIdHovered("")}
+            onMouseEnter={() => dispatch(setNodeIdHovered(neighborID))}
+            onMouseLeave={() => dispatch(unHoverNode())}
           >
             delete
           </button>

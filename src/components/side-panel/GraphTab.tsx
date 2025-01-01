@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
+import { toast } from "react-toastify";
 
 import {
   AsEdge,
@@ -15,6 +16,7 @@ import { LoadingContext } from "../contexts/LoadingProvider";
 import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
+import QuestionCircle from "../shared/QuestionCircle";
 import { addDoorsToGraph, dist, savingHelper } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
@@ -115,49 +117,63 @@ const GraphTab = ({ floorCode }: Props) => {
     (door) => door.roomIds.length == 2
   );
 
+  const renderAddNodeButtonsRow = () => (
+    <div className="flex gap-2">
+      <SidePanelButton
+        text="Add Node"
+        onClick={() => dispatch(setMode(ADD_NODE))}
+      />
+      <SidePanelButton
+        text="Add Door Node"
+        onClick={() => dispatch(setMode(ADD_DOOR_NODE))}
+      />
+    </div>
+  );
+
+  const renderDoorAsGraphRow = () => (
+    <div className="flex">
+      <p className="py-1">Doors are</p>
+      <SidePanelButton
+        text="Nodes"
+        onClick={() => addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes)}
+        style="ml-2 px-2 py-1 border"
+      />
+      <SidePanelButton
+        text="Edges"
+        onClick={() => addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes)}
+        style="ml-2 px-2 py-1 border"
+      />
+    </div>
+  );
+
+  const renderMSTRow = () => (
+    <div className="flex items-center gap-5">
+      <SidePanelButton
+        text="Calculate MST"
+        onClick={() => toast.error("Not Implemented!")}
+      />
+      <QuestionCircle
+        url="https://en.wikipedia.org/wiki/Minimum_spanning_tree"
+        style="text-blue-900"
+      />
+    </div>
+  );
+
   return (
     <div className="ml-2 mr-2 space-y-4">
-      <div className="flex gap-2">
-        <SidePanelButton
-          text="Add Node"
-          onClick={() => dispatch(setMode(ADD_NODE))}
-        />
-        <SidePanelButton
-          text="Add Door Node"
-          onClick={() => dispatch(setMode(ADD_DOOR_NODE))}
-        />
-      </div>
-
-      <div className="flex">
-        <p className="py-1">Doors are</p>
-        <SidePanelButton
-          text="Nodes"
-          onClick={() =>
-            addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes)
-          }
-          style="ml-2 px-2 py-1 border"
-        />
-        <SidePanelButton
-          text="Edges"
-          onClick={() =>
-            addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes)
-          }
-          style="ml-2 px-2 py-1 border"
-        />
-      </div>
-
+      {renderAddNodeButtonsRow()}
+      {renderDoorAsGraphRow()}
+      {renderMSTRow()}
       <SidePanelButton
         text="Relink Rooms and Doors"
         onClick={relinkDoorsAndRooms}
         style="block"
       />
-
       <SidePanelButton
         text="Remove Overlapping Nodes"
         onClick={removeOverlappingsNodes}
         style="block"
       />
-
       <NodeSizeSlider text="Node" />
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { FaRegQuestionCircle } from "react-icons/fa";
 import { AiOutlineMacCommand } from "react-icons/ai";
 import { MdOutlinePalette } from "react-icons/md";
+
+import QuestionCircle from "../shared/QuestionCircle";
 
 const HelpInfo = () => {
   const IconHelper = (IconComponent, renderText) => {
@@ -122,12 +123,10 @@ const HelpInfo = () => {
 
   return (
     <div className="fixed bottom-2 right-4 z-50 flex space-x-3">
-      <a
-        href="https://docs.google.com/document/d/1-cCIbMQp5eLcjvXO46XwQY86PnqABLn0Ts0VEIpT6AM"
-        target="_blank"
-      >
-        <FaRegQuestionCircle className="cursor-pointer rounded-full bg-gray-100 text-2xl hover:text-blue-600" />
-      </a>
+      <QuestionCircle
+        url="https://docs.google.com/document/d/1-cCIbMQp5eLcjvXO46XwQY86PnqABLn0Ts0VEIpT6AM"
+        style="bg-gray-100"
+      />
       {IconHelper(AiOutlineMacCommand, renderKeyboardShortcutText)}
       {IconHelper(MdOutlinePalette, renderColorInfoText)}
     </div>

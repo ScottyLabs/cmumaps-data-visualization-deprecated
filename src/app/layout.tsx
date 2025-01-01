@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 
 import "../index.css";
+import StoreProvider from "./StoreProvider";
 
 export const metadata: Metadata = {
   icons: {
@@ -17,14 +18,16 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}>
-      <html lang="en">
-        <head>
-          <script>const global = globalThis;</script>
-        </head>
-        <body className="bg-gray-100">
-          <div id="root">{children}</div>
-        </body>
-      </html>
+      <StoreProvider>
+        <html lang="en">
+          <head>
+            <script>const global = globalThis;</script>
+          </head>
+          <body className="bg-gray-100">
+            <div id="root">{children}</div>
+          </body>
+        </html>
+      </StoreProvider>
     </ClerkProvider>
   );
 }

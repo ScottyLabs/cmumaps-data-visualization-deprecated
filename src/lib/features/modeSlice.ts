@@ -1,4 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { toast } from "react-toastify";
 
 export type Mode =
   | "Graph Select"
@@ -32,8 +34,10 @@ const modeSlice = createSlice({
   name: "mode",
   initialState,
   reducers: {
-    setMode(state, action) {
+    // responsible for toasting
+    setMode(state, action: PayloadAction<Mode>) {
       state.mode = action.payload;
+      toast.info("Hello World!");
     },
   },
 });

@@ -49,4 +49,4 @@ tsconfig.tsbuildinfo
 
 .env
 
-pdf
+*.pdf

@@ -74,7 +74,7 @@ const VisibilityTab = ({ floorCode, parsePDF }: Props) => {
       {SHOW_REGENERATE_BUTTON && !editPolygon && (
         <SidePanelButton
           text="Regenerate"
-          onClick={handleRegenerate}
+          handleClick={handleRegenerate}
           style={RED_BUTTON_STYLE + " text-base"}
         />
       )}

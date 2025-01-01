@@ -94,7 +94,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       return (
         <SidePanelButton
           text="Add Hole"
-          onClick={() => addHole()}
+          handleClick={() => addHole()}
           style="px-2 py-1"
         />
       );
@@ -102,7 +102,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       return (
         <SidePanelButton
           text="Delete Hole"
-          onClick={() => deleteHole()}
+          handleClick={() => deleteHole()}
           style="px-2 py-1"
         />
       );
@@ -174,17 +174,17 @@ const PolygonTab = ({ floorCode }: Props) => {
       <div className="space-x-2">
         <SidePanelButton
           text="Add Vertex"
-          onClick={() => dispatch(setMode(POLYGON_ADD_VERTEX))}
+          handleClick={() => dispatch(setMode(POLYGON_ADD_VERTEX))}
         />
         <SidePanelButton
           text="Delete Vertex"
-          onClick={() => dispatch(setMode(POLYGON_DELETE_VERTEX))}
+          handleClick={() => dispatch(setMode(POLYGON_DELETE_VERTEX))}
         />
       </div>
 
       <SidePanelButton
         text="Simplify Polygon"
-        onClick={() => simplifyPolygon()}
+        handleClick={() => simplifyPolygon()}
         style="block"
       />
 
@@ -192,7 +192,7 @@ const PolygonTab = ({ floorCode }: Props) => {
 
       <SidePanelButton
         text="Delete Polygon"
-        onClick={() => deletePolygon()}
+        handleClick={() => deletePolygon()}
         style={RED_BUTTON_STYLE + " block"}
       />
     </div>

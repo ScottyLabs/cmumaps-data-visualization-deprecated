@@ -4,18 +4,18 @@ import React from "react";
 
 interface Props {
   text: string;
-  onClick: () => void;
+  handleClick: () => void;
   style?: string;
 }
 
-const SidePanelButton = ({ text, onClick, style }: Props) => {
+const SidePanelButton = ({ text, handleClick, style }: Props) => {
   return (
     <button
       className={twMerge(
         "text-nowrap rounded bg-blue-500 px-4 py-2 text-sm font-bold text-emerald-200 hover:bg-blue-700",
         style
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {text}
     </button>

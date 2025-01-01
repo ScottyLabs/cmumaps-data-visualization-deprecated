@@ -122,11 +122,11 @@ const GraphTab = ({ floorCode }: Props) => {
     <div className="flex gap-2">
       <SidePanelButton
         text="Add Node"
-        onClick={() => dispatch(setMode(ADD_NODE))}
+        handleClick={() => dispatch(setMode(ADD_NODE))}
       />
       <SidePanelButton
         text="Add Door Node"
-        onClick={() => dispatch(setMode(ADD_DOOR_NODE))}
+        handleClick={() => dispatch(setMode(ADD_DOOR_NODE))}
       />
     </div>
   );
@@ -136,12 +136,16 @@ const GraphTab = ({ floorCode }: Props) => {
       <p className="py-1">Doors are</p>
       <SidePanelButton
         text="Nodes"
-        onClick={() => addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes)}
+        handleClick={() =>
+          addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes)
+        }
         style="ml-2 px-2 py-1 border"
       />
       <SidePanelButton
         text="Edges"
-        onClick={() => addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes)}
+        handleClick={() =>
+          addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes)
+        }
         style="ml-2 px-2 py-1 border"
       />
     </div>
@@ -152,7 +156,7 @@ const GraphTab = ({ floorCode }: Props) => {
       <div className="flex items-center gap-2">
         <SidePanelButton
           text="Calculate MST"
-          onClick={() => calcMst(nodes, dispatch)}
+          handleClick={() => calcMst(nodes, dispatch)}
         />
         <BiHide
           size={25}
@@ -174,12 +178,12 @@ const GraphTab = ({ floorCode }: Props) => {
       {renderMstRow()}
       <SidePanelButton
         text="Relink Rooms and Doors"
-        onClick={relinkDoorsAndRooms}
+        handleClick={relinkDoorsAndRooms}
         style="block"
       />
       <SidePanelButton
         text="Remove Overlapping Nodes"
-        onClick={removeOverlappingsNodes}
+        handleClick={removeOverlappingsNodes}
         style="block"
       />
       <NodeSizeSlider text="Node" />

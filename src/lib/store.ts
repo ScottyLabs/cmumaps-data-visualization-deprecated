@@ -1,12 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import modeSlice from "./features/modeSlice";
+import mouseEventSlice from "./features/mouseEventSlice";
 import mstSlice from "./features/mstSlice";
 import nodeSizeSlice from "./features/nodeSizeSlice";
 
 export const makeStore = () => {
   return configureStore({
-    reducer: { mode: modeSlice, nodeSize: nodeSizeSlice, mst: mstSlice },
+    reducer: {
+      mode: modeSlice,
+      nodeSize: nodeSizeSlice,
+      mst: mstSlice,
+      mouseEvent: mouseEventSlice,
+    },
   });
 };
 

@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { Line } from "react-konva";
 
+import { useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { ID } from "../shared/types";
 import { getNodeIdSelected, getRoomId } from "../utils/utils";
 
@@ -13,14 +13,15 @@ interface Props {
 }
 
 const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
-  const includedNodes = new Set();
-  const edges: [number[], string][] = [];
+  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
 
   const { nodes } = useContext(GraphContext);
   const { showRoomSpecific } = useContext(DisplaySettingsContext);
   const { idSelected } = useContext(IdEventsContext);
-  const { nodeSize } = useContext(NodeSizeContext);
   const roomIdSelected = getRoomId(nodes, idSelected);
+
+  const includedNodes = new Set();
+  const edges: [number[], string][] = [];
 
   const getStrokeColor = (curID: ID, neighborID: ID) => {
     const nodeIdSelected = getNodeIdSelected(idSelected);

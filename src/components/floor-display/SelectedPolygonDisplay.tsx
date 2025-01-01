@@ -3,8 +3,8 @@ import { Polygon } from "geojson";
 import React, { useContext } from "react";
 import { Line } from "react-konva";
 
+import { useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { ID } from "../shared/types";
 import PolygonEditor from "./PolygonEditor";
 
@@ -19,8 +19,8 @@ const SelectedPolygonDisplay = ({
   roomIdSelected,
   polygon,
 }: Props) => {
+  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
   const { editPolygon } = useContext(DisplaySettingsContext);
-  const { nodeSize } = useContext(NodeSizeContext);
 
   if (!polygon) {
     return;

@@ -15,7 +15,6 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { EdgeTypeList, Node, ID } from "../shared/types";
@@ -44,11 +43,12 @@ const NodesDisplay = ({
   const dispatch = useAppDispatch();
 
   const mode = useAppSelector((state) => state.mode.mode);
+  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+
   const setSaveStatus = useContext(SaveStatusContext);
 
   const { rooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
-  const { nodeSize } = useContext(NodeSizeContext);
   const { showRoomSpecific } = useContext(DisplaySettingsContext);
   const { idSelected, nodeIdHovered } = useContext(IdEventsContext);
   const roomIdSelected = getRoomId(nodes, idSelected);

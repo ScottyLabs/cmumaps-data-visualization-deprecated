@@ -1,12 +1,15 @@
-import React, { useContext } from "react";
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
+import React from "react";
+
+import { setNodeSize } from "../../lib/features/nodeSizeSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 
 interface Props {
   text: string;
 }
 
 const NodeSizeSlider = ({ text }: Props) => {
-  const { nodeSize, setNodeSize } = useContext(NodeSizeContext);
+  const dispatch = useAppDispatch();
+  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
 
   return (
     <div className="w-48">
@@ -16,7 +19,7 @@ const NodeSizeSlider = ({ text }: Props) => {
         max="10"
         step=".1"
         value={nodeSize}
-        onChange={(e) => setNodeSize(parseFloat(e.target.value))}
+        onChange={(e) => dispatch(setNodeSize(parseFloat(e.target.value)))}
         className="h-2 w-full cursor-pointer rounded-lg bg-blue-400"
       />
       <div className="text-center text-sm">

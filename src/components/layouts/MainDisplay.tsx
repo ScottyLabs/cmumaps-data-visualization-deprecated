@@ -34,7 +34,6 @@ import {
 } from "../contexts/IdEventsTypes";
 // context providers
 import { LoadingContext } from "../contexts/LoadingProvider";
-import NodeSizeProvider from "../contexts/NodeSizeProvider";
 import OutlineProvider from "../contexts/OutlineProvider";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
@@ -72,7 +71,6 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
   const setSaveStatus = useContext(SaveStatusContext);
 
   const [shortcutsDisabled, setShortcutsDisabled] = useState<boolean>(false);
-  const [nodeSize, setNodeSize] = useState<number>(2);
 
   // id events data
   const [nodeIdHovered, setNodeIdHovered] = useState<ID>("");
@@ -404,32 +402,27 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
           shortcutsStatusData={{ shortcutsDisabled, setShortcutsDisabled }}
         >
           <IdEventsProvider idEventsData={idEventsData}>
-            <NodeSizeProvider nodeSizeData={{ nodeSize, setNodeSize }}>
-              <PolygonProvider polygonData={polygonData}>
-                <RoomsProvider roomsData={{ rooms, setRooms }}>
-                  <OutlineProvider outlineData={outlineData}>
-                    <GraphProvider graphData={{ nodes, setNodes }}>
-                      <VisibilitySettingsProvider
-                        visibilitySettingsData={visibilitySettings}
-                      >
-                        <div className="fixed top-1/2 z-50 -translate-y-1/2">
-                          <SidePanel
-                            floorCode={floorCode}
-                            parsePDF={parsePDF}
-                          />
+            <PolygonProvider polygonData={polygonData}>
+              <RoomsProvider roomsData={{ rooms, setRooms }}>
+                <OutlineProvider outlineData={outlineData}>
+                  <GraphProvider graphData={{ nodes, setNodes }}>
+                    <VisibilitySettingsProvider
+                      visibilitySettingsData={visibilitySettings}
+                    >
+                      <div className="fixed top-1/2 z-50 -translate-y-1/2">
+                        <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+                      </div>
+                      <ZoomPanWrapper floorCode={floorCode} />
+                      {getNodeIdSelected(idSelected) && (
+                        <div className="absolute right-4 top-28 z-50">
+                          <InfoDisplay floorCode={floorCode} />
                         </div>
-                        <ZoomPanWrapper floorCode={floorCode} />
-                        {getNodeIdSelected(idSelected) && (
-                          <div className="absolute right-4 top-28 z-50">
-                            <InfoDisplay floorCode={floorCode} />
-                          </div>
-                        )}
-                      </VisibilitySettingsProvider>
-                    </GraphProvider>
-                  </OutlineProvider>
-                </RoomsProvider>
-              </PolygonProvider>
-            </NodeSizeProvider>
+                      )}
+                    </VisibilitySettingsProvider>
+                  </GraphProvider>
+                </OutlineProvider>
+              </RoomsProvider>
+            </PolygonProvider>
           </IdEventsProvider>
         </ShortcutsStatusProvider>
       </DisplaySettingsProvider>

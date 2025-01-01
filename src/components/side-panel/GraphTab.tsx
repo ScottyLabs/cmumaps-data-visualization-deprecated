@@ -7,12 +7,11 @@ import {
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
-import { useAppDispatch } from "../../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
 import { DefaultIdSelected } from "../contexts/IdEventsTypes";
 import { LoadingContext } from "../contexts/LoadingProvider";
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import QuestionCircle from "../shared/QuestionCircle";
@@ -29,10 +28,11 @@ const GraphTab = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+
   const { doors, setDoors, setRoomlessDoors } = useContext(OutlineContext);
   const { nodes, setNodes } = useContext(GraphContext);
   const { setLoadingText } = useContext(LoadingContext);
-  const { nodeSize } = useContext(NodeSizeContext);
   const setSaveStatus = useContext(SaveStatusContext);
   const { setIdSelected } = useContext(IdEventsContext);
 

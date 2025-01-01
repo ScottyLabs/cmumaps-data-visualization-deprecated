@@ -1,10 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import modeSlice from "./features/modeSlice";
+import nodeSizeSlice from "./features/nodeSizeSlice";
 
 export const makeStore = () => {
   return configureStore({
-    reducer: { mode: modeSlice },
+    reducer: { mode: modeSlice, nodeSize: nodeSizeSlice },
   });
 };
 

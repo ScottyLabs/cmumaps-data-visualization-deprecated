@@ -22,11 +22,11 @@ export const POLYGON_SELECT: Mode = "Polygon Select";
 export const POLYGON_ADD_VERTEX: Mode = "Polygon Add Vertex";
 export const POLYGON_DELETE_VERTEX: Mode = "Polygon Delete Vertex";
 
-interface DataState {
+interface ModeState {
   mode: Mode;
 }
 
-const initialState: DataState = {
+const initialState: ModeState = {
   mode: GRAPH_SELECT,
 };
 

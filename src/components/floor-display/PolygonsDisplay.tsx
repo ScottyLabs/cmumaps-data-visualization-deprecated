@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import { Path } from "react-konva";
 
-import { NodeSizeContext } from "../contexts/NodeSizeProvider";
+import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 
@@ -15,10 +15,10 @@ interface Props {
 
 const PolygonsDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
+  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
 
   const { rooms } = useContext(RoomsContext);
   const { showPolygons } = useContext(VisibilitySettingsContext);
-  const { nodeSize } = useContext(NodeSizeContext);
 
   // get all random colors
   const [fillColors, setFillColors] = useState<string[]>([]);

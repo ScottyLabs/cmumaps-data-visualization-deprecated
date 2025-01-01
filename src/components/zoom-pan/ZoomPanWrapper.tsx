@@ -74,7 +74,7 @@ const ZoomPanWrapper = ({ floorCode }: Props) => {
       <div className="ml-52 mt-24 h-screen overflow-hidden">
         <PDFViewer floorCode={floorCode} scale={scale} offset={offset} />
       </div>
-      <div className="absolute inset-0 z-10 ml-52 mt-24">
+      <div className="absolute inset-0 z-10 ml-52 mt-24 overflow-hidden">
         <FloorDisplay
           floorCode={floorCode}
           setCanPan={setCanPan}

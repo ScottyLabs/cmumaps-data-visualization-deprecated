@@ -78,33 +78,34 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
       );
     };
 
-    return Object.entries(sameFloorNeighbors).map(([neighborID, neighbor]) => (
-      <tr key={neighborID}>
-        <td className="border p-2">
-          <button
-            className="whitespace-nowrap border px-1 text-sm hover:bg-sky-700"
-            onClick={() => {
-              router.push(`${floorCode}?nodeId=${neighborID}`);
-            }}
-            onMouseEnter={() => dispatch(setNodeIdHovered(neighborID))}
-            onMouseLeave={() => dispatch(unHoverNode())}
-          >
-            select
-          </button>
-        </td>
-        <td className="border p-2"> {neighbor.dist.toPrecision(3)}</td>
-        <td className="border p-2">
-          <button
-            className="whitespace-nowrap border px-1 text-sm hover:bg-sky-700"
-            onClick={() => deleteEdge(nodeId, neighborID)}
-            onMouseEnter={() => dispatch(setNodeIdHovered(neighborID))}
-            onMouseLeave={() => dispatch(unHoverNode())}
-          >
-            delete
-          </button>
-        </td>
-      </tr>
-    ));
+    const renderCell = (text: string, neighborID, handleClick) => (
+      <td className="border p-2">
+        <button
+          className="whitespace-nowrap border px-1 text-sm hover:bg-sky-700"
+          onClick={handleClick}
+          onMouseEnter={() => dispatch(setNodeIdHovered(neighborID))}
+          onMouseLeave={() => dispatch(unHoverNode())}
+        >
+          {text}
+        </button>
+      </td>
+    );
+
+    return Object.entries(sameFloorNeighbors).map(([neighborID, neighbor]) => {
+      const selectHandleClick = () => {
+        router.push(`${floorCode}?nodeId=${neighborID}`);
+      };
+
+      const deleteHandleClick = () => deleteEdge(nodeId, neighborID);
+
+      return (
+        <tr key={neighborID}>
+          {renderCell("select", neighborID, selectHandleClick)}
+          <td className="border p-2"> {neighbor.dist.toPrecision(3)}</td>
+          {renderCell("delete", neighborID, deleteHandleClick)}
+        </tr>
+      );
+    });
   };
 
   const renderDifferentFloorNeighbors = (

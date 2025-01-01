@@ -14,7 +14,7 @@ const mstSlice = createSlice({
   name: "mst",
   initialState,
   reducers: {
-    setMst(state, action: PayloadAction<Mst>) {
+    setMst(state, action: PayloadAction<Mst | null>) {
       state.mst = action.payload;
     },
   },

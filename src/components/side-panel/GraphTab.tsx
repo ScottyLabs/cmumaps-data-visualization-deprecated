@@ -1,12 +1,14 @@
 import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
+import { BiHide } from "react-icons/bi";
 
 import {
   AsEdge,
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
+import { setMst } from "../../lib/features/mstSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { IdEventsContext } from "../contexts/IdEventsProvider";
@@ -148,10 +150,17 @@ const GraphTab = ({ floorCode }: Props) => {
 
   const renderMstRow = () => (
     <div className="flex items-center gap-5">
-      <SidePanelButton
-        text="Calculate MST"
-        onClick={() => calcMst(nodes, dispatch)}
-      />
+      <div className="flex items-center gap-2">
+        <SidePanelButton
+          text="Calculate MST"
+          onClick={() => calcMst(nodes, dispatch)}
+        />
+        <BiHide
+          size={25}
+          className="cursor-pointer text-gray-600 hover:text-gray-800"
+          onClick={() => dispatch(setMst(null))}
+        />
+      </div>
       <QuestionCircle
         url="https://en.wikipedia.org/wiki/Minimum_spanning_tree"
         style="text-blue-900"

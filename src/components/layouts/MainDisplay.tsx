@@ -288,7 +288,7 @@ const MainDisplay = ({ floorCode, idSelected, setIdSelected }: Props) => {
           toastNodeNotSelectedErr();
         }
       } else if (event.key === "m") {
-        calcMst(nodes);
+        calcMst(nodes, dispatch);
       } else if (
         event.key === "Backspace" ||
         event.key === "Delete" ||

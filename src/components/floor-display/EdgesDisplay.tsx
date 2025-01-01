@@ -15,7 +15,6 @@ interface Props {
 const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
   const mst = useAppSelector((state) => state.mst.mst);
-  console.log(mst);
 
   const { nodes } = useContext(GraphContext);
   const { showRoomSpecific } = useContext(DisplaySettingsContext);
@@ -25,41 +24,64 @@ const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
   const includedNodes = new Set();
   const edges: [number[], string][] = [];
 
-  const getStrokeColor = (curID: ID, neighborID: ID) => {
+  const shouldRender = (curId: ID, neighborId: ID) => {
+    // don't display an edge twice
+    if (includedNodes.has(neighborId)) {
+      return false;
+    }
+
+    // don't display edge of a node on drag
+    if (nodeIdOnDrag === curId || nodeIdOnDrag === neighborId) {
+      return false;
+    }
+
+    // don't display edge that connect to a different floor
+    if (!nodes[neighborId]) {
+      return false;
+    }
+
+    // logic for displaying room specific edges
+    if (showRoomSpecific && nodes[curId].roomId !== roomIdSelected) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const getStrokeColor = (curId: ID, neighborId: ID) => {
+    // orange if selected
     const nodeIdSelected = getNodeIdSelected(idSelected);
-    if (curID == nodeIdSelected || neighborID == nodeIdSelected) {
+    if (curId == nodeIdSelected || neighborId == nodeIdSelected) {
       return "orange";
     }
 
+    // blue if in the mst
+    if (mst) {
+      if (
+        (mst && mst[curId] && mst[curId][neighborId]) ||
+        (mst[neighborId] && mst[neighborId][curId])
+      ) {
+        return "blue";
+      }
+    }
+
+    // default is green
     return "green";
   };
 
-  for (const curID in nodes) {
-    for (const neighborID in nodes[curID].neighbors) {
-      // don't display an edge twice and don't display edge of a node on drag
-      if (
-        !includedNodes.has(neighborID) &&
-        nodeIdOnDrag != curID &&
-        nodeIdOnDrag != neighborID
-      ) {
-        // don't display edge that connect to a different floor
-        if (nodes[neighborID]) {
-          // logic for displaying room specific edges
-          if (!showRoomSpecific || nodes[curID].roomId == roomIdSelected) {
-            edges.push([
-              [
-                nodes[curID].pos.x,
-                nodes[curID].pos.y,
-                nodes[neighborID].pos.x,
-                nodes[neighborID].pos.y,
-              ],
-              getStrokeColor(curID, neighborID),
-            ]);
-          }
-        }
+  for (const curId in nodes) {
+    for (const neighborId in nodes[curId].neighbors) {
+      if (shouldRender(curId, neighborId)) {
+        const line = [
+          nodes[curId].pos.x,
+          nodes[curId].pos.y,
+          nodes[neighborId].pos.x,
+          nodes[neighborId].pos.y,
+        ];
+        edges.push([line, getStrokeColor(curId, neighborId)]);
       }
     }
-    includedNodes.add(curID);
+    includedNodes.add(curId);
   }
 
   return edges.map(([points, color], index: number) => {

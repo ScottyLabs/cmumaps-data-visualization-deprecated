@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
 import Select from "react-select";
+
 import { ShortcutsStatusContext } from "../contexts/ShortcutsStatusProvider";
 import { selectStyle } from "../shared/selectStyle";
+
 interface Props {
   defaultType: string | undefined;
-  typeList: string[];
+  typeList: readonly string[];
   handleChange;
 }
 

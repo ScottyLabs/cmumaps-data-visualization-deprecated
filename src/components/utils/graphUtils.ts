@@ -69,8 +69,8 @@ export const calcMst = (nodes: Graph, rooms: Rooms, dispatch) => {
       const room = rooms[nodes[nodeId].roomId];
       if (room.type != "Inaccessible") {
         const curDist = Array.from(visited).reduce(
-          (min, nodeId) =>
-            Math.min(min, dist(nodes[nodeId].pos, nodes[nodeId].pos)),
+          (min, visitedNodeId) =>
+            Math.min(min, dist(nodes[nodeId].pos, nodes[visitedNodeId].pos)),
           Infinity
         );
         if (!nodeNotInMst || curDist < minDist) {

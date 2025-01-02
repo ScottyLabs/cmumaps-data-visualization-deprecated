@@ -117,7 +117,7 @@ export const RoomTypeList = [
   "Parking",
   "Inaccessible",
   "", // not assigned
-];
+] as const;
 
 export type RoomType = (typeof RoomTypeList)[number];
 

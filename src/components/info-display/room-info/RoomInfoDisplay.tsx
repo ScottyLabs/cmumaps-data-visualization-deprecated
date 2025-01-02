@@ -179,7 +179,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
         <EditTypeRow
           key={roomId}
           defaultType={room.type}
-          typeList={RoomTypeList}
+          typeList={RoomTypeList as readonly string[]}
           handleChange={handleChange}
         />
       </tr>

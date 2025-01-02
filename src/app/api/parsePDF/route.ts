@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 // switch back to spawn if needed
 import { promisify } from "util";
 
-import { Rooms } from "../../../components/shared/types";
+import { Rooms, RoomType } from "../../../components/shared/types";
 import prisma from "../../../lib/prisma";
 import { ALWAYS_REGENERATE } from "../../../settings";
 import {
@@ -38,7 +38,7 @@ const getRooms = async (buildingCode, floorLevel) => {
 
     rooms[roomId] = {
       name: room.name,
-      type: room.type,
+      type: room.type as RoomType,
       displayAlias: room.displayAlias || "",
       aliases,
       labelPosition: {

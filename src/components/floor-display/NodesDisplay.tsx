@@ -92,7 +92,7 @@ const NodesDisplay = ({
 
     if (
       rooms[nodes[nodeId].roomId] &&
-      rooms[nodes[nodeId].roomId].type == "inaccessible"
+      rooms[nodes[nodeId].roomId].type == "Inaccessible"
     ) {
       return "gray";
     }

@@ -4,6 +4,7 @@ import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
 import mstSlice from "./features/mstSlice";
 import nodeSizeSlice from "./features/nodeSizeSlice";
+import uiSlice from "./features/uiSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -12,6 +13,7 @@ export const makeStore = () => {
       nodeSize: nodeSizeSlice,
       mst: mstSlice,
       mouseEvent: mouseEventSlice,
+      ui: uiSlice,
     },
   });
 };

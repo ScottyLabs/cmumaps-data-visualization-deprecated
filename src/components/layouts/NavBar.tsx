@@ -2,9 +2,9 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 
-import { SAVED } from "../../lib/features/statusSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { buildingCodeToName } from "../shared/buildings";
+import { leavePage } from "../utils/routerUtils";
 
 interface Props {
   buildingCode: string;
@@ -13,18 +13,6 @@ interface Props {
 const NavBar = ({ buildingCode }: Props) => {
   const router = useRouter();
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
-
-  const handleBackClick = () => {
-    if (saveStatus === SAVED) {
-      router.push("/");
-    }
-
-    // ask for confirmation if not saved
-    const message = "You have unsaved changes. Are you sure you want to leave?";
-    if (window.confirm(message)) {
-      router.push("/");
-    }
-  };
 
   return (
     <nav className="bg-gray-800 p-4">
@@ -36,7 +24,7 @@ const NavBar = ({ buildingCode }: Props) => {
           {buildingCodeToName[buildingCode]}
         </div>
         <button
-          onClick={handleBackClick}
+          onClick={() => leavePage("/", saveStatus, router)}
           className="mr-2 cursor-pointer text-lg text-white hover:text-gray-400"
         >
           Back

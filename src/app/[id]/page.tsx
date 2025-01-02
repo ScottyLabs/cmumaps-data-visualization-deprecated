@@ -83,20 +83,14 @@ const Page = ({ params }: { params: { id: string } }) => {
     return;
   }
 
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve(
-          <LiveblocksWrapper floorCode={floorCode}>
-            <MainLayout
-              buildingCode={buildingCode}
-              floorLevel={floorLevel}
-              floorLevels={buildings[buildingCode].floors}
-            />
-          </LiveblocksWrapper>
-        ),
-      3000
-    )
+  return (
+    <LiveblocksWrapper floorCode={floorCode}>
+      <MainLayout
+        buildingCode={buildingCode}
+        floorLevel={floorLevel}
+        floorLevels={buildings[buildingCode].floors}
+      />
+    </LiveblocksWrapper>
   );
 };
 

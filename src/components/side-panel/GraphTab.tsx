@@ -9,9 +9,9 @@ import {
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setMst } from "../../lib/features/mstSlice";
+import { finishLoading, startLoading } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
-import { LoadingContext } from "../contexts/LoadingProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import QuestionCircle from "../shared/QuestionCircle";
@@ -33,7 +33,6 @@ const GraphTab = ({ floorCode }: Props) => {
   const { doors, setDoors, setRoomlessDoors } = useContext(OutlineContext);
   const { nodes, setNodes } = useContext(GraphContext);
   const { rooms } = useContext(RoomsContext);
-  const { setLoadingText } = useContext(LoadingContext);
 
   const removeOverlappingsNodes = () => {
     const nodeIds = Object.keys(nodes);
@@ -89,7 +88,7 @@ const GraphTab = ({ floorCode }: Props) => {
   const relinkDoorsAndRooms = async () => {
     router.push(floorCode);
 
-    setLoadingText("Relinking rooms and doors");
+    dispatch(startLoading("Relinking rooms and doors"));
 
     const result = await fetch("/api/relinkRoomsAndDoors", {
       method: "POST",
@@ -108,7 +107,7 @@ const GraphTab = ({ floorCode }: Props) => {
     setDoors(body.doors);
     setRoomlessDoors(body.roomlessDoors);
 
-    setLoadingText("");
+    dispatch(finishLoading());
   };
 
   // used for addDoorToGraph api

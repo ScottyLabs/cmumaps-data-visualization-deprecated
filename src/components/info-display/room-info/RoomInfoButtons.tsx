@@ -12,6 +12,7 @@ import {
   setMode,
 } from "../../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
+import { finishLoading, startLoading } from "../../../lib/features/statusSlice";
 import {
   toggleEditRoomLabel,
   toggleShowRoomSpecific,
@@ -19,7 +20,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { LoadingContext } from "../../contexts/LoadingProvider";
 import { PolygonContext } from "../../contexts/PolygonProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
@@ -34,8 +34,6 @@ const RoomInfoTable = ({ floorCode }: Props) => {
   const router = useRouter();
   const { session } = useSession();
   const dispatch = useAppDispatch();
-
-  const { setLoadingText } = useContext(LoadingContext);
 
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
@@ -140,7 +138,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
 
       router.push(floorCode);
 
-      setLoadingText("Detect Walkway");
+      dispatch(startLoading("Detect Walkway"));
 
       const room = rooms[roomId];
       const walkwayResult = await fetch(
@@ -163,7 +161,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
 
       // setNodes({ ...nodes, ...walkwayBody.nodes });
       setNodes(walkwayBody.nodes);
-      setLoadingText("");
+      dispatch(finishLoading());
     };
 
     if (WalkwayTypeList.includes(room.type)) {

@@ -2,7 +2,7 @@ import { Polygon } from "geojson";
 import { useRouter, useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
@@ -20,11 +20,15 @@ import {
   selectDoor,
   selectNode,
 } from "../../lib/features/mouseEventSlice";
+import {
+  failedLoading,
+  finishLoading,
+  LOADED,
+  startLoading,
+} from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import GraphProvider from "../contexts/GraphProvider";
-// context providers
-import { LoadingContext } from "../contexts/LoadingProvider";
 import OutlineProvider from "../contexts/OutlineProvider";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
@@ -33,7 +37,6 @@ import VisibilitySettingsProvider from "../contexts/VisibilitySettingsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
 import { deleteNode } from "../shared/keyboardShortcuts";
 import { ID, Node, RoomInfo, DoorInfo, WalkwayTypeList } from "../shared/types";
-// components
 import SidePanel from "../side-panel/SidePanel";
 import { calcMst } from "../utils/graphUtils";
 import {
@@ -56,9 +59,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     getNodeIdSelected(state.mouseEvent)
   );
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
-
-  const { loadingText, setLoadingText, setLoadingFailed } =
-    useContext(LoadingContext);
+  const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
 
   const [shortcutsDisabled, setShortcutsDisabled] = useState<boolean>(false);
 
@@ -116,7 +117,7 @@ const MainDisplay = ({ floorCode }: Props) => {
 
   const parsePDF = useCallback(
     async (regenerate = false) => {
-      setLoadingText("Parsing PDF");
+      dispatch(startLoading("Parsing PDF"));
 
       // parsing the file
       const parseResponse = await fetch("/api/parsePDF", {
@@ -132,9 +133,10 @@ const MainDisplay = ({ floorCode }: Props) => {
       // handle error
       if (!parseResponse.ok) {
         console.error(parsedBody.error);
-        setLoadingFailed(true);
-        setLoadingText(
-          "Failed to parse the PDF! Check the Console for detailed error."
+        dispatch(
+          failedLoading(
+            "Failed to parse the PDF! Check the Console for detailed error."
+          )
         );
         return;
       }
@@ -153,7 +155,7 @@ const MainDisplay = ({ floorCode }: Props) => {
       setRoomlessDoors(parsedRes["roomlessDoors"]);
       setRooms(parsedRes["rooms"]);
 
-      setLoadingText("Detecting Walkways");
+      dispatch(startLoading("Detecting Walkways"));
 
       if (!parsedRes["calculated"] || TEST_WALKWAYS) {
         const newRooms = parsedRes["rooms"];
@@ -193,9 +195,9 @@ const MainDisplay = ({ floorCode }: Props) => {
 
       setNodes(graphBody.result);
 
-      setLoadingText("");
+      dispatch(finishLoading());
     },
-    [floorCode, setLoadingFailed, setLoadingText]
+    [dispatch, floorCode]
   );
 
   // fetch data
@@ -364,34 +366,36 @@ const MainDisplay = ({ floorCode }: Props) => {
     return;
   }
 
+  if (loadingStatus !== LOADED) {
+    return;
+  }
+
   return (
-    !loadingText && (
-      <ShortcutsStatusProvider
-        shortcutsStatusData={{ shortcutsDisabled, setShortcutsDisabled }}
-      >
-        <PolygonProvider polygonData={polygonData}>
-          <RoomsProvider roomsData={{ rooms, setRooms }}>
-            <OutlineProvider outlineData={outlineData}>
-              <GraphProvider graphData={{ nodes, setNodes }}>
-                <VisibilitySettingsProvider
-                  visibilitySettingsData={visibilitySettings}
-                >
-                  <div className="fixed top-1/2 z-50 -translate-y-1/2">
-                    <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+    <ShortcutsStatusProvider
+      shortcutsStatusData={{ shortcutsDisabled, setShortcutsDisabled }}
+    >
+      <PolygonProvider polygonData={polygonData}>
+        <RoomsProvider roomsData={{ rooms, setRooms }}>
+          <OutlineProvider outlineData={outlineData}>
+            <GraphProvider graphData={{ nodes, setNodes }}>
+              <VisibilitySettingsProvider
+                visibilitySettingsData={visibilitySettings}
+              >
+                <div className="fixed top-1/2 z-50 -translate-y-1/2">
+                  <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+                </div>
+                <ZoomPanWrapper floorCode={floorCode} />
+                {nodeIdSelected && (
+                  <div className="absolute right-4 top-28 z-50">
+                    <InfoDisplay floorCode={floorCode} />
                   </div>
-                  <ZoomPanWrapper floorCode={floorCode} />
-                  {nodeIdSelected && (
-                    <div className="absolute right-4 top-28 z-50">
-                      <InfoDisplay floorCode={floorCode} />
-                    </div>
-                  )}
-                </VisibilitySettingsProvider>
-              </GraphProvider>
-            </OutlineProvider>
-          </RoomsProvider>
-        </PolygonProvider>
-      </ShortcutsStatusProvider>
-    )
+                )}
+              </VisibilitySettingsProvider>
+            </GraphProvider>
+          </OutlineProvider>
+        </RoomsProvider>
+      </PolygonProvider>
+    </ShortcutsStatusProvider>
   );
 };
 

@@ -1,12 +1,10 @@
 import dynamic from "next/dynamic";
 
 import { useEffect } from "react";
-import { useState } from "react";
 import { toast } from "react-toastify";
 
 import Loader from "../../components/common/Loader";
 import FloorLevelsProvider from "../../components/contexts/FloorLevelsProvider";
-import LoadingProvider from "../../components/contexts/LoadingProvider";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
 import MainDisplay from "../../components/layouts/MainDisplay";
 import NavBar from "../../components/layouts/NavBar";
@@ -22,7 +20,7 @@ import {
   POLYGON_DELETE_VERTEX,
   setMode,
 } from "../../lib/features/modeSlice";
-import { SAVED } from "../../lib/features/statusSlice";
+import { FAILED_LOAD, LOADED, SAVED } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
 import ModeDisplay from "./ModeDisplay";
@@ -49,15 +47,8 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
 
   const mode = useAppSelector((state) => state.mode.mode);
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
-
-  const [loadingText, setLoadingText] = useState<string>("Loading");
-  const [loadingFailed, setLoadingFailed] = useState<boolean>(false);
-
-  const loadingData = {
-    loadingText,
-    setLoadingText,
-    setLoadingFailed,
-  };
+  const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
+  const loadingText = useAppSelector((state) => state.status.loadingText);
 
   // warning before closing tab
   useEffect(() => {
@@ -107,16 +98,14 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   }, [mode]);
 
   const renderLoadingText = () => {
-    if (loadingText) {
-      if (loadingFailed) {
-        return (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2">
-            <p className="text-nowrap text-3xl text-red-500">{loadingText}</p>
-          </div>
-        );
-      } else {
-        return <Loader loadingText={loadingText} />;
-      }
+    if (loadingStatus === FAILED_LOAD) {
+      return (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2">
+          <p className="text-nowrap text-3xl text-red-500">{loadingText}</p>
+        </div>
+      );
+    } else {
+      return <Loader loadingText={loadingText} />;
     }
   };
 
@@ -128,15 +117,11 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
 
       {floorLevel && (
         <>
-          {renderLoadingText()}
-
           <FloorLevelsProvider floorLevels={floorLevels}>
-            <LoadingProvider loadingData={loadingData}>
-              <MainDisplay floorCode={buildingCode + "-" + floorLevel} />
-            </LoadingProvider>
+            <MainDisplay floorCode={buildingCode + "-" + floorLevel} />
           </FloorLevelsProvider>
 
-          {!loadingText && (
+          {loadingStatus === LOADED ? (
             <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2">
               <FloorSwitcher
                 buildingCode={buildingCode}
@@ -144,6 +129,8 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
                 floorLevelSelected={floorLevel}
               />
             </div>
+          ) : (
+            renderLoadingText()
           )}
 
           <HelpInfo />

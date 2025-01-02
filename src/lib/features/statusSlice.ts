@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type LoadingStatus = "Succeeded" | "Loading" | "Failed";
-const SUCCEEDED_LOAD: LoadingStatus = "Succeeded";
+export const LOADED: LoadingStatus = "Succeeded";
 const LOADING: LoadingStatus = "Loading";
-const FAILED_LOAD: LoadingStatus = "Failed";
+export const FAILED_LOAD: LoadingStatus = "Failed";
 
 export type SaveStatus = "Saved" | "Saving..." | "Failed to Save!";
 export const SAVED: SaveStatus = "Saved";
@@ -31,7 +31,8 @@ const statusSlice = createSlice({
       state.loadingText = action.payload;
     },
     finishLoading(state) {
-      state.loadingStatus = SUCCEEDED_LOAD;
+      state.loadingStatus = LOADED;
+      state.loadingText = "";
     },
     failedLoading(state, action: PayloadAction<string>) {
       state.loadingStatus = FAILED_LOAD;

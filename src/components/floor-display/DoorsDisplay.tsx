@@ -26,7 +26,7 @@ const DoorsDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector((state) => state.mode.mode);
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
   const { nodes, setNodes } = useContext(GraphContext);
   const { doors, roomlessDoors } = useContext(OutlineContext);

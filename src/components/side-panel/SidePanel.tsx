@@ -11,7 +11,7 @@ interface Props {
 }
 
 const SidePanel = ({ floorCode, parsePDF }: Props) => {
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 

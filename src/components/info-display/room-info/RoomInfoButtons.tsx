@@ -13,7 +13,6 @@ import {
 } from "../../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import {
-  toggleEditPolygon,
   toggleEditRoomLabel,
   toggleShowRoomSpecific,
 } from "../../../lib/features/uiSlice";
@@ -39,7 +38,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
   const { setLoadingText } = useContext(LoadingContext);
 
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
   const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
@@ -56,7 +55,6 @@ const RoomInfoTable = ({ floorCode }: Props) => {
   const handleEditPolygonModeClick = useCallback(() => {
     const curPolygon = rooms[roomId].polygon;
 
-    dispatch(toggleEditPolygon());
     if (editPolygon) {
       dispatch(setMode(GRAPH_SELECT));
     } else {

@@ -58,7 +58,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
   const { loadingText, setLoadingText, setLoadingFailed } =
     useContext(LoadingContext);

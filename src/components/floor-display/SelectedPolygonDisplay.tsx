@@ -19,7 +19,7 @@ const SelectedPolygonDisplay = ({
   polygon,
 }: Props) => {
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
   if (!polygon) {
     return;

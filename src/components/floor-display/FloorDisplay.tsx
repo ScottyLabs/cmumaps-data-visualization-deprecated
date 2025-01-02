@@ -25,7 +25,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import {
-  setEditPolygon,
   setEditRoomLabel,
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
@@ -296,7 +295,6 @@ const FloorDisplay = ({
     else if (e.target === e.target.getStage()) {
       router.push(floorCode);
       dispatch(setShowRoomSpecific(false));
-      dispatch(setEditPolygon(false));
       dispatch(setEditRoomLabel(false));
       dispatch(setMode(GRAPH_SELECT));
     }

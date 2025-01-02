@@ -1,7 +1,7 @@
 import React from "react";
 
+import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import {
-  setEditPolygon,
   setEditRoomLabel,
   setInfoDisplayActiveTabIndex,
 } from "../../lib/features/uiSlice";
@@ -31,9 +31,9 @@ const InfoDisplay = ({ floorCode }: Props) => {
 
   const renderTabHeader = (tabName, index) => {
     const handleClick = () => {
-      dispatch(setEditPolygon(false));
       dispatch(setEditRoomLabel(false));
       dispatch(setInfoDisplayActiveTabIndex(index));
+      dispatch(setMode(GRAPH_SELECT));
     };
 
     return (

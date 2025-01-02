@@ -17,7 +17,7 @@ interface Props {
 const VisibilityTab = ({ floorCode, parsePDF }: Props) => {
   const router = useRouter();
 
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
   const {
     showFile,

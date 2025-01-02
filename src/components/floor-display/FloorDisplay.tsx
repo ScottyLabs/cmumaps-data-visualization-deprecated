@@ -196,7 +196,7 @@ const FloorDisplay = ({
       newNodes[nodeIdSelected].neighbors[newNodeId] = { dist: newDist };
     }
 
-    router.push(`${floorCode}?nodeId=${newNodeId}`);
+    router.push(`?nodeId=${newNodeId}`);
 
     setNodes(newNodes);
 
@@ -338,7 +338,7 @@ const FloorDisplay = ({
           {showOutline && <WallsDisplay />}
           {showOutline && <DoorsDisplay floorCode={floorCode} />}
 
-          {showPolygons && <PolygonsDisplay floorCode={floorCode} />}
+          {showPolygons && <PolygonsDisplay />}
 
           {showEdges && !editPolygon && !editRoomLabel && (
             <EdgesDisplay nodeIdOnDrag={nodeIdOnDrag} />

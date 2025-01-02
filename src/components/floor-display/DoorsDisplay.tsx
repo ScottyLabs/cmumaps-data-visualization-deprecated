@@ -38,7 +38,7 @@ const DoorsDisplay = ({ floorCode }: Props) => {
           addDoorsToGraph(floorCode, [doors[doorId]], AsNode, setNodes);
           dispatch(setMode(GRAPH_SELECT));
         } else {
-          router.push(`${floorCode}?doorId=${doorId}`);
+          router.push(`?doorId=${doorId}`);
         }
       }
     };

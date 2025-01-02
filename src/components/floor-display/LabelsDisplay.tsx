@@ -78,7 +78,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
         )[0];
 
         if (nodeInfo) {
-          router.push(`${floorCode}?nodeId=${nodeInfo[0]}`);
+          router.push(`?nodeId=${nodeInfo[0]}`);
         } else {
           addNewNode({
             pos: roomInfo.labelPosition,

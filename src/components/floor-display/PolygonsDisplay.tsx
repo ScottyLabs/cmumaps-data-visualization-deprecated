@@ -9,11 +9,7 @@ import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 
-interface Props {
-  floorCode: string;
-}
-
-const PolygonsDisplay = ({ floorCode }: Props) => {
+const PolygonsDisplay = () => {
   const router = useRouter();
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
 
@@ -70,7 +66,7 @@ const PolygonsDisplay = ({ floorCode }: Props) => {
         strokeWidth={nodeSize / 2}
         closed
         fill={fillColors[colorIndex]}
-        onClick={() => router.push(`${floorCode}?roomId=${roomId}`)}
+        onClick={() => router.push(`?roomId=${roomId}`)}
       />
     );
   });

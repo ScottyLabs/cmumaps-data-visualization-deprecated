@@ -99,7 +99,7 @@ const NodesDisplay = ({
 
   const handleNodeClick = (nodeId: ID) => {
     if (mode == GRAPH_SELECT) {
-      router.push(`${floorCode}?nodeId=${nodeId}`);
+      router.push(`?nodeId=${nodeId}`);
     } else if (mode == ADD_EDGE) {
       if (!nodeIdSelected) {
         // this line should never run because we check that idSelected is

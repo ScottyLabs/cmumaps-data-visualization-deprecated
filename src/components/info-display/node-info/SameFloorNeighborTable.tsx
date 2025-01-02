@@ -67,7 +67,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   ) => {
     return Object.entries(sameFloorNeighbors).map(([neighborID, neighbor]) => {
       const selectHandleClick = () => {
-        router.push(`${floorCode}?nodeId=${neighborID}`);
+        router.push(`?nodeId=${neighborID}`);
       };
 
       const deleteHandleClick = () => deleteEdge(nodeId, neighborID);

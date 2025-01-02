@@ -2,12 +2,14 @@
 
 import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 import buildings from "../../../public/cmumaps-data/buildings.json";
 import LiveblocksWrapper from "../../components/layouts/LiveblocksWrapper";
 import MainLayout from "../../components/layouts/MainLayout";
+import { setFloorLevels } from "../../lib/features/dataSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 
 /**
@@ -19,15 +21,16 @@ import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
  */
 const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const [validated, setValidated] = useState<boolean>(false);
+  const floorLevels = useAppSelector((state) => state.data.floorLevels);
 
   // get floor info
   const floorCode = params.id;
   const buildingCode = extractBuildingCode(floorCode);
   const floorLevel = extractFloorLevel(floorCode);
 
-  // get floor levels
+  // Validate floor level and get floor levels
   useEffect(() => {
     // handle invalid building code
     if (!buildings[buildingCode]) {
@@ -58,7 +61,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       return;
     }
 
-    setValidated(true);
+    dispatch(setFloorLevels(buildings[buildingCode].floors));
   }, [buildingCode, floorLevel, router]);
 
   // Toast the error message based on session storage
@@ -79,7 +82,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     sessionStorage.setItem("error", "");
   }, []);
 
-  if (!validated) {
+  if (!floorLevels) {
     return;
   }
 

@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 import Loader from "../../components/common/Loader";
-import FloorLevelsProvider from "../../components/contexts/FloorLevelsProvider";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
 import MainDisplay from "../../components/layouts/MainDisplay";
 import NavBar from "../../components/layouts/NavBar";
@@ -114,32 +113,18 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
       <div className="absolute inset-0 z-50 h-min">
         <NavBar buildingCode={buildingCode} />
       </div>
-
-      {floorLevel && (
-        <>
-          <FloorLevelsProvider floorLevels={floorLevels}>
-            <MainDisplay floorCode={buildingCode + "-" + floorLevel} />
-          </FloorLevelsProvider>
-
-          {loadingStatus === LOADED ? (
-            <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2">
-              <FloorSwitcher
-                buildingCode={buildingCode}
-                floorLevels={floorLevels}
-                floorLevelSelected={floorLevel}
-              />
-            </div>
-          ) : (
-            renderLoadingText()
-          )}
-
-          <HelpInfo />
-
-          {LIVEBLOCKS_ENABLED && <UserCount />}
-
-          <ModeDisplay />
-        </>
-      )}
+      <MainDisplay floorCode={buildingCode + "-" + floorLevel} />
+      <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2">
+        <FloorSwitcher
+          buildingCode={buildingCode}
+          floorLevels={floorLevels}
+          floorLevelSelected={floorLevel}
+        />
+      </div>
+      <ModeDisplay />
+      <HelpInfo />
+      {LIVEBLOCKS_ENABLED && <UserCount />}
+      {loadingStatus !== LOADED && renderLoadingText()}
 
       <MyToastContainer />
     </div>

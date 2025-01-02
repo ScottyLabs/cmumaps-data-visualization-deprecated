@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
-import { FloorLevelsContext } from "../../contexts/FloorLevelsProvider";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
 import { connectedBuildings } from "../../shared/buildings";
@@ -14,13 +13,13 @@ interface Props {
 }
 
 const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
+  const floorLevels = useAppSelector((state) => state.data.floorLevels);
+
   const { setShortcutsDisabled } = useContext(ShortcutsStatusContext);
   const { setNodes } = useContext(GraphContext);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
-
-  const floorLevels = useContext(FloorLevelsContext);
 
   const [floorCode2, setFloorCode2] = useState("");
   const nodeIdRef = useRef<HTMLInputElement | null>(null);
@@ -57,6 +56,10 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
       );
     }
   }, [floorCode]);
+
+  if (!floorLevels) {
+    return;
+  }
 
   const addEdgeWithID = async () => {
     if (!floorCode2) {

@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
+import dataSlice from "./features/dataSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
 import mstSlice from "./features/mstSlice";
@@ -16,6 +17,7 @@ export const makeStore = () => {
       mouseEvent: mouseEventSlice,
       ui: uiSlice,
       status: statusSlice,
+      data: dataSlice,
     },
   });
 };

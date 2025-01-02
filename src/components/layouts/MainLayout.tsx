@@ -38,6 +38,13 @@ interface Props {
   floorLevels: string[];
 }
 
+/**
+ * Layout for the floor editing page.
+ *
+ * - Responsible for:
+ *   - loading display
+ *   - mode related handling
+ */
 const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   const dispatch = useAppDispatch();
 

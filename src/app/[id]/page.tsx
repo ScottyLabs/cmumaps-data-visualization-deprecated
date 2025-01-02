@@ -10,6 +10,13 @@ import LiveblocksWrapper from "../../components/layouts/LiveblocksWrapper";
 import MainLayout from "../../components/layouts/MainLayout";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 
+/**
+ * Entry point to the floor plan editting page.
+ *
+ * - Responsible for:
+ *   - validating that the params referes to a valid floor
+ *   - toasting error message based on session storage
+ */
 const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
 
@@ -19,24 +26,6 @@ const Page = ({ params }: { params: { id: string } }) => {
   const floorCode = params.id;
   const buildingCode = extractBuildingCode(floorCode);
   const floorLevel = extractFloorLevel(floorCode);
-
-  // Toast the error message based on session storage
-  useEffect(() => {
-    // make sure on client side
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const error = sessionStorage.getItem("error");
-    switch (error) {
-      case "InvalidFloorLevel":
-        toast.error("The floor level is invalid!");
-        break;
-    }
-
-    // clear storage so it is not toasted again when refreshed
-    sessionStorage.setItem("error", "");
-  }, []);
 
   // get floor levels
   useEffect(() => {
@@ -71,6 +60,24 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     setValidated(true);
   }, [buildingCode, floorLevel, router]);
+
+  // Toast the error message based on session storage
+  useEffect(() => {
+    // make sure on client side
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const error = sessionStorage.getItem("error");
+    switch (error) {
+      case "InvalidFloorLevel":
+        toast.error("The floor level is invalid!");
+        break;
+    }
+
+    // clear storage so it is not toasted again when refreshed
+    sessionStorage.setItem("error", "");
+  }, []);
 
   if (!validated) {
     return;

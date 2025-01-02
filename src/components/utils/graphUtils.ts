@@ -2,14 +2,16 @@ import { PriorityQueue } from "@datastructures-js/priority-queue";
 
 import { toast } from "react-toastify";
 
+import { selectNode } from "../../lib/features/mouseEventSlice";
 import { setMst } from "../../lib/features/mstSlice";
-import { Graph, Mst } from "../shared/types";
+import { Graph, ID, Mst, Rooms } from "../shared/types";
+import { dist } from "./utils";
 
 // calculate mst for each connected components of the graph
-export const calcMst = (nodes: Graph, dispatch) => {
+export const calcMst = (nodes: Graph, rooms: Rooms, dispatch) => {
   // MST is a set of edges (inNodeId, outNodeId)
   const mst: Mst = {};
-  const visited = new Set();
+  const visited: Set<string> = new Set();
   const pq = new PriorityQueue<{ value: [string, string]; priority: number }>(
     (a, b) => a.priority - b.priority
   );
@@ -59,7 +61,32 @@ export const calcMst = (nodes: Graph, dispatch) => {
     addEdgesToQueue(outNodeId);
   }
 
-  // return the closest node to the MST if there is any
+  // return the closest node to the MST
+  let nodeNotInMst: ID | null = null;
+  let minDist = 0;
+  for (const nodeId in nodes) {
+    if (!visited.has(nodeId)) {
+      const room = rooms[nodes[nodeId].roomId];
+      if (room.type != "Inaccessible") {
+        const curDist = Array.from(visited).reduce(
+          (min, nodeId) =>
+            Math.min(min, dist(nodes[nodeId].pos, nodes[nodeId].pos)),
+          Infinity
+        );
+        if (!nodeNotInMst || curDist < minDist) {
+          nodeNotInMst = nodeId;
+          minDist = curDist;
+        }
+      }
+    }
+  }
+
+  if (nodeNotInMst) {
+    toast.error("MST not complete!");
+    dispatch(selectNode(nodeNotInMst));
+  } else {
+    toast.success("Found MST!");
+  }
 
   dispatch(setMst(mst));
 };

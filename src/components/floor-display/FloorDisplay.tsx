@@ -93,7 +93,7 @@ const FloorDisplay = ({
   const { nodes, setNodes } = useContext(GraphContext);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
-  const editPolygon = useAppSelector((state) => state.ui.showRoomSpecific);
+  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
   const setSaveStatus = useContext(SaveStatusContext);

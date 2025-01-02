@@ -256,7 +256,7 @@ const MainDisplay = ({ floorCode }: Props) => {
           toastNodeNotSelectedErr();
         }
       } else if (event.key === "m") {
-        calcMst(nodes, dispatch);
+        calcMst(nodes, rooms, dispatch);
       } else if (
         event.key === "Backspace" ||
         event.key === "Delete" ||
@@ -301,6 +301,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     setSaveStatus,
     dispatch,
     nodeIdSelected,
+    rooms,
   ]);
 
   // select node, door, or room based on searchParams

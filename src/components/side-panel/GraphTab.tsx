@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { LoadingContext } from "../contexts/LoadingProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
+import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import QuestionCircle from "../shared/QuestionCircle";
 import { calcMst } from "../utils/graphUtils";
@@ -33,6 +34,7 @@ const GraphTab = ({ floorCode }: Props) => {
 
   const { doors, setDoors, setRoomlessDoors } = useContext(OutlineContext);
   const { nodes, setNodes } = useContext(GraphContext);
+  const { rooms } = useContext(RoomsContext);
   const { setLoadingText } = useContext(LoadingContext);
   const setSaveStatus = useContext(SaveStatusContext);
 
@@ -156,7 +158,7 @@ const GraphTab = ({ floorCode }: Props) => {
       <div className="flex items-center gap-2">
         <SidePanelButton
           text="Calculate MST"
-          handleClick={() => calcMst(nodes, dispatch)}
+          handleClick={() => calcMst(nodes, rooms, dispatch)}
         />
         <BiHide
           size={25}

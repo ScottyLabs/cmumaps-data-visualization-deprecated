@@ -8,7 +8,6 @@ import {
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
-import { setMst } from "../../lib/features/mstSlice";
 import { finishLoading, startLoading } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";

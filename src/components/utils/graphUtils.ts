@@ -2,8 +2,8 @@ import { PriorityQueue } from "@datastructures-js/priority-queue";
 
 import { toast } from "react-toastify";
 
+import { setMst } from "../../lib/features/dataSlice";
 import { selectNode } from "../../lib/features/mouseEventSlice";
-import { setMst } from "../../lib/features/mstSlice";
 import { Graph, ID, Mst, Rooms } from "../shared/types";
 import { dist } from "./utils";
 

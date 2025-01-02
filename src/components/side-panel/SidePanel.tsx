@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
-import VisibilityTab from "./VisibilityTab";
+import React, { useState } from "react";
+
+import { useAppSelector } from "../../lib/hooks";
 import GraphTab from "./GraphTab";
 import PolygonTab from "./PolygonTab";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
+import VisibilityTab from "./VisibilityTab";
 
 interface Props {
   floorCode: string;
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const SidePanel = ({ floorCode, parsePDF }: Props) => {
-  const { editPolygon } = useContext(DisplaySettingsContext);
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 

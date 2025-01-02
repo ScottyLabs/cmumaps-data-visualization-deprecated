@@ -24,10 +24,14 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import {
+  setEditPolygon,
+  setEditRoomLabel,
+  setShowRoomSpecific,
+} from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
@@ -90,18 +94,14 @@ const FloorDisplay = ({
   const { nodes, setNodes } = useContext(GraphContext);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
-  const { setShowRoomSpecific, editRoomLabel } = useContext(
-    DisplaySettingsContext
-  );
+  const editPolygon = useAppSelector((state) => state.ui.showRoomSpecific);
+  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
+
   const setSaveStatus = useContext(SaveStatusContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
 
   const [nodeIdOnDrag, setNodeIdOnDrag] = useState<ID>("");
-
-  const { editPolygon, setEditPolygon, setEditRoomLabel } = useContext(
-    DisplaySettingsContext
-  );
 
   const [token, setToken] = useState<string | null | undefined>(null);
 
@@ -295,9 +295,9 @@ const FloorDisplay = ({
     // click to unselect a room or exit polygon editing or room label editing
     else if (e.target === e.target.getStage()) {
       router.push(floorCode);
-      setShowRoomSpecific(false);
-      setEditPolygon(false);
-      setEditRoomLabel(false);
+      dispatch(setShowRoomSpecific(false));
+      dispatch(setEditPolygon(false));
+      dispatch(setEditRoomLabel(false));
       dispatch(setMode(GRAPH_SELECT));
     }
   };

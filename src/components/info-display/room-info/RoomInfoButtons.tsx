@@ -12,9 +12,13 @@ import {
   setMode,
 } from "../../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
+import {
+  toggleEditPolygon,
+  toggleEditRoomLabel,
+  toggleShowRoomSpecific,
+} from "../../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
-import { DisplaySettingsContext } from "../../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { LoadingContext } from "../../contexts/LoadingProvider";
 import { PolygonContext } from "../../contexts/PolygonProvider";
@@ -34,15 +38,11 @@ const RoomInfoTable = ({ floorCode }: Props) => {
 
   const { setLoadingText } = useContext(LoadingContext);
 
-  const { showRoomSpecific, setShowRoomSpecific, editRoomLabel } = useContext(
-    DisplaySettingsContext
-  );
+  const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
   const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
-
-  const { editPolygon, setEditPolygon, setEditRoomLabel } = useContext(
-    DisplaySettingsContext
-  );
 
   const { rooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
@@ -56,24 +56,15 @@ const RoomInfoTable = ({ floorCode }: Props) => {
   const handleEditPolygonModeClick = useCallback(() => {
     const curPolygon = rooms[roomId].polygon;
 
+    dispatch(toggleEditPolygon());
     if (editPolygon) {
-      setEditPolygon(false);
       dispatch(setMode(GRAPH_SELECT));
     } else {
-      setEditPolygon(true);
       dispatch(setMode(POLYGON_SELECT));
       setHistory([curPolygon]);
       setCoordsIndex(0);
     }
-  }, [
-    dispatch,
-    editPolygon,
-    roomId,
-    rooms,
-    setCoordsIndex,
-    setEditPolygon,
-    setHistory,
-  ]);
+  }, [dispatch, editPolygon, roomId, rooms, setCoordsIndex, setHistory]);
 
   useEffect(() => {
     if (shortcutsDisabled) {
@@ -115,7 +106,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
       <td className="text-center">
         <button
           className="my-2 w-28 rounded bg-slate-500 px-4 py-1 text-sm text-white hover:bg-slate-700"
-          onClick={() => setEditRoomLabel(!editRoomLabel)}
+          onClick={() => dispatch(toggleEditRoomLabel())}
         >
           {editRoomLabel ? "Finish Editing" : "Edit Room Label"}
         </button>
@@ -130,7 +121,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
           <div className="flex items-center justify-center py-2 text-right">
             <ToggleSwitch
               isOn={showRoomSpecific}
-              handleToggle={() => setShowRoomSpecific(!showRoomSpecific)}
+              handleToggle={() => dispatch(toggleShowRoomSpecific())}
             />
             <p className="ml-2 text-sm">Show Room Specific Graph</p>
           </div>

@@ -13,7 +13,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { SaveStatusContext } from "../contexts/SaveStatusProvider";
@@ -38,12 +37,12 @@ const NodesDisplay = ({
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
 
   const setSaveStatus = useContext(SaveStatusContext);
 
   const { rooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
-  const { showRoomSpecific } = useContext(DisplaySettingsContext);
 
   const nodeIdHovered = useAppSelector(
     (state) => state.mouseEvent.nodeIdHovered

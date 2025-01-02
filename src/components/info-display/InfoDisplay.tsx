@@ -1,8 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import { setInfoDisplayActiveTabIndex } from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import GraphInfoDisplay from "./node-info/GraphInfoDisplay";
 import RoomInfoDisplay from "./room-info/RoomInfoDisplay";
 
@@ -16,7 +15,9 @@ const InfoDisplay = ({ floorCode }: Props) => {
   const activeTabIndex = useAppSelector(
     (state) => state.ui.infoDisplayActiveTabIndex
   );
-  const { editPolygon, editRoomLabel } = useContext(DisplaySettingsContext);
+
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
+  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
   const renderRoomInfoDisplay = () => <RoomInfoDisplay floorCode={floorCode} />;
 

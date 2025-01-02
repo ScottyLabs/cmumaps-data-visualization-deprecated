@@ -6,7 +6,6 @@ import { Group, Path, Rect } from "react-konva";
 
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
@@ -23,10 +22,11 @@ interface Props {
 const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const router = useRouter();
 
+  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
+
   const { showLabels } = useContext(VisibilitySettingsContext);
   const { doors } = useContext(OutlineContext);
   const { rooms, setRooms } = useContext(RoomsContext);
-  const { editRoomLabel } = useContext(DisplaySettingsContext);
   const { nodes } = useContext(GraphContext);
   const setSaveStatus = useContext(SaveStatusContext);
 

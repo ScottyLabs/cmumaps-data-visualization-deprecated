@@ -22,7 +22,6 @@ import {
 } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
-import DisplaySettingsProvider from "../contexts/DisplaySettingsProvider";
 import GraphProvider from "../contexts/GraphProvider";
 // context providers
 import { LoadingContext } from "../contexts/LoadingProvider";
@@ -59,6 +58,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
 
   const { loadingText, setLoadingText, setLoadingFailed } =
     useContext(LoadingContext);
@@ -102,20 +102,6 @@ const MainDisplay = ({ floorCode }: Props) => {
     setDoors,
     roomlessDoors,
     setRoomlessDoors,
-  };
-
-  // room info display settings
-  const [showRoomSpecific, setShowRoomSpecific] = useState<boolean>(false);
-  const [editPolygon, setEditPolygon] = useState<boolean>(false);
-  const [editRoomLabel, setEditRoomLabel] = useState<boolean>(false);
-
-  const roomDisplaySettingsData = {
-    showRoomSpecific,
-    setShowRoomSpecific,
-    editPolygon,
-    setEditPolygon,
-    editRoomLabel,
-    setEditRoomLabel,
   };
 
   // polygon editing history
@@ -377,33 +363,31 @@ const MainDisplay = ({ floorCode }: Props) => {
 
   return (
     !loadingText && (
-      <DisplaySettingsProvider displaySettingsData={roomDisplaySettingsData}>
-        <ShortcutsStatusProvider
-          shortcutsStatusData={{ shortcutsDisabled, setShortcutsDisabled }}
-        >
-          <PolygonProvider polygonData={polygonData}>
-            <RoomsProvider roomsData={{ rooms, setRooms }}>
-              <OutlineProvider outlineData={outlineData}>
-                <GraphProvider graphData={{ nodes, setNodes }}>
-                  <VisibilitySettingsProvider
-                    visibilitySettingsData={visibilitySettings}
-                  >
-                    <div className="fixed top-1/2 z-50 -translate-y-1/2">
-                      <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+      <ShortcutsStatusProvider
+        shortcutsStatusData={{ shortcutsDisabled, setShortcutsDisabled }}
+      >
+        <PolygonProvider polygonData={polygonData}>
+          <RoomsProvider roomsData={{ rooms, setRooms }}>
+            <OutlineProvider outlineData={outlineData}>
+              <GraphProvider graphData={{ nodes, setNodes }}>
+                <VisibilitySettingsProvider
+                  visibilitySettingsData={visibilitySettings}
+                >
+                  <div className="fixed top-1/2 z-50 -translate-y-1/2">
+                    <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+                  </div>
+                  <ZoomPanWrapper floorCode={floorCode} />
+                  {nodeIdSelected && (
+                    <div className="absolute right-4 top-28 z-50">
+                      <InfoDisplay floorCode={floorCode} />
                     </div>
-                    <ZoomPanWrapper floorCode={floorCode} />
-                    {nodeIdSelected && (
-                      <div className="absolute right-4 top-28 z-50">
-                        <InfoDisplay floorCode={floorCode} />
-                      </div>
-                    )}
-                  </VisibilitySettingsProvider>
-                </GraphProvider>
-              </OutlineProvider>
-            </RoomsProvider>
-          </PolygonProvider>
-        </ShortcutsStatusProvider>
-      </DisplaySettingsProvider>
+                  )}
+                </VisibilitySettingsProvider>
+              </GraphProvider>
+            </OutlineProvider>
+          </RoomsProvider>
+        </PolygonProvider>
+      </ShortcutsStatusProvider>
     )
   );
 };

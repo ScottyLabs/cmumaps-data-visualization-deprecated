@@ -11,7 +11,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { DoorInfo, ID } from "../shared/types";
@@ -27,10 +26,10 @@ const DoorsDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector((state) => state.mode.mode);
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
 
   const { nodes, setNodes } = useContext(GraphContext);
   const { doors, roomlessDoors } = useContext(OutlineContext);
-  const { editPolygon } = useContext(DisplaySettingsContext);
 
   const drawDoors = () => {
     const handleDoorClick = (doorId) => {

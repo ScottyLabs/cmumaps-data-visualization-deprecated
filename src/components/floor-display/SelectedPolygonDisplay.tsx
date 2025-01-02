@@ -1,10 +1,9 @@
 import { Polygon } from "geojson";
 
-import React, { useContext } from "react";
+import React from "react";
 import { Line } from "react-konva";
 
 import { useAppSelector } from "../../lib/hooks";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { ID } from "../shared/types";
 import PolygonEditor from "./PolygonEditor";
 
@@ -20,7 +19,7 @@ const SelectedPolygonDisplay = ({
   polygon,
 }: Props) => {
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
-  const { editPolygon } = useContext(DisplaySettingsContext);
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
 
   if (!polygon) {
     return;

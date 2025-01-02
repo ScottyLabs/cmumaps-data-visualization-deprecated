@@ -2,9 +2,9 @@ import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
 
+import { useAppSelector } from "../../lib/hooks";
 import { SHOW_REGENERATE_BUTTON } from "../../settings";
 import ToggleSwitch from "../common/ToggleSwitch";
-import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import SidePanelButton from "./SidePanelButton";
@@ -17,7 +17,7 @@ interface Props {
 const VisibilityTab = ({ floorCode, parsePDF }: Props) => {
   const router = useRouter();
 
-  const { editPolygon } = useContext(DisplaySettingsContext);
+  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
 
   const {
     showFile,

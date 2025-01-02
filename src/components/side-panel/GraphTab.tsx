@@ -7,6 +7,7 @@ import {
   AsEdge,
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
+import { setMst } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { finishLoading, startLoading } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
@@ -152,7 +153,7 @@ const GraphTab = ({ floorCode }: Props) => {
       <div className="flex items-center gap-2">
         <SidePanelButton
           text="Calculate MST"
-          handleClick={() => calcMst(nodes, rooms, dispatch)}
+          handleClick={() => calcMst(nodes, rooms, router, dispatch)}
         />
         <BiHide
           size={25}

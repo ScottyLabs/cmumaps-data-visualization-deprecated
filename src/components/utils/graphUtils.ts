@@ -1,14 +1,20 @@
 import { PriorityQueue } from "@datastructures-js/priority-queue";
+import { Dispatch } from "@reduxjs/toolkit";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 import { toast } from "react-toastify";
 
 import { setMst } from "../../lib/features/dataSlice";
-import { selectNode } from "../../lib/features/mouseEventSlice";
 import { Graph, ID, Mst, Rooms } from "../shared/types";
 import { dist } from "./utils";
 
 // calculate mst for each connected components of the graph
-export const calcMst = (nodes: Graph, rooms: Rooms, dispatch) => {
+export const calcMst = (
+  nodes: Graph,
+  rooms: Rooms,
+  router: AppRouterInstance,
+  dispatch: Dispatch
+) => {
   // MST is a set of edges (inNodeId, outNodeId)
   const mst: Mst = {};
   const visited: Set<string> = new Set();
@@ -83,7 +89,7 @@ export const calcMst = (nodes: Graph, rooms: Rooms, dispatch) => {
 
   if (nodeNotInMst) {
     toast.error("MST not complete!");
-    dispatch(selectNode(nodeNotInMst));
+    router.push(`?nodeId=${nodeNotInMst}`);
   } else {
     toast.success("Found MST!");
   }

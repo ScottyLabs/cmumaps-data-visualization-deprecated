@@ -16,6 +16,7 @@ import {
 } from "../../lib/features/modeSlice";
 import {
   deselect,
+  getNodeIdSelected,
   selectDoor,
   selectNode,
 } from "../../lib/features/mouseEventSlice";
@@ -40,7 +41,6 @@ import SidePanel from "../side-panel/SidePanel";
 import { calcMst } from "../utils/graphUtils";
 import {
   getNodeIdByRoomId,
-  getNodeIdSelected,
   getRoomIdByRoomName,
   savingHelper,
 } from "../utils/utils";
@@ -56,6 +56,9 @@ const MainDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
+  const nodeIdSelected = useAppSelector((state) =>
+    getNodeIdSelected(state.mouseEvent)
+  );
 
   const { loadingText, setLoadingText, setLoadingFailed } =
     useContext(LoadingContext);
@@ -227,8 +230,6 @@ const MainDisplay = ({ floorCode }: Props) => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const toastNodeNotSelectedErr = () => toast.error("Select a node first!");
 
-      const nodeIdSelected = getNodeIdSelected(idSelected);
-
       // visibility
       if (event.key === "f") {
         setShowFile(!showFile);
@@ -391,7 +392,7 @@ const MainDisplay = ({ floorCode }: Props) => {
                       <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
                     </div>
                     <ZoomPanWrapper floorCode={floorCode} />
-                    {getNodeIdSelected(idSelected) && (
+                    {nodeIdSelected && (
                       <div className="absolute right-4 top-28 z-50">
                         <InfoDisplay floorCode={floorCode} />
                       </div>

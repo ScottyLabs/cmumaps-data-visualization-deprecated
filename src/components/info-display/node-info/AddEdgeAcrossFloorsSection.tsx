@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
+import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
 import { FloorLevelsContext } from "../../contexts/FloorLevelsProvider";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
 import { connectedBuildings } from "../../shared/buildings";
 import { Floor } from "../../shared/types";
-import { getNodeIdSelected } from "../../utils/utils";
 
 interface Props {
   floorCode: string;
@@ -16,8 +16,9 @@ interface Props {
 const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   const { setShortcutsDisabled } = useContext(ShortcutsStatusContext);
   const { setNodes } = useContext(GraphContext);
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const nodeIdSelected = getNodeIdSelected(idSelected);
+  const nodeIdSelected = useAppSelector((state) =>
+    getNodeIdSelected(state.mouseEvent)
+  );
 
   const floorLevels = useContext(FloorLevelsContext);
 

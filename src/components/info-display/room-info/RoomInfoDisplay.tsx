@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import React, { useContext } from "react";
 
+import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
@@ -9,7 +10,6 @@ import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Node, RoomInfo, RoomTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import {
-  getNodeIdSelected,
   getRoomId,
   getRoomIdFromRoomInfo,
   savingHelper,
@@ -29,10 +29,8 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const nodeId = getNodeIdSelected(idSelected);
-
-  const roomId = getRoomId(nodes, idSelected);
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
+  const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];
 
   if (!roomId) {

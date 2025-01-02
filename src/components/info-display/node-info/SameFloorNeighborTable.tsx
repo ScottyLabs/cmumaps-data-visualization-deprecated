@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useContext } from "react";
 
 import {
+  getNodeIdSelected,
   setNodeIdHovered,
   unHoverNode,
 } from "../../../lib/features/mouseEventSlice";
@@ -11,7 +12,7 @@ import { GraphContext } from "../../contexts/GraphProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Edge } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import { getNodeIdSelected, savingHelper } from "../../utils/utils";
+import { savingHelper } from "../../utils/utils";
 
 interface Props {
   floorCode: string;
@@ -25,8 +26,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   const { nodes, setNodes } = useContext(GraphContext);
   const setSaveStatus = useContext(SaveStatusContext);
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const nodeId = getNodeIdSelected(idSelected);
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const deleteEdge = (nodeId, neighborID) => {
     dispatch(unHoverNode());

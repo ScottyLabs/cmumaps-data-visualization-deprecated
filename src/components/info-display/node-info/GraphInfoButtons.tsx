@@ -9,12 +9,12 @@ import {
   DELETE_EDGE,
   setMode,
 } from "../../../lib/features/modeSlice";
+import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { deleteNode } from "../../shared/keyboardShortcuts";
 import { RED_BUTTON_STYLE } from "../../utils/displayUtils";
-import { getNodeIdSelected } from "../../utils/utils";
 
 interface Props {
   floorCode: string;
@@ -24,8 +24,7 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const nodeId = getNodeIdSelected(idSelected);
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const setSaveStatus = useContext(SaveStatusContext);
   const { nodes, setNodes } = useContext(GraphContext);

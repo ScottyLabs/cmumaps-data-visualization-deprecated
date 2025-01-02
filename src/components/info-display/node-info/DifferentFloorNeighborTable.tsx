@@ -2,12 +2,13 @@ import Link from "next/link";
 
 import React, { useContext } from "react";
 
+import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Node, Edge, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import { getNodeIdSelected, savingHelper } from "../../utils/utils";
+import { savingHelper } from "../../utils/utils";
 import EditTypeRow from "../SelectTypeCell";
 
 interface Props {
@@ -23,9 +24,7 @@ const DifferentFloorNeighborTable = ({
 }: Props) => {
   const { nodes, setNodes } = useContext(GraphContext);
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const nodeId = getNodeIdSelected(idSelected);
-
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const setSaveStatus = useContext(SaveStatusContext);
 
   const renderDifferentFloorNeighbors = (

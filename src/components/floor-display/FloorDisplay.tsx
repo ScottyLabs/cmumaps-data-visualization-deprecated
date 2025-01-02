@@ -23,6 +23,7 @@ import {
   POLYGON_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
+import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
@@ -36,13 +37,7 @@ import { ID, Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
-import {
-  dist,
-  distPointToLine,
-  getNodeIdSelected,
-  getRoomId,
-  savingHelper,
-} from "../utils/utils";
+import { dist, distPointToLine, getRoomId, savingHelper } from "../utils/utils";
 import LiveCursors from "../zoom-pan/LiveCursors";
 import DoorsDisplay from "./DoorsDisplay";
 import EdgesDisplay from "./EdgesDisplay";
@@ -84,12 +79,16 @@ const FloorDisplay = ({
   const dispatch = useAppDispatch();
 
   const mode = useAppSelector((state) => state.mode.mode);
+  const nodeIdSelected = useAppSelector((state) =>
+    getNodeIdSelected(state.mouseEvent)
+  );
 
   const { showOutline, showNodes, showEdges, showPolygons } = useContext(
     VisibilitySettingsContext
   );
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
+  const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const { setShowRoomSpecific, editRoomLabel } = useContext(
     DisplaySettingsContext
@@ -100,8 +99,6 @@ const FloorDisplay = ({
 
   const [nodeIdOnDrag, setNodeIdOnDrag] = useState<ID>("");
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const roomIdSelected = getRoomId(nodes, idSelected);
   const { editPolygon, setEditPolygon, setEditRoomLabel } = useContext(
     DisplaySettingsContext
   );
@@ -193,7 +190,6 @@ const FloorDisplay = ({
     newNodes[newNodeId] = newNode;
 
     // create an edge between the selected node and the new node
-    const nodeIdSelected = getNodeIdSelected(idSelected);
     if (nodeIdSelected) {
       const newDist = dist(
         newNodes[newNodeId].pos,

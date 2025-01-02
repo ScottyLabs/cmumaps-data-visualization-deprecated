@@ -14,12 +14,12 @@ export interface IdSelectedInfo {
 
 const DEFAULT: IdSelectedInfo = { id: "", type: NONE };
 
-interface mouseEventState {
+interface MouseEventState {
   idSelected: IdSelectedInfo;
   nodeIdHovered: ID | null;
 }
 
-const initialState: mouseEventState = {
+const initialState: MouseEventState = {
   idSelected: DEFAULT,
   nodeIdHovered: null,
 };
@@ -46,6 +46,16 @@ const mouseEventSlice = createSlice({
     },
   },
 });
+
+export const getNodeIdSelected = (state: MouseEventState) => {
+  const idSelected = state.idSelected;
+  return idSelected.type == NODE ? idSelected.id : "";
+};
+
+export const getDoorIdSelected = (state: MouseEventState) => {
+  const idSelected = state.idSelected;
+  return idSelected.type == DOOR ? idSelected.id : "";
+};
 
 export const {
   selectNode,

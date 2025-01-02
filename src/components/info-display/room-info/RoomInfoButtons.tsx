@@ -11,6 +11,7 @@ import {
   POLYGON_SELECT,
   setMode,
 } from "../../../lib/features/modeSlice";
+import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { DisplaySettingsContext } from "../../contexts/DisplaySettingsProvider";
@@ -46,8 +47,8 @@ const RoomInfoTable = ({ floorCode }: Props) => {
   const { rooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const roomId = getRoomId(nodes, idSelected);
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
+  const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];
 
   const { setHistory, setCoordsIndex } = useContext(PolygonContext);

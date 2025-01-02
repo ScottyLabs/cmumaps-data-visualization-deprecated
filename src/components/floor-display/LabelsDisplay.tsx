@@ -4,7 +4,7 @@ import React, { useContext } from "react";
 import { TfiLocationPin } from "react-icons/tfi";
 import { Group, Path, Rect } from "react-konva";
 
-import { DOOR } from "../../lib/features/mouseEventSlice";
+import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
@@ -31,7 +31,8 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const setSaveStatus = useContext(SaveStatusContext);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const roomIdSelected = getRoomId(nodes, idSelected);
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
+  const roomIdSelected = getRoomId(nodes, nodeId);
 
   const path = TfiLocationPin({}).props.children[1].props.d;
   const viewBox = TfiLocationPin({}).props.attr.viewBox.split(" ");

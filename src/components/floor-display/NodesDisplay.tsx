@@ -11,6 +11,7 @@ import {
   GRAPH_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
+import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { DisplaySettingsContext } from "../contexts/DisplaySettingsProvider";
 import { GraphContext } from "../contexts/GraphProvider";
@@ -19,13 +20,7 @@ import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { EdgeTypeList, Node, ID } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
-import {
-  dist,
-  getNodeIdSelected,
-  getRoomId,
-  savingHelper,
-  setCursor,
-} from "../utils/utils";
+import { dist, getRoomId, savingHelper, setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;
@@ -53,11 +48,12 @@ const NodesDisplay = ({
   const nodeIdHovered = useAppSelector(
     (state) => state.mouseEvent.nodeIdHovered
   );
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const roomIdSelected = getRoomId(nodes, idSelected);
+  const nodeIdSelected = useAppSelector((state) =>
+    getNodeIdSelected(state.mouseEvent)
+  );
+  const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const getFillColor = (nodeId: ID) => {
-    const nodeIdSelected = getNodeIdSelected(idSelected);
     if (nodeId == nodeIdSelected) {
       return "yellow";
     }
@@ -109,8 +105,6 @@ const NodesDisplay = ({
     if (mode == GRAPH_SELECT) {
       router.push(`${floorCode}?nodeId=${nodeId}`);
     } else if (mode == ADD_EDGE) {
-      const nodeIdSelected = getNodeIdSelected(idSelected);
-
       if (!nodeIdSelected) {
         // this line should never run because we check that idSelected is
         // selected before setting mode to ADD_EDGE
@@ -159,8 +153,6 @@ const NodesDisplay = ({
 
       dispatch(setMode(GRAPH_SELECT));
     } else if (mode == DELETE_EDGE) {
-      const nodeIdSelected = getNodeIdSelected(idSelected);
-
       if (!nodeIdSelected) {
         // this line should never run because we check that idSelected is
         // selected before setting mode to ADD_EDGE

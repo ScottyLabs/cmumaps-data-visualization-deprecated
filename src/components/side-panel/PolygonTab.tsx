@@ -9,6 +9,7 @@ import {
   POLYGON_DELETE_VERTEX,
   setMode,
 } from "../../lib/features/modeSlice";
+import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
@@ -40,10 +41,8 @@ const PolygonTab = ({ floorCode }: Props) => {
   } = useContext(PolygonContext);
 
   const { nodes } = useContext(GraphContext);
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const roomIdSelected = getRoomId(nodes, idSelected);
-
-  const roomId = getRoomId(nodes, idSelected);
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
+  const roomId = getRoomId(nodes, nodeId);
   const polygon = rooms[roomId].polygon;
 
   const renderInteriorButton = () => {
@@ -58,9 +57,10 @@ const PolygonTab = ({ floorCode }: Props) => {
         setHistoryIndex,
         newPolygon
       );
+
       saveToRooms(
         floorCode,
-        roomIdSelected,
+        roomId,
         rooms,
         setRooms,
         newPolygon,
@@ -80,9 +80,10 @@ const PolygonTab = ({ floorCode }: Props) => {
         setHistoryIndex,
         newPolygon
       );
+
       saveToRooms(
         floorCode,
-        roomIdSelected,
+        roomId,
         rooms,
         setRooms,
         newPolygon,

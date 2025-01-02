@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Mst } from "../../components/shared/types";
 
-interface mstState {
+interface MstState {
   mst: Mst | null;
 }
 
-const initialState: mstState = {
+const initialState: MstState = {
   mst: null,
 };
 

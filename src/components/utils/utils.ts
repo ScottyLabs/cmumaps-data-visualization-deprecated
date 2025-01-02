@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
-import { IdSelectedInfo } from "../../lib/features/mouseEventSlice";
 import { FAILED, SAVED, SaveStatus, SAVING } from "../contexts/SaveStatusType";
 import { Graph, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
 
@@ -87,13 +86,8 @@ export const dist = (p1: PDFCoordinate, p2: PDFCoordinate) => {
 };
 
 // variable getters
-export const getRoomId = (nodes, idSelected: IdSelectedInfo) => {
-  const nodeIdSelected = getNodeIdSelected(idSelected);
-  return nodeIdSelected ? nodes[nodeIdSelected]?.roomId : "";
-};
-
-export const getNodeIdSelected = (idSelected: IdSelectedInfo) => {
-  return idSelected.type == "Node" ? idSelected.id : "";
+export const getRoomId = (nodes, nodeId: ID) => {
+  return nodeId ? nodes[nodeId]?.roomId : "";
 };
 
 export const getBuildingCodeFromRoomId = (roomId: ID) => {

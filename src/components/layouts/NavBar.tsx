@@ -1,7 +1,9 @@
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import React from "react";
 
+import { SAVED } from "../../lib/features/statusSlice";
+import { useAppSelector } from "../../lib/hooks";
 import { buildingCodeToName } from "../shared/buildings";
 
 interface Props {
@@ -9,6 +11,21 @@ interface Props {
 }
 
 const NavBar = ({ buildingCode }: Props) => {
+  const router = useRouter();
+  const saveStatus = useAppSelector((state) => state.status.saveStatus);
+
+  const handleBackClick = () => {
+    if (saveStatus === SAVED) {
+      router.push("/");
+    }
+
+    // ask for confirmation if not saved
+    const message = "You have unsaved changes. Are you sure you want to leave?";
+    if (window.confirm(message)) {
+      router.push("/");
+    }
+  };
+
   return (
     <nav className="bg-gray-800 p-4">
       <div className="flex justify-between">
@@ -18,12 +35,12 @@ const NavBar = ({ buildingCode }: Props) => {
         <div className="h-7 -translate-x-1/2 text-xl text-white">
           {buildingCodeToName[buildingCode]}
         </div>
-        <Link
-          href={"/"}
+        <button
+          onClick={handleBackClick}
           className="mr-2 cursor-pointer text-lg text-white hover:text-gray-400"
         >
           Back
-        </Link>
+        </button>
       </div>
     </nav>
   );

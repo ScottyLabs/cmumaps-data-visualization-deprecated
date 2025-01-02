@@ -8,7 +8,6 @@ import {
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
-import { deselect } from "../../lib/features/mouseEventSlice";
 import { setMst } from "../../lib/features/mstSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
@@ -91,7 +90,6 @@ const GraphTab = ({ floorCode }: Props) => {
 
   const relinkDoorsAndRooms = async () => {
     router.push(floorCode);
-    dispatch(deselect());
 
     setLoadingText("Relinking rooms and doors");
 

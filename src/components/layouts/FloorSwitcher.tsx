@@ -1,4 +1,5 @@
 import { useRouter } from "next/navigation";
+
 import React, { useState } from "react";
 import { FaArrowUp } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
@@ -22,12 +23,13 @@ const FloorSwitcher = ({
       <td
         key={floorLevel}
         className={
-          "cursor-pointer border border-black px-2 " +
+          "cursor-pointer border border-black px-4 " +
           (floorLevel == floorLevelSelected ? "font-bold" : "")
         }
         onClick={() => {
-          router.push(`${buildingCode}-${floorLevel}`);
+          // exit full display mode in case clicking on the same floor level
           setFullDisplayMode(false);
+          router.push(`${buildingCode}-${floorLevel}`);
         }}
       >
         {floorLevel}

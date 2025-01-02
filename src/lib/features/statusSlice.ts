@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type LoadingStatus = "Succeeded" | "Loading" | "Failed";
-export const SUCCEEDED_LOAD: LoadingStatus = "Succeeded";
-export const LOADING: LoadingStatus = "Loading";
-export const FAILED_LOAD: LoadingStatus = "Failed";
+const SUCCEEDED_LOAD: LoadingStatus = "Succeeded";
+const LOADING: LoadingStatus = "Loading";
+const FAILED_LOAD: LoadingStatus = "Failed";
 
 export type SaveStatus = "Saved" | "Saving..." | "Failed to Save!";
 export const SAVED: SaveStatus = "Saved";
-export const SAVING: SaveStatus = "Saving...";
-export const FAILED_SAVE: SaveStatus = "Failed to Save!";
+const SAVING: SaveStatus = "Saving...";
+const FAILED_SAVE: SaveStatus = "Failed to Save!";
 
 interface StatusState {
   loadingStatus: LoadingStatus;
@@ -30,7 +30,7 @@ const statusSlice = createSlice({
       state.loadingStatus = LOADING;
       state.loadingText = action.payload;
     },
-    finishedLoading(state) {
+    finishLoading(state) {
       state.loadingStatus = SUCCEEDED_LOAD;
     },
     failedLoading(state, action: PayloadAction<string>) {
@@ -41,7 +41,7 @@ const statusSlice = createSlice({
     startSaving(state) {
       state.saveStatus = SAVING;
     },
-    finishedSaving(state) {
+    finishSaving(state) {
       state.saveStatus = SAVED;
     },
     failedSaving(state) {
@@ -52,10 +52,10 @@ const statusSlice = createSlice({
 
 export const {
   startLoading,
-  finishedLoading,
+  finishLoading,
   failedLoading,
   startSaving,
-  finishedSaving,
+  finishSaving,
   failedSaving,
 } = statusSlice.actions;
 export default statusSlice.reducer;

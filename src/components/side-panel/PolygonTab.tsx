@@ -14,7 +14,6 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { getRoomId } from "../utils/utils";
@@ -30,7 +29,6 @@ const PolygonTab = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const { rooms, setRooms } = useContext(RoomsContext);
-  const setSaveStatus = useContext(SaveStatusContext);
   const {
     history,
     setHistory,
@@ -58,14 +56,7 @@ const PolygonTab = ({ floorCode }: Props) => {
         newPolygon
       );
 
-      saveToRooms(
-        floorCode,
-        roomId,
-        rooms,
-        setRooms,
-        newPolygon,
-        setSaveStatus
-      );
+      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
     };
 
     const deleteHole = () => {
@@ -81,14 +72,7 @@ const PolygonTab = ({ floorCode }: Props) => {
         newPolygon
       );
 
-      saveToRooms(
-        floorCode,
-        roomId,
-        rooms,
-        setRooms,
-        newPolygon,
-        setSaveStatus
-      );
+      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
     };
 
     if (coordsIndex == 0) {
@@ -136,7 +120,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       setHistoryIndex,
       newPolygon
     );
-    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, setSaveStatus);
+    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
   };
 
   const deletePolygon = async () => {
@@ -151,7 +135,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       setHistoryIndex,
       newPolygon
     );
-    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, setSaveStatus);
+    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
   };
 
   return (

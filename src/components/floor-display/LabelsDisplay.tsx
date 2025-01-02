@@ -5,11 +5,10 @@ import { TfiLocationPin } from "react-icons/tfi";
 import { Group, Path, Rect } from "react-konva";
 
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
-import { useAppSelector } from "../../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { RoomInfo } from "../shared/types";
 import { getRoomId, savingHelper, setCursor } from "../utils/utils";
@@ -21,6 +20,7 @@ interface Props {
 
 const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
@@ -28,7 +28,6 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const { doors } = useContext(OutlineContext);
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes } = useContext(GraphContext);
-  const setSaveStatus = useContext(SaveStatusContext);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -69,7 +68,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
             roomId: roomId,
             newRoomInfo: newRoomInfo,
           }),
-          setSaveStatus
+          dispatch
         );
       };
 

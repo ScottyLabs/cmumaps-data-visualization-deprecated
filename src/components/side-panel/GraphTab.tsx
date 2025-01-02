@@ -14,7 +14,6 @@ import { GraphContext } from "../contexts/GraphProvider";
 import { LoadingContext } from "../contexts/LoadingProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import QuestionCircle from "../shared/QuestionCircle";
 import { calcMst } from "../utils/graphUtils";
 import { addDoorsToGraph, dist, savingHelper } from "../utils/utils";
@@ -35,7 +34,6 @@ const GraphTab = ({ floorCode }: Props) => {
   const { nodes, setNodes } = useContext(GraphContext);
   const { rooms } = useContext(RoomsContext);
   const { setLoadingText } = useContext(LoadingContext);
-  const setSaveStatus = useContext(SaveStatusContext);
 
   const removeOverlappingsNodes = () => {
     const nodeIds = Object.keys(nodes);
@@ -84,7 +82,7 @@ const GraphTab = ({ floorCode }: Props) => {
         floorCode: floorCode,
         newGraph: JSON.stringify(newNodes),
       }),
-      setSaveStatus
+      dispatch
     );
   };
 

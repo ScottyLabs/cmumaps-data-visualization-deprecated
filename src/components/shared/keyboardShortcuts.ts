@@ -8,7 +8,6 @@ export const deleteNode = async (
   nodeId,
   setNodes,
   floorCode,
-  setSaveStatus,
   router,
   dispatch
 ) => {
@@ -71,6 +70,6 @@ export const deleteNode = async (
       floorCode: floorCode,
       newGraph: JSON.stringify(newNodes),
     }),
-    setSaveStatus
+    dispatch
   );
 };

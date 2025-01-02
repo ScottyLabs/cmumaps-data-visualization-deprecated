@@ -13,7 +13,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { ShortcutsStatusContext } from "../contexts/ShortcutsStatusProvider";
 import { ID } from "../shared/types";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
@@ -33,7 +32,6 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
 
   const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
   const { rooms, setRooms } = useContext(RoomsContext);
-  const setSaveStatus = useContext(SaveStatusContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
 
@@ -52,16 +50,9 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
 
   const saveToRoomsHelper = useCallback(
     (newPolygon: Polygon) => {
-      saveToRooms(
-        floorCode,
-        roomId,
-        rooms,
-        setRooms,
-        newPolygon,
-        setSaveStatus
-      );
+      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
     },
-    [floorCode, roomId, rooms, setRooms, setSaveStatus]
+    [dispatch, floorCode, roomId, rooms, setRooms]
   );
 
   useEffect(() => {

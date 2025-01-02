@@ -28,8 +28,6 @@ import { LoadingContext } from "../contexts/LoadingProvider";
 import OutlineProvider from "../contexts/OutlineProvider";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
-import { SaveStatusContext } from "../contexts/SaveStatusProvider";
-import { SaveStatus } from "../contexts/SaveStatusType";
 import ShortcutsStatusProvider from "../contexts/ShortcutsStatusProvider";
 import VisibilitySettingsProvider from "../contexts/VisibilitySettingsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
@@ -47,7 +45,6 @@ import ZoomPanWrapper from "../zoom-pan/ZoomPanWrapper";
 
 interface Props {
   floorCode: string;
-  saveStatus: SaveStatus;
 }
 
 const MainDisplay = ({ floorCode }: Props) => {
@@ -62,7 +59,6 @@ const MainDisplay = ({ floorCode }: Props) => {
 
   const { loadingText, setLoadingText, setLoadingFailed } =
     useContext(LoadingContext);
-  const setSaveStatus = useContext(SaveStatusContext);
 
   const [shortcutsDisabled, setShortcutsDisabled] = useState<boolean>(false);
 
@@ -268,7 +264,6 @@ const MainDisplay = ({ floorCode }: Props) => {
             nodeIdSelected,
             setNodes,
             floorCode,
-            setSaveStatus,
             router,
             dispatch
           );
@@ -298,7 +293,6 @@ const MainDisplay = ({ floorCode }: Props) => {
     showLabels,
     router,
     showPolygons,
-    setSaveStatus,
     dispatch,
     nodeIdSelected,
     rooms,
@@ -348,7 +342,7 @@ const MainDisplay = ({ floorCode }: Props) => {
             floorCode: floorCode,
             newGraph: JSON.stringify(newNodes),
           }),
-          setSaveStatus
+          dispatch
         );
       }
     }
@@ -364,7 +358,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     }
 
     setStateUpdated(true);
-  }, [dispatch, floorCode, nodes, rooms, searchParams, setSaveStatus]);
+  }, [dispatch, floorCode, nodes, rooms, searchParams]);
 
   if (!statesUpdated) {
     return;

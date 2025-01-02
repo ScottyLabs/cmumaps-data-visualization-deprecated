@@ -9,7 +9,6 @@ import {
 } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Edge } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { savingHelper } from "../../utils/utils";
@@ -24,7 +23,6 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   const dispatch = useAppDispatch();
 
   const { nodes, setNodes } = useContext(GraphContext);
-  const setSaveStatus = useContext(SaveStatusContext);
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
@@ -47,7 +45,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
         floorCode: floorCode,
         newGraph: JSON.stringify(newNodes),
       }),
-      setSaveStatus
+      dispatch
     );
   };
 

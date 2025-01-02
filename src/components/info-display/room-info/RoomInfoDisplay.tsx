@@ -3,10 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import React, { useContext } from "react";
 
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
-import { useAppSelector } from "../../../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
-import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Node, RoomInfo, RoomTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import {
@@ -24,7 +23,7 @@ interface Props {
 }
 
 const RoomInfoDisplay = ({ floorCode }: Props) => {
-  const setSaveStatus = useContext(SaveStatusContext);
+  const dispatch = useAppDispatch();
 
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
@@ -64,7 +63,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
           roomId: newRoomId,
           newRoomInfo: newRoomInfo,
         }),
-        setSaveStatus
+        dispatch
       );
 
       savingHelper(
@@ -73,7 +72,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
           floorCode: floorCode,
           newGraph: JSON.stringify(newNodes),
         }),
-        setSaveStatus
+        dispatch
       );
     };
 
@@ -105,7 +104,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
         roomId,
         roomData: roomInfo,
       }),
-      setSaveStatus
+      dispatch
     );
 
     // frontend update only if backend update succeeded

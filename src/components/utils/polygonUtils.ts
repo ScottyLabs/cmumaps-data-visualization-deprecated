@@ -21,7 +21,7 @@ export const saveToRooms = (
   rooms,
   setRooms,
   newPolygon: Polygon,
-  setSaveStatus
+  dispatch
 ) => {
   const newRooms = { ...rooms };
 
@@ -36,6 +36,6 @@ export const saveToRooms = (
       roomId: roomId,
       newRoomInfo: newRooms[roomId],
     }),
-    setSaveStatus
+    dispatch
   );
 };

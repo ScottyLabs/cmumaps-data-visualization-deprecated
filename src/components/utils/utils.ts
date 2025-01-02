@@ -1,8 +1,14 @@
-import { Dispatch, SetStateAction } from "react";
+import { UnknownAction } from "@reduxjs/toolkit";
+
+import { Dispatch } from "react";
 import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
-import { FAILED, SAVED, SaveStatus, SAVING } from "../contexts/SaveStatusType";
+import {
+  failedSaving,
+  finishSaving,
+  startSaving,
+} from "../../lib/features/statusSlice";
 import { Graph, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
 
 /**
@@ -132,15 +138,15 @@ export const setCursor = (e, cursor) => {
 export const savingHelper = async (
   apiPath: string,
   body: BodyInit,
-  setSaveStatus: Dispatch<SetStateAction<SaveStatus>>
+  dispatch: Dispatch<UnknownAction>
 ): Promise<boolean> => {
-  setSaveStatus(SAVING);
+  dispatch(startSaving());
   const response = await fetch(apiPath, { method: "POST", body });
 
   if (response.ok) {
-    setSaveStatus(SAVED);
+    dispatch(finishSaving());
   } else {
-    setSaveStatus(FAILED);
+    dispatch(failedSaving());
     const body = await response.json();
     console.error(body.error);
     if (body.errorMessage) {

@@ -34,7 +34,6 @@ import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { SaveStatusContext } from "../contexts/SaveStatusProvider";
 import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { ID, Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
@@ -96,7 +95,6 @@ const FloorDisplay = ({
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
-  const setSaveStatus = useContext(SaveStatusContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
 
@@ -208,7 +206,7 @@ const FloorDisplay = ({
         floorCode: floorCode,
         newGraph: JSON.stringify(newNodes),
       }),
-      setSaveStatus
+      dispatch
     );
   };
 
@@ -286,7 +284,7 @@ const FloorDisplay = ({
         rooms,
         setRooms,
         newPolygon,
-        setSaveStatus
+        dispatch
       );
 
       dispatch(setMode(POLYGON_SELECT));

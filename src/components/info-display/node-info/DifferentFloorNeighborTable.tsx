@@ -3,9 +3,8 @@ import Link from "next/link";
 import React, { useContext } from "react";
 
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
-import { useAppSelector } from "../../../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { Node, Edge, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { savingHelper } from "../../utils/utils";
@@ -22,10 +21,11 @@ const DifferentFloorNeighborTable = ({
   neighbors,
   differentFloorNeighbors,
 }: Props) => {
+  const dispatch = useAppDispatch();
+
   const { nodes, setNodes } = useContext(GraphContext);
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-  const setSaveStatus = useContext(SaveStatusContext);
 
   const renderDifferentFloorNeighbors = (
     differentFloorNeighbors: Record<string, Edge>
@@ -69,7 +69,7 @@ const DifferentFloorNeighborTable = ({
             floorCode: floorCode,
             newGraph: JSON.stringify(newNodes),
           }),
-          setSaveStatus
+          dispatch
         );
 
         // update neighbor floor's graph json
@@ -84,7 +84,7 @@ const DifferentFloorNeighborTable = ({
             neighborId: nodeId,
             newToFloorInfo: neighborFloorInfo,
           }),
-          setSaveStatus
+          dispatch
         );
       };
 
@@ -102,7 +102,7 @@ const DifferentFloorNeighborTable = ({
           floorCode: floorCode,
           newGraph: JSON.stringify(newNodes),
         }),
-        setSaveStatus
+        dispatch
       );
 
       // update neighbor floor's graph json
@@ -113,7 +113,7 @@ const DifferentFloorNeighborTable = ({
           nodeId: neighborId,
           neighborId: nodeId,
         }),
-        setSaveStatus
+        dispatch
       );
     };
 

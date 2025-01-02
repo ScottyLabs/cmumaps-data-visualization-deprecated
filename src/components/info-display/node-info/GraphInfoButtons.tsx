@@ -12,7 +12,6 @@ import {
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { SaveStatusContext } from "../../contexts/SaveStatusProvider";
 import { deleteNode } from "../../shared/keyboardShortcuts";
 import { RED_BUTTON_STYLE } from "../../utils/displayUtils";
 
@@ -26,7 +25,6 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
-  const setSaveStatus = useContext(SaveStatusContext);
   const { nodes, setNodes } = useContext(GraphContext);
 
   const renderButton = (text, handleClick, style?) => {
@@ -56,15 +54,7 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
 
   const renderDeleteNodeButton = () => {
     const deleteNodeHelper = () =>
-      deleteNode(
-        nodes,
-        nodeId,
-        setNodes,
-        floorCode,
-        setSaveStatus,
-        router,
-        dispatch
-      );
+      deleteNode(nodes, nodeId, setNodes, floorCode, router, dispatch);
 
     return renderButton("Delete Node", deleteNodeHelper, RED_BUTTON_STYLE);
   };

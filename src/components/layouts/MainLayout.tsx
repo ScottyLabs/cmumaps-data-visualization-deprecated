@@ -7,8 +7,6 @@ import { toast } from "react-toastify";
 import Loader from "../../components/common/Loader";
 import FloorLevelsProvider from "../../components/contexts/FloorLevelsProvider";
 import LoadingProvider from "../../components/contexts/LoadingProvider";
-import SaveStatusProvider from "../../components/contexts/SaveStatusProvider";
-import { SaveStatus, SAVED } from "../../components/contexts/SaveStatusType";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
 import MainDisplay from "../../components/layouts/MainDisplay";
 import NavBar from "../../components/layouts/NavBar";
@@ -24,6 +22,7 @@ import {
   POLYGON_DELETE_VERTEX,
   setMode,
 } from "../../lib/features/modeSlice";
+import { SAVED } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
 import ModeDisplay from "./ModeDisplay";
@@ -49,6 +48,7 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   const dispatch = useAppDispatch();
 
   const mode = useAppSelector((state) => state.mode.mode);
+  const saveStatus = useAppSelector((state) => state.status.saveStatus);
 
   const [loadingText, setLoadingText] = useState<string>("Loading");
   const [loadingFailed, setLoadingFailed] = useState<boolean>(false);
@@ -58,8 +58,6 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
     setLoadingText,
     setLoadingFailed,
   };
-
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>(SAVED);
 
   // warning before closing tab
   useEffect(() => {
@@ -134,12 +132,7 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
 
           <FloorLevelsProvider floorLevels={floorLevels}>
             <LoadingProvider loadingData={loadingData}>
-              <SaveStatusProvider setSaveStatus={setSaveStatus}>
-                <MainDisplay
-                  floorCode={buildingCode + "-" + floorLevel}
-                  saveStatus={saveStatus}
-                />
-              </SaveStatusProvider>
+              <MainDisplay floorCode={buildingCode + "-" + floorLevel} />
             </LoadingProvider>
           </FloorLevelsProvider>
 

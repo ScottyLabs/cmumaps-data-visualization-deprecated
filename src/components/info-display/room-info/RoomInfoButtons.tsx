@@ -22,7 +22,6 @@ import ToggleSwitch from "../../common/ToggleSwitch";
 import { GraphContext } from "../../contexts/GraphProvider";
 import { PolygonContext } from "../../contexts/PolygonProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
-import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
 import { WalkwayTypeList } from "../../shared/types";
 import { getRoomId } from "../../utils/utils";
 
@@ -34,8 +33,9 @@ const RoomInfoTable = () => {
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
-
-  const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
+  const shortcutsDisabled = useAppSelector(
+    (state) => state.status.shortcutsDisabled
+  );
 
   const { rooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);

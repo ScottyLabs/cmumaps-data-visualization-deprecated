@@ -1,6 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCheck, FaPencilAlt } from "react-icons/fa";
-import { ShortcutsStatusContext } from "../contexts/ShortcutsStatusProvider";
+
+import { setShortcutsDisabled } from "../../lib/features/statusSlice";
+import { useAppDispatch } from "../../lib/hooks";
 
 interface Props {
   property: string;
@@ -9,7 +11,7 @@ interface Props {
 }
 
 const EditCell = ({ property, value, handleSave }: Props) => {
-  const { setShortcutsDisabled } = useContext(ShortcutsStatusContext);
+  const dispatch = useAppDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -34,12 +36,12 @@ const EditCell = ({ property, value, handleSave }: Props) => {
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 handleSave(editedValue, setEditedValue, setIsEditing);
-                setShortcutsDisabled(false);
+                dispatch(setShortcutsDisabled(false));
               }
             }}
             onBlur={() => {
               setEditedValue(value);
-              setShortcutsDisabled(false);
+              dispatch(setShortcutsDisabled(false));
               setIsEditing(false);
             }}
             autoFocus
@@ -48,7 +50,7 @@ const EditCell = ({ property, value, handleSave }: Props) => {
             className="ml-2 cursor-pointer text-2xl text-white hover:text-gray-400"
             onMouseDown={() => {
               handleSave(editedValue, setEditedValue, setIsEditing);
-              setShortcutsDisabled(false);
+              dispatch(setShortcutsDisabled(false));
             }}
           />
         </div>
@@ -61,7 +63,7 @@ const EditCell = ({ property, value, handleSave }: Props) => {
             className="ml-2 mt-1 cursor-pointer text-right text-white hover:text-gray-400"
             onClick={() => {
               setIsEditing(true);
-              setShortcutsDisabled(true);
+              dispatch(setShortcutsDisabled(true));
             }}
           />
         </div>

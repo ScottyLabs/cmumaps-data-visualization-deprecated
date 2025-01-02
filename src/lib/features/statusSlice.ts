@@ -14,12 +14,14 @@ interface StatusState {
   loadingStatus: LoadingStatus;
   loadingText: string;
   saveStatus: SaveStatus;
+  shortcutsDisabled: boolean;
 }
 
 const initialState: StatusState = {
   loadingStatus: "Loading",
   loadingText: "",
   saveStatus: SAVED,
+  shortcutsDisabled: false,
 };
 
 const statusSlice = createSlice({
@@ -48,6 +50,10 @@ const statusSlice = createSlice({
     failedSaving(state) {
       state.saveStatus = FAILED_SAVE;
     },
+
+    setShortcutsDisabled(state, action: PayloadAction<boolean>) {
+      state.shortcutsDisabled = action.payload;
+    },
   },
 });
 
@@ -58,5 +64,6 @@ export const {
   startSaving,
   finishSaving,
   failedSaving,
+  setShortcutsDisabled,
 } = statusSlice.actions;
 export default statusSlice.reducer;

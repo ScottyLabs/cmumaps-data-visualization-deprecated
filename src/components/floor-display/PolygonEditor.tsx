@@ -13,7 +13,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { ShortcutsStatusContext } from "../contexts/ShortcutsStatusProvider";
 import { ID } from "../shared/types";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { setCursor } from "../utils/utils";
@@ -29,8 +28,10 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const dispatch = useAppDispatch();
 
   const mode = useAppSelector((state) => state.mode.mode);
+  const shortcutsDisabled = useAppSelector(
+    (state) => state.status.shortcutsDisabled
+  );
 
-  const { shortcutsDisabled } = useContext(ShortcutsStatusContext);
   const { rooms, setRooms } = useContext(RoomsContext);
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);

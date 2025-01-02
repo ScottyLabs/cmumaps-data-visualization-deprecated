@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 
-import { ShortcutsStatusContext } from "../contexts/ShortcutsStatusProvider";
+import { setShortcutsDisabled } from "../../lib/features/statusSlice";
+import { useAppDispatch } from "../../lib/hooks";
 import { selectStyle } from "../shared/selectStyle";
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const EditTypeRow = ({ handleChange, typeList, defaultType }: Props) => {
-  const { setShortcutsDisabled } = useContext(ShortcutsStatusContext);
+  const dispatch = useAppDispatch();
 
   const options = typeList.map((type) => ({
     value: type,
@@ -32,11 +33,11 @@ const EditTypeRow = ({ handleChange, typeList, defaultType }: Props) => {
         onChange={handleChange(setSelectedOption)}
         options={options}
         onFocus={() => {
-          setShortcutsDisabled(true);
+          dispatch(setShortcutsDisabled(true));
           setValueColor("gray");
         }}
         onBlur={() => {
-          setShortcutsDisabled(false);
+          dispatch(setShortcutsDisabled(false));
           setValueColor("black");
         }}
         blurInputOnSelect

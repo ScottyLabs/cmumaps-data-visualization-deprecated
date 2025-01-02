@@ -1,7 +1,8 @@
-import React, { KeyboardEventHandler, useContext } from "react";
+import React, { KeyboardEventHandler } from "react";
 import { toast } from "react-toastify";
 
-import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
+import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
+import { useAppDispatch } from "../../../lib/hooks";
 import { RoomInfo } from "../../shared/types";
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const AliasesMultiSelect = ({ room, handleSaveHelper }: Props) => {
-  const { setShortcutsDisabled } = useContext(ShortcutsStatusContext);
+  const dispatch = useAppDispatch();
 
   const saveAliasesHelper = (newAliases) => {
     const newRoomInfo = { ...room, aliases: newAliases };
@@ -55,12 +56,8 @@ const AliasesMultiSelect = ({ room, handleSaveHelper }: Props) => {
           value={inputValue}
           onChange={(newValue) => setInputValue(newValue.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => {
-            setShortcutsDisabled(true);
-          }}
-          onBlur={() => {
-            setShortcutsDisabled(false);
-          }}
+          onFocus={() => dispatch(setShortcutsDisabled(true))}
+          onBlur={() => dispatch(setShortcutsDisabled(false))}
         />
         <button className="w-8 rounded bg-white p-1" onClick={addAlias}>
           +

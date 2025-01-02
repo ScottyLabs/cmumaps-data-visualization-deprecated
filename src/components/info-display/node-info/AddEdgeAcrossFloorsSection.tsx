@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
-import { useAppSelector } from "../../../lib/hooks";
+import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
+import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { GraphContext } from "../../contexts/GraphProvider";
-import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
 import { connectedBuildings } from "../../shared/buildings";
 import { Floor } from "../../shared/types";
 
@@ -13,9 +13,10 @@ interface Props {
 }
 
 const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
+  const dispatch = useAppDispatch();
+
   const floorLevels = useAppSelector((state) => state.data.floorLevels);
 
-  const { setShortcutsDisabled } = useContext(ShortcutsStatusContext);
   const { setNodes } = useContext(GraphContext);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
@@ -212,8 +213,8 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
             ref={nodeIdRef}
             placeholder="Node ID"
             className="rounded px-2 text-black"
-            onFocus={() => setShortcutsDisabled(true)}
-            onBlur={() => setShortcutsDisabled(false)}
+            onFocus={() => dispatch(setShortcutsDisabled(true))}
+            onBlur={() => dispatch(setShortcutsDisabled(false))}
           />
         </div>
       </div>

@@ -1,6 +1,10 @@
 import React from "react";
 
-import { setInfoDisplayActiveTabIndex } from "../../lib/features/uiSlice";
+import {
+  setEditPolygon,
+  setEditRoomLabel,
+  setInfoDisplayActiveTabIndex,
+} from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import GraphInfoDisplay from "./node-info/GraphInfoDisplay";
 import RoomInfoDisplay from "./room-info/RoomInfoDisplay";
@@ -16,9 +20,6 @@ const InfoDisplay = ({ floorCode }: Props) => {
     (state) => state.ui.infoDisplayActiveTabIndex
   );
 
-  const editPolygon = useAppSelector((state) => state.ui.editPolygon);
-  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
-
   const renderRoomInfoDisplay = () => <RoomInfoDisplay floorCode={floorCode} />;
 
   const renderGraphInfoDisplay = () => (
@@ -30,9 +31,9 @@ const InfoDisplay = ({ floorCode }: Props) => {
 
   const renderTabHeader = (tabName, index) => {
     const handleClick = () => {
-      if (!editPolygon && !editRoomLabel) {
-        dispatch(setInfoDisplayActiveTabIndex(index));
-      }
+      dispatch(setEditPolygon(false));
+      dispatch(setEditRoomLabel(false));
+      dispatch(setInfoDisplayActiveTabIndex(index));
     };
 
     return (

@@ -88,11 +88,7 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   return (
     <LiveblocksWrapper floorCode={floorCode}>
-      <MainLayout
-        buildingCode={buildingCode}
-        floorLevel={floorLevel}
-        floorLevels={buildings[buildingCode].floors}
-      />
+      <MainLayout floorCode={floorCode} />
     </LiveblocksWrapper>
   );
 };

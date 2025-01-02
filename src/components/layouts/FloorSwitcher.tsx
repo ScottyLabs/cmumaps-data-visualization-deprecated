@@ -9,18 +9,19 @@ import { leavePage } from "../utils/routerUtils";
 
 interface Props {
   buildingCode: string;
-  floorLevels: string[];
   floorLevelSelected: string;
 }
 
-const FloorSwitcher = ({
-  buildingCode,
-  floorLevels,
-  floorLevelSelected,
-}: Props) => {
+const FloorSwitcher = ({ buildingCode, floorLevelSelected }: Props) => {
   const router = useRouter();
+  const floorLevels = useAppSelector((state) => state.data.floorLevels);
+
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
   const [fullDisplayMode, setFullDisplayMode] = useState<boolean>(false);
+
+  if (!floorLevels) {
+    return;
+  }
 
   const renderFullDisplayMode = () =>
     floorLevels.map((floorLevel) => (
@@ -118,16 +119,18 @@ const FloorSwitcher = ({
   };
 
   return (
-    <div className="rounded border border-black bg-gray-50">
-      <table>
-        <tbody className="flex">
-          <tr className="flex">
-            {fullDisplayMode
-              ? renderFullDisplayMode()
-              : renderNotFullDisplayMode()}
-          </tr>
-        </tbody>
-      </table>
+    <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2">
+      <div className="rounded border border-black bg-gray-50">
+        <table>
+          <tbody className="flex">
+            <tr className="flex">
+              {fullDisplayMode
+                ? renderFullDisplayMode()
+                : renderNotFullDisplayMode()}
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

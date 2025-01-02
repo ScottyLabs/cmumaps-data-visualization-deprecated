@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 
+import { extractBuildingCode, extractFloorLevel } from "../../app/api/apiUtils";
 import Loader from "../../components/common/Loader";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
 import MainDisplay from "../../components/layouts/MainDisplay";
@@ -29,9 +30,7 @@ const UserCount = dynamic(() => import("../../components/layouts/UserCount"), {
 });
 
 interface Props {
-  buildingCode: string;
-  floorLevel: string;
-  floorLevels: string[];
+  floorCode: string;
 }
 
 /**
@@ -41,8 +40,11 @@ interface Props {
  *   - loading display
  *   - mode related handling
  */
-const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
+const MainLayout = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
+
+  const buildingCode = extractBuildingCode(floorCode);
+  const floorLevel = extractFloorLevel(floorCode);
 
   const mode = useAppSelector((state) => state.mode.mode);
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
@@ -110,22 +112,16 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
 
   return (
     <div>
-      <div className="absolute inset-0 z-50 h-min">
-        <NavBar buildingCode={buildingCode} />
-      </div>
-      <MainDisplay floorCode={buildingCode + "-" + floorLevel} />
-      <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2">
-        <FloorSwitcher
-          buildingCode={buildingCode}
-          floorLevels={floorLevels}
-          floorLevelSelected={floorLevel}
-        />
-      </div>
+      <NavBar buildingCode={buildingCode} />
+      <MainDisplay floorCode={floorCode} />
+      <FloorSwitcher
+        buildingCode={buildingCode}
+        floorLevelSelected={floorLevel}
+      />
       <ModeDisplay />
       <HelpInfo />
       {LIVEBLOCKS_ENABLED && <UserCount />}
       {loadingStatus !== LOADED && renderLoadingText()}
-
       <MyToastContainer />
     </div>
   );

@@ -83,14 +83,20 @@ const Page = ({ params }: { params: { id: string } }) => {
     return;
   }
 
-  return (
-    <LiveblocksWrapper floorCode={floorCode}>
-      <MainLayout
-        buildingCode={buildingCode}
-        floorLevel={floorLevel}
-        floorLevels={buildings[buildingCode].floors}
-      />
-    </LiveblocksWrapper>
+  return new Promise((resolve) =>
+    setTimeout(
+      () =>
+        resolve(
+          <LiveblocksWrapper floorCode={floorCode}>
+            <MainLayout
+              buildingCode={buildingCode}
+              floorLevel={floorLevel}
+              floorLevels={buildings[buildingCode].floors}
+            />
+          </LiveblocksWrapper>
+        ),
+      3000
+    )
   );
 };
 

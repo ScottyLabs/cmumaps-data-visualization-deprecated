@@ -212,7 +212,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
           {renderEditNameRow()}
           {renderEditTypeRow()}
           {renderEditAliasesRow()}
-          <RoomInfoButtons floorCode={floorCode} />
+          <RoomInfoButtons />
         </tbody>
       </table>
     </>

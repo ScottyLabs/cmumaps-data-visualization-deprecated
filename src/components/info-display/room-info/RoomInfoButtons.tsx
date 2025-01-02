@@ -26,11 +26,7 @@ import { ShortcutsStatusContext } from "../../contexts/ShortcutsStatusProvider";
 import { WalkwayTypeList } from "../../shared/types";
 import { getRoomId } from "../../utils/utils";
 
-interface Props {
-  floorCode: string;
-}
-
-const RoomInfoTable = ({ floorCode }: Props) => {
+const RoomInfoTable = () => {
   const router = useRouter();
   const { session } = useSession();
   const dispatch = useAppDispatch();
@@ -136,7 +132,7 @@ const RoomInfoTable = ({ floorCode }: Props) => {
     const detectWalkway = async () => {
       const token = await session?.getToken();
 
-      router.push(floorCode);
+      router.push("?");
 
       dispatch(startLoading("Detect Walkway"));
 

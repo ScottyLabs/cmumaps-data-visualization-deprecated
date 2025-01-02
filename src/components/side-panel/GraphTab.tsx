@@ -86,7 +86,7 @@ const GraphTab = ({ floorCode }: Props) => {
   };
 
   const relinkDoorsAndRooms = async () => {
-    router.push(floorCode);
+    router.push("?");
 
     dispatch(startLoading("Relinking rooms and doors"));
 

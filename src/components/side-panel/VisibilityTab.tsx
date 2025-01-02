@@ -10,11 +10,10 @@ import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import SidePanelButton from "./SidePanelButton";
 
 interface Props {
-  floorCode: string;
   parsePDF: (regnerate: boolean) => void;
 }
 
-const VisibilityTab = ({ floorCode, parsePDF }: Props) => {
+const VisibilityTab = ({ parsePDF }: Props) => {
   const router = useRouter();
 
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
@@ -51,7 +50,7 @@ const VisibilityTab = ({ floorCode, parsePDF }: Props) => {
     if (
       confirm("Are you sure you want to regnerate the graph for this floor?")
     ) {
-      router.push(floorCode);
+      router.push("?");
       parsePDF(true);
     }
   };

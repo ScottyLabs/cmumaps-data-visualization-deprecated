@@ -11,7 +11,7 @@ export const deleteNode = async (
   router,
   dispatch
 ) => {
-  router.push(floorCode);
+  router.push("?");
 
   dispatch(deselect());
   dispatch(setMode(GRAPH_SELECT));

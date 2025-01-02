@@ -19,9 +19,7 @@ const SidePanel = ({ floorCode, parsePDF }: Props) => {
     ? ["Visibility", "Polygon"]
     : ["Visibility", "Graph"];
 
-  const renderVisibilityTab = () => (
-    <VisibilityTab floorCode={floorCode} parsePDF={parsePDF} />
-  );
+  const renderVisibilityTab = () => <VisibilityTab parsePDF={parsePDF} />;
 
   const renderGraphTab = () => <GraphTab floorCode={floorCode} />;
 

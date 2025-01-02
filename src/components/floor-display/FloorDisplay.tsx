@@ -291,7 +291,7 @@ const FloorDisplay = ({
     }
     // click to unselect a room or exit polygon editing or room label editing
     else if (e.target === e.target.getStage()) {
-      router.push(floorCode);
+      router.push("?");
       dispatch(setShowRoomSpecific(false));
       dispatch(setEditRoomLabel(false));
       dispatch(setMode(GRAPH_SELECT));

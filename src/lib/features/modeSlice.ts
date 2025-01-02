@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { toast } from "react-toastify";
-
 export type Mode =
   | "Graph Select"
   | "Graph Add Edge"
@@ -34,34 +32,8 @@ const modeSlice = createSlice({
   name: "mode",
   initialState,
   reducers: {
-    // responsible for toasting
     setMode(state, action: PayloadAction<Mode>) {
       state.mode = action.payload;
-      switch (state.mode) {
-        case ADD_EDGE:
-          toast.info("Click on another node to add an edge!");
-          break;
-
-        case DELETE_EDGE:
-          toast.info("Click on another node to delete an edge!");
-          break;
-
-        case ADD_NODE:
-          toast.info("Click to add a node!");
-          break;
-
-        case ADD_DOOR_NODE:
-          toast.info("Click on a purple door to add a door node!");
-          break;
-
-        case POLYGON_DELETE_VERTEX:
-          toast.info("Click on vertex to delete it!");
-          break;
-
-        case POLYGON_ADD_VERTEX:
-          toast.info("Click to add a vertex!");
-          break;
-      }
     },
   },
 });

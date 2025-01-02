@@ -300,6 +300,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     showPolygons,
     setSaveStatus,
     dispatch,
+    nodeIdSelected,
   ]);
 
   // select node, door, or room based on searchParams
@@ -359,7 +360,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     } else {
       dispatch(deselect());
     }
-  }, [floorCode, nodes, rooms, searchParams, setSaveStatus]);
+  }, [dispatch, floorCode, nodes, rooms, searchParams, setSaveStatus]);
 
   return (
     !loadingText && (

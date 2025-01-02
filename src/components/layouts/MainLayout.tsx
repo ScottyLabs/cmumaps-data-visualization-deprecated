@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 
 import { useEffect } from "react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 import Loader from "../../components/common/Loader";
 import FloorLevelsProvider from "../../components/contexts/FloorLevelsProvider";
@@ -13,8 +14,17 @@ import MainDisplay from "../../components/layouts/MainDisplay";
 import NavBar from "../../components/layouts/NavBar";
 import MyToastContainer from "../../components/shared/MyToastContainer";
 import HelpInfo from "../../components/zoom-pan/HelpInfo";
-import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
-import { useAppDispatch } from "../../lib/hooks";
+import {
+  ADD_DOOR_NODE,
+  ADD_EDGE,
+  ADD_NODE,
+  DELETE_EDGE,
+  GRAPH_SELECT,
+  POLYGON_ADD_VERTEX,
+  POLYGON_DELETE_VERTEX,
+  setMode,
+} from "../../lib/features/modeSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
 import ModeDisplay from "./ModeDisplay";
 
@@ -30,6 +40,8 @@ interface Props {
 
 const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   const dispatch = useAppDispatch();
+
+  const mode = useAppSelector((state) => state.mode.mode);
 
   const [loadingText, setLoadingText] = useState<string>("Loading");
   const [loadingFailed, setLoadingFailed] = useState<boolean>(false);
@@ -58,6 +70,35 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   useEffect(() => {
     dispatch(setMode(GRAPH_SELECT));
   }, [dispatch, floorLevel]);
+
+  // toast when mode changes
+  useEffect(() => {
+    switch (mode) {
+      case ADD_EDGE:
+        toast.info("Click on another node to add an edge!");
+        break;
+
+      case DELETE_EDGE:
+        toast.info("Click on another node to delete an edge!");
+        break;
+
+      case ADD_NODE:
+        toast.info("Click to add a node!");
+        break;
+
+      case ADD_DOOR_NODE:
+        toast.info("Click on a purple door to add a door node!");
+        break;
+
+      case POLYGON_DELETE_VERTEX:
+        toast.info("Click on vertex to delete it!");
+        break;
+
+      case POLYGON_ADD_VERTEX:
+        toast.info("Click to add a vertex!");
+        break;
+    }
+  }, [mode]);
 
   const renderLoadingText = () => {
     if (loadingText) {

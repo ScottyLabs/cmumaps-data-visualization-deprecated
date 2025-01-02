@@ -9,7 +9,6 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { RoomInfo } from "../shared/types";
 import { getRoomId, savingHelper, setCursor } from "../utils/utils";
 
@@ -23,8 +22,8 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const dispatch = useAppDispatch();
 
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
+  const showLabels = useAppSelector((state) => state.visibility.showLabels);
 
-  const { showLabels } = useContext(VisibilitySettingsContext);
   const { doors } = useContext(OutlineContext);
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes } = useContext(GraphContext);

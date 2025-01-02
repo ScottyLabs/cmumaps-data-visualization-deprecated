@@ -6,6 +6,7 @@ import mouseEventSlice from "./features/mouseEventSlice";
 import nodeSizeSlice from "./features/nodeSizeSlice";
 import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
+import visibilitySlice from "./features/visibilitySlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -16,6 +17,7 @@ export const makeStore = () => {
       ui: uiSlice,
       status: statusSlice,
       data: dataSlice,
+      visibility: visibilitySlice,
     },
   });
 };

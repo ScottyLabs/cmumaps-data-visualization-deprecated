@@ -16,6 +16,7 @@ export const leavePage = (
 ) => {
   if (saveStatus === SAVED) {
     router.push(url);
+    return;
   }
 
   const message = "You have unsaved changes. Are you sure you want to leave?";

@@ -7,14 +7,13 @@ import { Path } from "react-konva";
 
 import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 
 const PolygonsDisplay = () => {
   const router = useRouter();
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
 
   const { rooms } = useContext(RoomsContext);
-  const { showPolygons } = useContext(VisibilitySettingsContext);
 
   // get all random colors
   const [fillColors, setFillColors] = useState<string[]>([]);

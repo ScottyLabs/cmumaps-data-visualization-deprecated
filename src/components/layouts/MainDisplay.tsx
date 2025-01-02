@@ -26,13 +26,20 @@ import {
   LOADED,
   startLoading,
 } from "../../lib/features/statusSlice";
+import {
+  toggleShowEdges,
+  toggleShowFile,
+  toggleShowLabels,
+  toggleShowNodes,
+  toggleShowOutline,
+  toggleShowPolygons,
+} from "../../lib/features/visibilitySlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import GraphProvider from "../contexts/GraphProvider";
 import OutlineProvider from "../contexts/OutlineProvider";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
-import VisibilitySettingsProvider from "../contexts/VisibilitySettingsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
 import { deleteNode } from "../shared/keyboardShortcuts";
 import { ID, Node, RoomInfo, DoorInfo, WalkwayTypeList } from "../shared/types";
@@ -62,29 +69,6 @@ const MainDisplay = ({ floorCode }: Props) => {
   const shortcutsDisabled = useAppSelector(
     (state) => state.status.shortcutsDisabled
   );
-
-  // visibility settings
-  const [showFile, setShowFile] = useState(false);
-  const [showOutline, setShowOutline] = useState(true);
-  const [showNodes, setShowNodes] = useState(true);
-  const [showEdges, setShowEdges] = useState(true);
-  const [showLabels, setShowLabels] = useState(false);
-  const [showPolygons, setShowPolygons] = useState(false);
-
-  const visibilitySettings = {
-    showFile,
-    setShowFile,
-    showOutline,
-    setShowOutline,
-    showNodes,
-    setShowNodes,
-    showEdges,
-    setShowEdges,
-    showLabels,
-    setShowLabels,
-    showPolygons,
-    setShowPolygons,
-  };
 
   // display data
   const [walls, setWalls] = useState<number[][]>([]);
@@ -216,16 +200,16 @@ const MainDisplay = ({ floorCode }: Props) => {
 
       // visibility
       if (event.key === "f") {
-        setShowFile(!showFile);
+        dispatch(toggleShowFile());
       } else if (event.key === "o") {
-        setShowOutline(!showOutline);
+        dispatch(toggleShowOutline());
       } else if (event.key === "g") {
-        setShowNodes(!showNodes);
-        setShowEdges(!showEdges);
+        dispatch(toggleShowNodes());
+        dispatch(toggleShowEdges());
       } else if (event.key === "l") {
-        setShowLabels(!showLabels);
+        dispatch(toggleShowLabels());
       } else if (event.key === "p") {
-        setShowPolygons(!showPolygons);
+        dispatch(toggleShowPolygons());
       }
 
       // quit
@@ -288,13 +272,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     nodes,
     shortcutsDisabled,
     editPolygon,
-    showFile,
-    showOutline,
-    showNodes,
-    showEdges,
-    showLabels,
     router,
-    showPolygons,
     dispatch,
     nodeIdSelected,
     rooms,
@@ -375,19 +353,15 @@ const MainDisplay = ({ floorCode }: Props) => {
       <RoomsProvider roomsData={{ rooms, setRooms }}>
         <OutlineProvider outlineData={outlineData}>
           <GraphProvider graphData={{ nodes, setNodes }}>
-            <VisibilitySettingsProvider
-              visibilitySettingsData={visibilitySettings}
-            >
-              <div className="fixed top-1/2 z-50 -translate-y-1/2">
-                <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+            <div className="fixed top-1/2 z-50 -translate-y-1/2">
+              <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+            </div>
+            <ZoomPanWrapper floorCode={floorCode} />
+            {nodeIdSelected && (
+              <div className="absolute right-4 top-28 z-50">
+                <InfoDisplay floorCode={floorCode} />
               </div>
-              <ZoomPanWrapper floorCode={floorCode} />
-              {nodeIdSelected && (
-                <div className="absolute right-4 top-28 z-50">
-                  <InfoDisplay floorCode={floorCode} />
-                </div>
-              )}
-            </VisibilitySettingsProvider>
+            )}
           </GraphProvider>
         </OutlineProvider>
       </RoomsProvider>

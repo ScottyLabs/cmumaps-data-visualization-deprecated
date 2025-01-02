@@ -34,7 +34,6 @@ import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { ID, Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
@@ -85,9 +84,11 @@ const FloorDisplay = ({
     getNodeIdSelected(state.mouseEvent)
   );
 
-  const { showOutline, showNodes, showEdges, showPolygons } = useContext(
-    VisibilitySettingsContext
-  );
+  const showOutline = useAppSelector((state) => state.visibility.showOutline);
+  const showNodes = useAppSelector((state) => state.visibility.showNodes);
+  const showEdges = useAppSelector((state) => state.visibility.showEdges);
+  const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
+
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes, setNodes } = useContext(GraphContext);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);

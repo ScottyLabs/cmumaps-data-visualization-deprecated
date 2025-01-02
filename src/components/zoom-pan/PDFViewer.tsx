@@ -1,6 +1,6 @@
 import { useSession } from "@clerk/nextjs";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiZoomIn } from "react-icons/fi";
 import { FiZoomOut } from "react-icons/fi";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -9,8 +9,8 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
 import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
+import { useAppSelector } from "../../lib/hooks";
 import { DEFAULT_PDF_SCALE_INDEX } from "../../settings";
-import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { PDFCoordinate } from "../shared/types";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -24,7 +24,7 @@ interface Props {
 const PDFViewer = ({ floorCode, scale, offset }: Props) => {
   const { session } = useSession();
 
-  const { showFile } = useContext(VisibilitySettingsContext);
+  const showFile = useAppSelector((state) => state.visibility.showFile);
 
   const [pdfScaleIndex, setPdfScaleIndex] = useState(DEFAULT_PDF_SCALE_INDEX);
   const pdfScales = [1, 2, 2.5, 3, 3.5, 4, 4.5, 5];

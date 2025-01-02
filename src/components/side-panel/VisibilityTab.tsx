@@ -1,11 +1,18 @@
 import { useRouter } from "next/navigation";
 
-import React, { useContext } from "react";
+import React from "react";
 
-import { useAppSelector } from "../../lib/hooks";
+import {
+  toggleShowEdges,
+  toggleShowFile,
+  toggleShowLabels,
+  toggleShowNodes,
+  toggleShowOutline,
+  toggleShowPolygons,
+} from "../../lib/features/visibilitySlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { SHOW_REGENERATE_BUTTON } from "../../settings";
 import ToggleSwitch from "../common/ToggleSwitch";
-import { VisibilitySettingsContext } from "../contexts/VisibilitySettingsProvider";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import SidePanelButton from "./SidePanelButton";
 
@@ -15,23 +22,15 @@ interface Props {
 
 const VisibilityTab = ({ parsePDF }: Props) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
-
-  const {
-    showFile,
-    setShowFile,
-    showOutline,
-    setShowOutline,
-    showNodes,
-    setShowNodes,
-    showEdges,
-    setShowEdges,
-    showLabels,
-    setShowLabels,
-    showPolygons,
-    setShowPolygons,
-  } = useContext(VisibilitySettingsContext);
+  const showFile = useAppSelector((state) => state.visibility.showFile);
+  const showOutline = useAppSelector((state) => state.visibility.showOutline);
+  const showNodes = useAppSelector((state) => state.visibility.showNodes);
+  const showEdges = useAppSelector((state) => state.visibility.showEdges);
+  const showLabels = useAppSelector((state) => state.visibility.showLabels);
+  const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
 
   const renderToggle = (
     text: string,
@@ -57,17 +56,17 @@ const VisibilityTab = ({ parsePDF }: Props) => {
 
   return (
     <div className="ml-3 mr-2 mt-1 space-y-5">
-      {renderToggle("Show File", showFile, () => setShowFile(!showFile))}
+      {renderToggle("Show File", showFile, () => dispatch(toggleShowFile()))}
       {renderToggle("Show Outline", showOutline, () =>
-        setShowOutline(!showOutline)
+        dispatch(toggleShowOutline())
       )}
-      {renderToggle("Show Nodes", showNodes, () => setShowNodes(!showNodes))}
-      {renderToggle("Show Edges", showEdges, () => setShowEdges(!showEdges))}
+      {renderToggle("Show Nodes", showNodes, () => dispatch(toggleShowNodes()))}
+      {renderToggle("Show Edges", showEdges, () => dispatch(toggleShowEdges()))}
       {renderToggle("Show Labels", showLabels, () =>
-        setShowLabels(!showLabels)
+        dispatch(toggleShowLabels())
       )}
       {renderToggle("Show Polygons", showPolygons, () =>
-        setShowPolygons(!showPolygons)
+        dispatch(toggleShowPolygons())
       )}
 
       {SHOW_REGENERATE_BUTTON && !editPolygon && (

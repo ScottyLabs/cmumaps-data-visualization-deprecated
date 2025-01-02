@@ -306,6 +306,7 @@ const MainDisplay = ({ floorCode }: Props) => {
 
   // select node, door, or room based on searchParams
   const searchParams = useSearchParams();
+  const [statesUpdated, setStateUpdated] = useState<boolean>(false);
   useEffect(() => {
     if (Object.keys(rooms).length == 0 || Object.keys(nodes).length == 0) {
       return;
@@ -361,7 +362,13 @@ const MainDisplay = ({ floorCode }: Props) => {
     } else {
       dispatch(deselect());
     }
+
+    setStateUpdated(true);
   }, [dispatch, floorCode, nodes, rooms, searchParams, setSaveStatus]);
+
+  if (!statesUpdated) {
+    return;
+  }
 
   return (
     !loadingText && (

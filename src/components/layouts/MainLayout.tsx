@@ -53,6 +53,7 @@ const MainLayout = ({ buildingCode, floorLevel, floorLevels }: Props) => {
   };
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SAVED);
+
   // warning before closing tab
   useEffect(() => {
     const handleWindowClose = (e) => {

@@ -6,7 +6,6 @@ import { Group, Path, Rect } from "react-konva";
 
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { GraphContext } from "../contexts/GraphProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { RoomInfo } from "../shared/types";
 import { getRoomId, savingHelper, setCursor } from "../utils/utils";
@@ -25,7 +24,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
 
   const doors = useAppSelector((state) => state.outline.doors);
   const { rooms, setRooms } = useContext(RoomsContext);
-  const { nodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -36,7 +35,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const width = Number(viewBox[2]);
   const height = Number(viewBox[3]);
 
-  if (!doors) {
+  if (!doors || !nodes) {
     return;
   }
 

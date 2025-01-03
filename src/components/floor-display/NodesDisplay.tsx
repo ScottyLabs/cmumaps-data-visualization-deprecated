@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
+import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -13,7 +14,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { GraphContext } from "../contexts/GraphProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
@@ -39,7 +39,7 @@ const NodesDisplay = ({
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
 
   const { rooms } = useContext(RoomsContext);
-  const { nodes, setNodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
 
   const nodeIdHovered = useAppSelector(
     (state) => state.mouseEvent.nodeIdHovered
@@ -48,6 +48,10 @@ const NodesDisplay = ({
     getNodeIdSelected(state.mouseEvent)
   );
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
+
+  if (!nodes) {
+    return;
+  }
 
   const getFillColor = (nodeId: ID) => {
     if (nodeId == nodeIdSelected) {
@@ -136,7 +140,7 @@ const NodesDisplay = ({
         addEdge(nodeIdSelected, nodeId, newNodes);
       }
 
-      setNodes(newNodes);
+      dispatch(setNodes(newNodes));
 
       savingHelper(
         "/api/updateGraph",
@@ -169,7 +173,7 @@ const NodesDisplay = ({
       delete newNode.neighbors[nodeId];
       newNodes[nodeIdSelected] = newNode;
 
-      setNodes(newNodes);
+      dispatch(setNodes(newNodes));
 
       savingHelper(
         "/api/updateGraph",
@@ -205,12 +209,15 @@ const NodesDisplay = ({
       if (!newNode.neighbors[neighborId].toFloorInfo) {
         const newDist = dist(newNode.pos, newNodes[neighborId].pos);
         newNode.neighbors[neighborId] = { dist: newDist };
-        newNodes[neighborId].neighbors[nodeId] = { dist: newDist };
+
+        const newNeighbor = JSON.parse(JSON.stringify(newNodes[neighborId]));
+        newNeighbor.neighbors[nodeId] = { dist: newDist };
+        newNodes[neighborId] = newNeighbor;
       }
     }
 
     newNodes[nodeId] = newNode;
-    setNodes(newNodes);
+    dispatch(setNodes(newNodes));
 
     savingHelper(
       "/api/node/update",

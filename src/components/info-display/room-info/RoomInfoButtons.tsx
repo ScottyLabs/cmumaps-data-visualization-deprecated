@@ -5,6 +5,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import { DEFAULT_DENSITY } from "../../../app/api/detectWalkway/detectWalkway";
 import { AWS_API_INVOKE_URL } from "../../../lib/apiRoutes";
+import { setNodes } from "../../../lib/features/dataSlice";
 import {
   GRAPH_SELECT,
   POLYGON_ADD_VERTEX,
@@ -19,7 +20,6 @@ import {
 } from "../../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
-import { GraphContext } from "../../contexts/GraphProvider";
 import { PolygonContext } from "../../contexts/PolygonProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { WalkwayTypeList } from "../../shared/types";
@@ -38,7 +38,7 @@ const RoomInfoTable = () => {
   );
 
   const { rooms } = useContext(RoomsContext);
-  const { nodes, setNodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
@@ -156,7 +156,7 @@ const RoomInfoTable = () => {
       }
 
       // setNodes({ ...nodes, ...walkwayBody.nodes });
-      setNodes(walkwayBody.nodes);
+      dispatch(setNodes(walkwayBody.nodes));
       dispatch(finishLoading());
     };
 

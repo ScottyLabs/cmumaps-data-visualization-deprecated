@@ -3,6 +3,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
+import { setNodes } from "../../lib/features/dataSlice";
 import {
   failedSaving,
   finishSaving,
@@ -158,7 +159,7 @@ export const savingHelper = async (
   return response.ok;
 };
 
-export const addDoorsToGraph = async (floorCode, doorInfos, type, setNodes) => {
+export const addDoorsToGraph = async (floorCode, doorInfos, type, dispatch) => {
   const response = await fetch("/api/addDoorToGraph", {
     method: "POST",
     body: JSON.stringify({
@@ -180,5 +181,5 @@ export const addDoorsToGraph = async (floorCode, doorInfos, type, setNodes) => {
     }
   }
 
-  setNodes(body.nodes);
+  dispatch(setNodes(body.nodes));
 };

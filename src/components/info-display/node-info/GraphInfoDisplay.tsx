@@ -1,8 +1,7 @@
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
-import { GraphContext } from "../../contexts/GraphProvider";
 import AddEdgeAcrossFloorsSection from "./AddEdgeAcrossFloorsSection";
 import DifferentFloorNeighborTable from "./DifferentFloorNeighborTable";
 import GraphInfoButtons from "./GraphInfoButtons";
@@ -13,10 +12,10 @@ interface Props {
 }
 
 const GraphInfoDisplay = ({ floorCode }: Props) => {
-  const { nodes } = useContext(GraphContext);
-
+  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-  const neighbors = nodes[nodeId].neighbors;
+
+  const neighbors = nodes ? nodes[nodeId].neighbors : null;
 
   const { sameFloorNeighbors, differentFloorNeighbors } = useMemo(() => {
     const sameFloor = {};
@@ -35,6 +34,10 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
       differentFloorNeighbors: differentFloor,
     };
   }, [neighbors]);
+
+  if (!neighbors) {
+    return;
+  }
 
   return (
     <>

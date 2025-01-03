@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-import React, { useContext } from "react";
+import React from "react";
 
+import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { GraphContext } from "../../contexts/GraphProvider";
 import { Node, Edge, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { savingHelper } from "../../utils/utils";
@@ -23,8 +23,7 @@ const DifferentFloorNeighborTable = ({
 }: Props) => {
   const dispatch = useAppDispatch();
 
-  const { nodes, setNodes } = useContext(GraphContext);
-
+  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const renderDifferentFloorNeighbors = (
@@ -60,7 +59,7 @@ const DifferentFloorNeighborTable = ({
 
         newToFloorInfo.type = newValue.value;
 
-        setNodes(newNodes);
+        dispatch(setNodes(newNodes));
 
         // update this floor's graph json
         savingHelper(
@@ -93,7 +92,7 @@ const DifferentFloorNeighborTable = ({
 
       delete newNodes[nodeId].neighbors[neighborId];
 
-      setNodes(newNodes);
+      dispatch(setNodes(newNodes));
 
       // update this floor's graph json
       savingHelper(

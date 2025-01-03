@@ -13,6 +13,7 @@ import React, {
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
+import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -31,7 +32,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
-import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { ID, Node } from "../shared/types";
@@ -90,7 +90,7 @@ const FloorDisplay = ({
   const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
 
   const { rooms, setRooms } = useContext(RoomsContext);
-  const { nodes, setNodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
@@ -199,7 +199,7 @@ const FloorDisplay = ({
 
     router.push(`?nodeId=${newNodeId}`);
 
-    setNodes(newNodes);
+    dispatch(setNodes(newNodes));
 
     savingHelper(
       "/api/updateGraph",

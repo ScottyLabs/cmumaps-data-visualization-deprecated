@@ -9,7 +9,7 @@ import {
   AS_NODE,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
-import { setMst } from "../../lib/features/dataSlice";
+import { setMst, setNodes } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setDoors } from "../../lib/features/outlineSlice";
 import {
@@ -18,7 +18,6 @@ import {
   startLoading,
 } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { GraphContext } from "../contexts/GraphProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import QuestionCircle from "../shared/QuestionCircle";
 import { calcMst, removeOverlappingsNodes } from "../utils/graphUtils";
@@ -36,13 +35,16 @@ const GraphTab = ({ floorCode }: Props) => {
 
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const doors = useAppSelector((state) => state.outline.doors);
-
-  const { nodes, setNodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
   const { rooms } = useContext(RoomsContext);
+
+  if (!doors || !nodes) {
+    return;
+  }
 
   const handleRemoveOverlappingsNodes = () => {
     const newNodes = removeOverlappingsNodes(nodes, nodeSize);
-    setNodes(newNodes);
+    dispatch(setNodes(newNodes));
     savingHelper(
       "/api/updateGraph",
       JSON.stringify({
@@ -69,10 +71,6 @@ const GraphTab = ({ floorCode }: Props) => {
     });
   };
 
-  if (!doors) {
-    return;
-  }
-
   // used for addDoorToGraph api
   const doorInfos = Object.values(doors).filter(
     (door) => door.roomIds.length == 2
@@ -97,7 +95,7 @@ const GraphTab = ({ floorCode }: Props) => {
       <SidePanelButton
         text="Nodes"
         handleClick={() =>
-          addDoorsToGraph(floorCode, doorInfos, AS_NODE, setNodes)
+          addDoorsToGraph(floorCode, doorInfos, AS_NODE, dispatch)
         }
         style="ml-2 px-2 py-1 border"
       />

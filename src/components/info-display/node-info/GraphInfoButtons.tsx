@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 
-import React, { useContext } from "react";
+import React from "react";
 import { toast } from "react-toastify";
 
 import {
@@ -11,7 +11,6 @@ import {
 } from "../../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { GraphContext } from "../../contexts/GraphProvider";
 import { deleteNode } from "../../shared/keyboardShortcuts";
 import { RED_BUTTON_STYLE } from "../../utils/displayUtils";
 
@@ -24,8 +23,7 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-
-  const { nodes, setNodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
 
   const renderButton = (text, handleClick, style?) => {
     return (
@@ -54,7 +52,7 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
 
   const renderDeleteNodeButton = () => {
     const deleteNodeHelper = () =>
-      deleteNode(nodes, nodeId, setNodes, floorCode, router, dispatch);
+      deleteNode(nodes, nodeId, floorCode, router, dispatch);
 
     return renderButton("Delete Node", deleteNodeHelper, RED_BUTTON_STYLE);
   };

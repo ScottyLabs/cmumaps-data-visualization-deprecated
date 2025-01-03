@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
+import { setNodes } from "../../lib/features/dataSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { Presence, useOthers } from "../../liveblocks.config";
-import { GraphContext } from "../contexts/GraphProvider";
 
 interface Props {
   scale: number;
@@ -11,7 +12,9 @@ interface Props {
 
 const LiveCursors = ({ scale }: Props) => {
   const others = useOthers();
-  const { nodes, setNodes } = useContext(GraphContext);
+
+  const dispatch = useAppDispatch();
+  const nodes = useAppSelector((state) => state.data.nodes);
 
   // const [myPresence, _updateMyPresence] = useMyPresence();
 
@@ -32,9 +35,9 @@ const LiveCursors = ({ scale }: Props) => {
       }
     });
 
-    setNodes(newNodes);
+    dispatch(setNodes(newNodes));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [others, setNodes]);
+  }, [others]);
 
   const drawCursor = (connectionId, presence: Presence) => {
     const path = GiArrowCursor({}).props.children[0].props.d;

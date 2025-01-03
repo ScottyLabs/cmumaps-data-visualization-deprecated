@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
+import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -37,12 +38,11 @@ import {
 } from "../../lib/features/visibilitySlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
-import GraphProvider from "../contexts/GraphProvider";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
 import { deleteNode } from "../shared/keyboardShortcuts";
-import { ID, Node, RoomInfo, WalkwayTypeList } from "../shared/types";
+import { ID, RoomInfo, WalkwayTypeList } from "../shared/types";
 import SidePanel from "../side-panel/SidePanel";
 import { calcMst } from "../utils/graphUtils";
 import {
@@ -70,9 +70,8 @@ const MainDisplay = ({ floorCode }: Props) => {
     (state) => state.status.shortcutsDisabled
   );
 
-  // display data
+  const nodes = useAppSelector((state) => state.data.nodes);
   const [rooms, setRooms] = useState<Record<ID, RoomInfo>>({});
-  const [nodes, setNodes] = useState<Record<ID, Node>>({});
 
   // polygon editing history
   const [history, setHistory] = useState<Polygon[]>([]);
@@ -169,8 +168,7 @@ const MainDisplay = ({ floorCode }: Props) => {
         return;
       }
 
-      setNodes(graphBody.result);
-
+      dispatch(setNodes(graphBody.result));
       dispatch(finishLoading());
     },
     [dispatch, floorCode]
@@ -230,21 +228,16 @@ const MainDisplay = ({ floorCode }: Props) => {
           toastNodeNotSelectedErr();
         }
       } else if (event.key === "m") {
-        calcMst(nodes, rooms, router, dispatch);
+        if (nodes) {
+          calcMst(nodes, rooms, router, dispatch);
+        }
       } else if (
         event.key === "Backspace" ||
         event.key === "Delete" ||
         event.key === "Escape"
       ) {
         if (nodeIdSelected) {
-          deleteNode(
-            nodes,
-            nodeIdSelected,
-            setNodes,
-            floorCode,
-            router,
-            dispatch
-          );
+          deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
         } else {
           toastNodeNotSelectedErr();
         }
@@ -261,20 +254,20 @@ const MainDisplay = ({ floorCode }: Props) => {
   }, [
     floorCode,
     idSelected,
-    nodes,
     shortcutsDisabled,
     editPolygon,
     router,
     dispatch,
     nodeIdSelected,
     rooms,
+    nodes,
   ]);
 
   // select node, door, or room based on searchParams
   const searchParams = useSearchParams();
   const [statesUpdated, setStateUpdated] = useState<boolean>(false);
   useEffect(() => {
-    if (Object.keys(rooms).length == 0 || Object.keys(nodes).length == 0) {
+    if (Object.keys(rooms).length == 0 || !nodes) {
       return;
     }
 
@@ -306,7 +299,7 @@ const MainDisplay = ({ floorCode }: Props) => {
           roomId: roomId,
         };
 
-        setNodes(newNodes);
+        dispatch(setNodes(newNodes));
 
         savingHelper(
           "/api/updateGraph",
@@ -343,17 +336,15 @@ const MainDisplay = ({ floorCode }: Props) => {
   return (
     <PolygonProvider polygonData={polygonData}>
       <RoomsProvider roomsData={{ rooms, setRooms }}>
-        <GraphProvider graphData={{ nodes, setNodes }}>
-          <div className="fixed top-1/2 z-50 -translate-y-1/2">
-            <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+        <div className="fixed top-1/2 z-50 -translate-y-1/2">
+          <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+        </div>
+        <ZoomPanWrapper floorCode={floorCode} />
+        {nodeIdSelected && (
+          <div className="absolute right-4 top-28 z-50">
+            <InfoDisplay floorCode={floorCode} />
           </div>
-          <ZoomPanWrapper floorCode={floorCode} />
-          {nodeIdSelected && (
-            <div className="absolute right-4 top-28 z-50">
-              <InfoDisplay floorCode={floorCode} />
-            </div>
-          )}
-        </GraphProvider>
+        )}
       </RoomsProvider>
     </PolygonProvider>
   );

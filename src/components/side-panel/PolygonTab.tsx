@@ -11,7 +11,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { GraphContext } from "../contexts/GraphProvider";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
@@ -38,7 +37,7 @@ const PolygonTab = ({ floorCode }: Props) => {
     setCoordsIndex,
   } = useContext(PolygonContext);
 
-  const { nodes } = useContext(GraphContext);
+  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
   const polygon = rooms[roomId].polygon;

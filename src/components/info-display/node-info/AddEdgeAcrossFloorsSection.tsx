@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
+import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { GraphContext } from "../../contexts/GraphProvider";
 import { connectedBuildings } from "../../shared/buildings";
 import { Floor } from "../../shared/types";
 
@@ -16,8 +16,6 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const floorLevels = useAppSelector((state) => state.data.floorLevels);
-
-  const { setNodes } = useContext(GraphContext);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
@@ -92,7 +90,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
 
     toast.info(body.message);
 
-    setNodes(body.newGraph);
+    dispatch(setNodes(body.newGraph));
 
     // clear inputs
     setFloorCode2("");
@@ -172,7 +170,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
 
       toast.info(body.message);
 
-      setNodes(body.newGraph);
+      dispatch(setNodes(body.newGraph));
 
       // clear inputs
       setFloorCode2("");

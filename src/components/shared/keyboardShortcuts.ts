@@ -1,3 +1,4 @@
+import { setNodes } from "../../lib/features/dataSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { deselect } from "../../lib/features/mouseEventSlice";
 import { dist, savingHelper } from "../utils/utils";
@@ -6,7 +7,6 @@ import { Edge } from "./types";
 export const deleteNode = async (
   nodes,
   nodeId,
-  setNodes,
   floorCode,
   router,
   dispatch
@@ -62,7 +62,7 @@ export const deleteNode = async (
     }
   }
 
-  setNodes(newNodes);
+  dispatch(setNodes(newNodes));
 
   savingHelper(
     "/api/updateGraph",

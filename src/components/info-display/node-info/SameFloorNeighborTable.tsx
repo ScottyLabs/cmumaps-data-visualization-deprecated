@@ -1,14 +1,14 @@
 import { useRouter } from "next/navigation";
 
-import React, { useContext } from "react";
+import React from "react";
 
+import { setNodes } from "../../../lib/features/dataSlice";
 import {
   getNodeIdSelected,
   setNodeIdHovered,
   unHoverNode,
 } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { GraphContext } from "../../contexts/GraphProvider";
 import { Edge } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { savingHelper } from "../../utils/utils";
@@ -22,8 +22,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { nodes, setNodes } = useContext(GraphContext);
-
+  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const deleteEdge = (nodeId, neighborID) => {
@@ -37,7 +36,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
 
     delete newNodes[neighborID].neighbors[nodeId];
 
-    setNodes(newNodes);
+    dispatch(setNodes(newNodes));
 
     savingHelper(
       "/api/updateGraph",

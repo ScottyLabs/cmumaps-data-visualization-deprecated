@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 
 import React, { useContext } from "react";
 
+import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { GraphContext } from "../../contexts/GraphProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { Node, RoomInfo, RoomTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
@@ -26,11 +26,14 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const { rooms, setRooms } = useContext(RoomsContext);
-  const { nodes, setNodes } = useContext(GraphContext);
-
+  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];
+
+  if (!nodes) {
+    return;
+  }
 
   if (!roomId) {
     const createRoom = async () => {
@@ -54,7 +57,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
 
       const newNodes = { ...nodes };
       newNodes[nodeId].roomId = newRoomId;
-      setNodes(newNodes);
+      dispatch(setNodes(newNodes));
 
       savingHelper(
         "/api/updateRoomInfo",
@@ -123,7 +126,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
             newNodes[nodeId] = newNode;
           }
         }
-        setNodes(newNodes);
+        dispatch(setNodes(newNodes));
 
         // need to delete the old room entry
         delete newRooms[roomId];

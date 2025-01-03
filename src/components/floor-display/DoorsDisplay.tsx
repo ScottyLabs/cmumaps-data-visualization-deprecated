@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-import React, { useContext } from "react";
+import React from "react";
 import { Line } from "react-konva";
 
 import { AS_NODE } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
@@ -11,7 +11,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { GraphContext } from "../contexts/GraphProvider";
 import { DoorInfo, ID } from "../shared/types";
 import { addDoorsToGraph, setCursor } from "../utils/utils";
 
@@ -27,12 +26,11 @@ const DoorsDisplay = ({ floorCode }: Props) => {
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
+  const nodes = useAppSelector((state) => state.data.nodes);
   const doors = useAppSelector((state) => state.outline.doors);
   const roomlessDoors = useAppSelector((state) => state.outline.roomlessDoors);
 
-  const { nodes, setNodes } = useContext(GraphContext);
-
-  if (!doors || !roomlessDoors) {
+  if (!nodes || !doors || !roomlessDoors) {
     return;
   }
 
@@ -40,7 +38,7 @@ const DoorsDisplay = ({ floorCode }: Props) => {
     const handleDoorClick = (doorId) => {
       if (!editPolygon) {
         if (mode == ADD_DOOR_NODE) {
-          addDoorsToGraph(floorCode, [doors[doorId]], AS_NODE, setNodes);
+          addDoorsToGraph(floorCode, [doors[doorId]], AS_NODE, dispatch);
           dispatch(setMode(GRAPH_SELECT));
         } else {
           router.push(`?doorId=${doorId}`);

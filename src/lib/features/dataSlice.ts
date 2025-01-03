@@ -10,8 +10,10 @@ interface DataState {
   floorLevels: string[] | null;
   nodes: Graph | null;
   mst: Mst | null;
+  // all operations <= editIndex are reversed operations
+  // all operations >  editIndex are original operations
   editHistory: Operation[][];
-  editIndex: number;
+  editIndex: number; // points to the edit to undo
 }
 
 const initialState: DataState = {
@@ -19,7 +21,7 @@ const initialState: DataState = {
   nodes: null,
   mst: null,
   editHistory: [],
-  editIndex: -1, // points to the edit to undo
+  editIndex: -1,
 };
 
 const dataSlice = createSlice({
@@ -44,7 +46,7 @@ const dataSlice = createSlice({
         state.editIndex = state.editHistory.length - 1;
       } catch (error) {
         console.error("Error applying patch:", error);
-        toast.error("Failed to apply patch.");
+        toast.error("Failed to apply change!");
       }
     },
 
@@ -56,11 +58,34 @@ const dataSlice = createSlice({
 
       try {
         const reversedPatch = state.editHistory[state.editIndex];
+        // replace with the orig patch
+        const orig = reversePatch(state.nodes, reversedPatch);
+        state.editHistory[state.editIndex] = orig;
+        // apply the reveresed patch to nodes
         state.nodes = applyPatch(state.nodes, reversedPatch).newDocument;
         state.editIndex -= 1;
       } catch (error) {
         console.error("Error undoing patch:", error);
-        toast.error("Failed to undo change.");
+        toast.error("Failed to undo change!");
+      }
+    },
+    redo(state) {
+      if (state.editIndex == state.editHistory.length - 1) {
+        toast.error("Can't redo anymore!");
+        return;
+      }
+
+      try {
+        state.editIndex += 1;
+        const patch = state.editHistory[state.editIndex];
+        // replace with the reversed patch
+        const reversedPatch = reversePatch(state.nodes, patch);
+        state.editHistory[state.editIndex] = reversedPatch;
+        // redo by applying the orig patch
+        state.nodes = applyPatch(state.nodes, patch).newDocument;
+      } catch (error) {
+        console.error("Error redoing patch:", error);
+        toast.error("Failed to redo change!");
       }
     },
 
@@ -70,6 +95,12 @@ const dataSlice = createSlice({
   },
 });
 
-export const { setFloorLevels, setNodes, applyPatchToGraph, setMst, undo } =
-  dataSlice.actions;
+export const {
+  setFloorLevels,
+  setNodes,
+  applyPatchToGraph,
+  setMst,
+  undo,
+  redo,
+} = dataSlice.actions;
 export default dataSlice.reducer;

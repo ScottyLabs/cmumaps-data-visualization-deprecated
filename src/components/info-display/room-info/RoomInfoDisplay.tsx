@@ -2,17 +2,14 @@ import { v4 as uuidv4 } from "uuid";
 
 import React, { useContext } from "react";
 
+import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { Node, RoomInfo, RoomTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import {
-  getRoomId,
-  getRoomIdFromRoomInfo,
-  savingHelper,
-} from "../../utils/utils";
+import { getRoomId, getRoomIdFromRoomInfo } from "../../utils/utils";
 import EditCell from "../EditCell";
 import EditTypeRow from "../SelectTypeCell";
 import AliasesMultiSelect from "./AliasesMultiSelect";

@@ -8,6 +8,7 @@ import {
   AS_EDGE,
   AS_NODE,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
+import { savingHelper } from "../../lib/apiRoutes";
 import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
 import { setMst, setNodes } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
@@ -21,7 +22,7 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import QuestionCircle from "../shared/QuestionCircle";
 import { calcMst, removeOverlappingsNodes } from "../utils/graphUtils";
-import { addDoorsToGraph, savingHelper } from "../utils/utils";
+import { addDoorsToGraph } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
 

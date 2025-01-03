@@ -4,11 +4,12 @@ import React, { useContext } from "react";
 import { TfiLocationPin } from "react-icons/tfi";
 import { Group, Path, Rect } from "react-konva";
 
+import { savingHelper } from "../../lib/apiRoutes";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { RoomInfo } from "../shared/types";
-import { getRoomId, savingHelper, setCursor } from "../utils/utils";
+import { getRoomId, setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;

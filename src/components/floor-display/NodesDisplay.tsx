@@ -5,6 +5,7 @@ import React, { useContext } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
+import { savingHelper } from "../../lib/apiRoutes";
 import { applyPatchToGraph, setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -23,7 +24,7 @@ import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
-import { dist, getRoomId, savingHelper, setCursor } from "../utils/utils";
+import { dist, getRoomId, setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;

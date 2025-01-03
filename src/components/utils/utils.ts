@@ -1,14 +1,7 @@
-import { Dispatch } from "@reduxjs/toolkit";
-
 import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
 import { setNodes } from "../../lib/features/dataSlice";
-import {
-  failedSaving,
-  finishSaving,
-  startSaving,
-} from "../../lib/features/statusSlice";
 import { Graph, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
 
 /**
@@ -124,39 +117,6 @@ export const setCursor = (e, cursor) => {
     const container = curStage.container();
     container.style.cursor = cursor;
   }
-};
-
-/**
- * POST `apiPath` with `body`
- *
- * @remarks Responsible for error handling.
- *
- * @param apiPath The POST api path that only returns if the request succeeded.
- * @param body The request's body
- * @returns Whether or not the request succeeded
- */
-export const savingHelper = async (
-  apiPath: string,
-  body: BodyInit,
-  dispatch: Dispatch
-): Promise<boolean> => {
-  dispatch(startSaving());
-  const response = await fetch(apiPath, { method: "POST", body });
-
-  if (response.ok) {
-    dispatch(finishSaving());
-  } else {
-    dispatch(failedSaving());
-    const body = await response.json();
-    console.error(body.error);
-    if (body.errorMessage) {
-      toast.error(body.errorMessage);
-    } else {
-      toast.error("Check the Console for detailed error!");
-    }
-  }
-
-  return response.ok;
 };
 
 export const addDoorsToGraph = async (floorCode, doorInfos, type, dispatch) => {

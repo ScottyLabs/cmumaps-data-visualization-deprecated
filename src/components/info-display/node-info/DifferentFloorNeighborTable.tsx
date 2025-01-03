@@ -2,12 +2,12 @@ import Link from "next/link";
 
 import React from "react";
 
+import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { Node, Edge, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import { savingHelper } from "../../utils/utils";
 import EditTypeRow from "../SelectTypeCell";
 
 interface Props {

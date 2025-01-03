@@ -1,7 +1,7 @@
 import { Polygon } from "geojson";
 
+import { savingHelper } from "../../lib/apiRoutes";
 import { ID } from "../shared/types";
-import { savingHelper } from "./utils";
 
 export const saveToPolygonHistory = (
   history,

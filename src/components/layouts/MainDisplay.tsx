@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
+import { savingHelper } from "../../lib/apiRoutes";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -45,11 +46,7 @@ import { deleteNode } from "../shared/keyboardShortcuts";
 import { ID, RoomInfo, WalkwayTypeList } from "../shared/types";
 import SidePanel from "../side-panel/SidePanel";
 import { calcMst } from "../utils/graphUtils";
-import {
-  getNodeIdByRoomId,
-  getRoomIdByRoomName,
-  savingHelper,
-} from "../utils/utils";
+import { getNodeIdByRoomId, getRoomIdByRoomName } from "../utils/utils";
 import ZoomPanWrapper from "../zoom-pan/ZoomPanWrapper";
 
 interface Props {

@@ -2,6 +2,7 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 
+import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import {
   getNodeIdSelected,
@@ -11,7 +12,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { Edge } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import { dist, savingHelper } from "../../utils/utils";
+import { dist } from "../../utils/utils";
 
 interface Props {
   floorCode: string;

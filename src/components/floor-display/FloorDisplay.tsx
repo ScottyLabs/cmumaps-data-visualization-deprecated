@@ -13,6 +13,7 @@ import React, {
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
+import { savingHelper } from "../../lib/apiRoutes";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -38,7 +39,7 @@ import { Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
-import { distPointToLine, getRoomId, savingHelper } from "../utils/utils";
+import { distPointToLine, getRoomId } from "../utils/utils";
 import LiveCursors from "../zoom-pan/LiveCursors";
 import DoorsDisplay from "./DoorsDisplay";
 import EdgesDisplay from "./EdgesDisplay";

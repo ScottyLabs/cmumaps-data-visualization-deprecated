@@ -194,6 +194,7 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
   const handleOnDragEnd = (e, nodeId) => {
     updateMyPresenceWrapper({ onDragNodeId: null });
     dispatch(releaseNode());
+
     const newNodes = { ...nodes };
     const newNode = JSON.parse(JSON.stringify(newNodes[nodeId]));
 

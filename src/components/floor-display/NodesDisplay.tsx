@@ -1,10 +1,11 @@
+import { compare } from "fast-json-patch";
 import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
-import { setNodes } from "../../lib/features/dataSlice";
+import { applyPatchToGraph, setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -202,20 +203,10 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
 
     newNode.roomId = findRoomId(rooms, newNode.pos);
 
-    for (const neighborId in newNode.neighbors) {
-      // don't modify distance for edge across floors
-      if (!newNode.neighbors[neighborId].toFloorInfo) {
-        const newDist = dist(newNode.pos, newNodes[neighborId].pos);
-        newNode.neighbors[neighborId] = { dist: newDist };
-
-        const newNeighbor = JSON.parse(JSON.stringify(newNodes[neighborId]));
-        newNeighbor.neighbors[nodeId] = { dist: newDist };
-        newNodes[neighborId] = newNeighbor;
-      }
-    }
-
     newNodes[nodeId] = newNode;
-    dispatch(setNodes(newNodes));
+
+    const patch = compare(nodes, newNodes);
+    dispatch(applyPatchToGraph(patch));
 
     savingHelper(
       "/api/node/update",

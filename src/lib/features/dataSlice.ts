@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { applyPatch, Operation } from "fast-json-patch";
 
 import { Graph, Mst } from "../../components/shared/types";
 
@@ -25,6 +26,9 @@ const dataSlice = createSlice({
     setNodes(state, action) {
       state.nodes = action.payload;
     },
+    applyPatchToGraph(state, action: PayloadAction<Operation[]>) {
+      state.nodes = applyPatch(state.nodes, action.payload).newDocument;
+    },
 
     setMst(state, action: PayloadAction<Mst | null>) {
       state.mst = action.payload;
@@ -32,5 +36,6 @@ const dataSlice = createSlice({
   },
 });
 
-export const { setFloorLevels, setNodes, setMst } = dataSlice.actions;
+export const { setFloorLevels, setNodes, applyPatchToGraph, setMst } =
+  dataSlice.actions;
 export default dataSlice.reducer;

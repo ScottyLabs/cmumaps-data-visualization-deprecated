@@ -18,7 +18,7 @@ const SelectedPolygonDisplay = ({
   roomIdSelected,
   polygon,
 }: Props) => {
-  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
   if (!polygon) {

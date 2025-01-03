@@ -35,7 +35,7 @@ const NodesDisplay = ({
   const dispatch = useAppDispatch();
 
   const mode = useAppSelector((state) => state.mode.mode);
-  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
 
   const { rooms } = useContext(RoomsContext);

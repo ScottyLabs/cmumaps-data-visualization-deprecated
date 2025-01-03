@@ -34,7 +34,7 @@ const GraphTab = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const doors = useAppSelector((state) => state.outline.doors);
 
   const { nodes, setNodes } = useContext(GraphContext);

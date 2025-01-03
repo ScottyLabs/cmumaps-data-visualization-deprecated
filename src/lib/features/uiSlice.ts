@@ -4,12 +4,14 @@ interface UIState {
   infoDisplayActiveTabIndex: number;
   showRoomSpecific: boolean;
   editRoomLabel: boolean;
+  nodeSize: number;
 }
 
 const initialState: UIState = {
   infoDisplayActiveTabIndex: 0,
   showRoomSpecific: false,
   editRoomLabel: false,
+  nodeSize: 2,
 };
 
 const UISlice = createSlice({
@@ -33,6 +35,10 @@ const UISlice = createSlice({
     toggleEditRoomLabel(state) {
       state.editRoomLabel = !state.editRoomLabel;
     },
+
+    setNodeSize(state, action: PayloadAction<number>) {
+      state.nodeSize = action.payload;
+    },
   },
 });
 
@@ -42,5 +48,6 @@ export const {
   toggleShowRoomSpecific,
   setEditRoomLabel,
   toggleEditRoomLabel,
+  setNodeSize,
 } = UISlice.actions;
 export default UISlice.reducer;

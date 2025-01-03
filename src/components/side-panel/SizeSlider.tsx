@@ -1,6 +1,6 @@
 import React from "react";
 
-import { setNodeSize } from "../../lib/features/nodeSizeSlice";
+import { setNodeSize } from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 
 const NodeSizeSlider = ({ text }: Props) => {
   const dispatch = useAppDispatch();
-  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const nodeSize = useAppSelector((state) => state.ui.nodeSize);
 
   return (
     <div className="w-48">

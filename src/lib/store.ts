@@ -3,7 +3,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import dataSlice from "./features/dataSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
-import nodeSizeSlice from "./features/nodeSizeSlice";
 import outlineSlice from "./features/outlineSlice";
 import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
@@ -13,7 +12,6 @@ export const makeStore = () => {
   return configureStore({
     reducer: {
       mode: modeSlice,
-      nodeSize: nodeSizeSlice,
       mouseEvent: mouseEventSlice,
       ui: uiSlice,
       status: statusSlice,

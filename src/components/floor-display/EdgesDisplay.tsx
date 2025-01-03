@@ -12,7 +12,7 @@ interface Props {
 }
 
 const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
-  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const mst = useAppSelector((state) => state.data.mst);
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
   const nodeIdSelected = useAppSelector((state) =>

@@ -10,7 +10,7 @@ import { RoomsContext } from "../contexts/RoomsProvider";
 
 const PolygonsDisplay = () => {
   const router = useRouter();
-  const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
 
   const { rooms } = useContext(RoomsContext);

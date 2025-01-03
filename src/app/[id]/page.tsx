@@ -122,31 +122,32 @@ const Page = ({ params }: { params: { id: string } }) => {
     }
   }, [mode]);
 
-  //#region Validate floor level and redirect if invalid
-  if (!buildings[buildingCode]) {
-    sessionStorage.setItem("error", "InvalidBuildingCode");
-    redirect("/");
-  }
+  // Validate floor level and redirect if invalid
+  (() => {
+    if (!buildings[buildingCode]) {
+      sessionStorage.setItem("error", "InvalidBuildingCode");
+      redirect("/");
+    }
 
-  if (!buildings[buildingCode].defaultFloor) {
-    sessionStorage.setItem("error", "NoDefaultFloor");
-    redirect("/");
-  }
+    if (!buildings[buildingCode].defaultFloor) {
+      sessionStorage.setItem("error", "NoDefaultFloor");
+      redirect("/");
+    }
 
-  const defaultFloorUrl =
-    buildingCode + "-" + buildings[buildingCode].defaultFloor;
+    const defaultFloorUrl =
+      buildingCode + "-" + buildings[buildingCode].defaultFloor;
 
-  // go to the default floor of the building if the floor is unspecified in the url
-  if (!floorLevel) {
-    redirect(defaultFloorUrl);
-  }
+    // go to the default floor of the building if the floor is unspecified in the url
+    if (!floorLevel) {
+      redirect(defaultFloorUrl);
+    }
 
-  // handle invalid floor level
-  if (!buildings[buildingCode].floors.includes(floorLevel)) {
-    sessionStorage.setItem("error", "InvalidFloorLevel");
-    redirect(defaultFloorUrl);
-  }
-  //#endregion
+    // handle invalid floor level
+    if (!buildings[buildingCode].floors.includes(floorLevel)) {
+      sessionStorage.setItem("error", "InvalidFloorLevel");
+      redirect(defaultFloorUrl);
+    }
+  })();
 
   return (
     <LiveblocksWrapper floorCode={floorCode}>

@@ -6,11 +6,7 @@ import { useAppSelector } from "../../lib/hooks";
 import { ID } from "../shared/types";
 import { getRoomId } from "../utils/utils";
 
-interface Props {
-  nodeIdOnDrag;
-}
-
-const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
+const EdgesDisplay = () => {
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const mst = useAppSelector((state) => state.data.mst);
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
@@ -19,6 +15,7 @@ const EdgesDisplay = ({ nodeIdOnDrag }: Props) => {
   );
 
   const nodes = useAppSelector((state) => state.data.nodes);
+  const nodeIdOnDrag = useAppSelector((state) => state.mouseEvent.nodeIdOnDrag);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const includedNodes = new Set();

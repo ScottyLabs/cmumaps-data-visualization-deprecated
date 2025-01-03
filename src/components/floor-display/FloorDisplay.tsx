@@ -34,7 +34,7 @@ import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { ID, Node } from "../shared/types";
+import { Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -98,8 +98,6 @@ const FloorDisplay = ({
 
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
-
-  const [nodeIdOnDrag, setNodeIdOnDrag] = useState<ID>("");
 
   const [token, setToken] = useState<string | null | undefined>(null);
 
@@ -337,14 +335,11 @@ const FloorDisplay = ({
 
           {showPolygons && <PolygonsDisplay />}
 
-          {showEdges && !editPolygon && !editRoomLabel && (
-            <EdgesDisplay nodeIdOnDrag={nodeIdOnDrag} />
-          )}
+          {showEdges && !editPolygon && !editRoomLabel && <EdgesDisplay />}
           {showNodes && !editPolygon && !editRoomLabel && (
             <NodesDisplay
               floorCode={floorCode}
               updateMyPresenceWrapper={updateMyPresenceWrapper}
-              setNodeIdOnDrag={setNodeIdOnDrag}
             />
           )}
 

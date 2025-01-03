@@ -5,7 +5,7 @@ import React from "react";
 import { setNodes } from "../../../lib/features/dataSlice";
 import {
   getNodeIdSelected,
-  setNodeIdHovered,
+  hoverNode,
   unHoverNode,
 } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
@@ -57,7 +57,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
       <button
         className="whitespace-nowrap border px-1 text-sm hover:bg-sky-700"
         onClick={handleClick}
-        onMouseEnter={() => dispatch(setNodeIdHovered(neighborID))}
+        onMouseEnter={() => dispatch(hoverNode(neighborID))}
         onMouseLeave={() => dispatch(unHoverNode())}
       >
         {text}

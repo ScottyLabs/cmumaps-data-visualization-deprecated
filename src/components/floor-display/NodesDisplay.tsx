@@ -12,7 +12,11 @@ import {
   GRAPH_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
-import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import {
+  dragNode,
+  getNodeIdSelected,
+  releaseNode,
+} from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID } from "../shared/types";
@@ -23,14 +27,9 @@ import { dist, getRoomId, savingHelper, setCursor } from "../utils/utils";
 interface Props {
   floorCode: string;
   updateMyPresenceWrapper;
-  setNodeIdOnDrag;
 }
 
-const NodesDisplay = ({
-  floorCode,
-  updateMyPresenceWrapper,
-  setNodeIdOnDrag,
-}: Props) => {
+const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -42,7 +41,7 @@ const NodesDisplay = ({
   const nodes = useAppSelector((state) => state.data.nodes);
 
   const nodeIdHovered = useAppSelector(
-    (state) => state.mouseEvent.nodeIdHovered
+    (state) => state.mouseEvent.nodeIdOnHover
   );
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
@@ -192,8 +191,7 @@ const NodesDisplay = ({
 
   const handleOnDragEnd = (e, nodeId) => {
     updateMyPresenceWrapper({ onDragNodeId: null });
-    setNodeIdOnDrag("");
-
+    dispatch(releaseNode());
     const newNodes = { ...nodes };
     const newNode = JSON.parse(JSON.stringify(newNodes[nodeId]));
 
@@ -247,7 +245,7 @@ const NodesDisplay = ({
             draggable
             onDragStart={() => {
               updateMyPresenceWrapper({ onDragNodeId: nodeId });
-              setNodeIdOnDrag(nodeId);
+              dispatch(dragNode(nodeId));
             }}
             onDragEnd={(e) => handleOnDragEnd(e, nodeId)}
             onDragMove={(e) => {

@@ -96,8 +96,33 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
   };
 
   const handleSaveHelper = async (roomInfo: RoomInfo) => {
+    // frontend update
+    const newRooms = { ...rooms };
+    const newRoomId = getRoomIdFromRoomInfo(floorCode, roomInfo);
+
+    // if room id changed, then need to do extra things
+    if (newRoomId != roomId) {
+      // need to update roomId of nodes belonging to this room
+      const newNodes = { ...nodes };
+      for (const nodeId in newNodes) {
+        if (nodes[nodeId].roomId == roomId) {
+          const newNode: Node = JSON.parse(JSON.stringify(newNodes[nodeId]));
+          newNode.roomId = newRoomId;
+          newNodes[nodeId] = newNode;
+        }
+      }
+      dispatch(setNodes(newNodes));
+
+      // need to delete the old room entry
+      delete newRooms[roomId];
+    }
+
+    // if room id didn't change, then only need to reassign
+    newRooms[newRoomId] = roomInfo;
+    setRooms(newRooms);
+
     // backend update
-    const succeeded = await savingHelper(
+    const succeeded = savingHelper(
       "/api/room/update",
       JSON.stringify({
         floorCode,
@@ -106,33 +131,6 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
       }),
       dispatch
     );
-
-    // frontend update only if backend update succeeded
-    if (succeeded) {
-      const newRooms = { ...rooms };
-      const newRoomId = getRoomIdFromRoomInfo(floorCode, roomInfo);
-
-      // if room id changed, then need to do extra things
-      if (newRoomId != roomId) {
-        // need to update roomId of nodes belonging to this room
-        const newNodes = { ...nodes };
-        for (const nodeId in newNodes) {
-          if (nodes[nodeId].roomId == roomId) {
-            const newNode: Node = JSON.parse(JSON.stringify(newNodes[nodeId]));
-            newNode.roomId = newRoomId;
-            newNodes[nodeId] = newNode;
-          }
-        }
-        dispatch(setNodes(newNodes));
-
-        // need to delete the old room entry
-        delete newRooms[roomId];
-      }
-
-      // if room id didn't change, then only need to reassign
-      newRooms[newRoomId] = roomInfo;
-      setRooms(newRooms);
-    }
 
     return succeeded;
   };

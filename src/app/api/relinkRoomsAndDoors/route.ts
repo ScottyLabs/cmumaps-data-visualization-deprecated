@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const execPromise = promisify(exec);
     const { stdout, stderr } = await execPromise(
-      `python3 public/python/api/relink_rooms_and_doors.py ${buildingCode}/${floorCode}`
+      `python3 -m public.python.api.relink_rooms_and_doors ${buildingCode}/${floorCode}`
     );
 
     // Python Error Message

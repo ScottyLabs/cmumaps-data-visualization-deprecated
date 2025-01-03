@@ -1,6 +1,6 @@
 import json
 from ..add_floorplan.door_utils import link_doors_with_rooms, combine_doors
-from file_utils import getOutlineData
+from .file_utils import getOutlineData
 
 
 def relink(data):

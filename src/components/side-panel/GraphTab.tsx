@@ -10,7 +10,11 @@ import {
 import { setMst } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setDoors } from "../../lib/features/outlineSlice";
-import { finishLoading, startLoading } from "../../lib/features/statusSlice";
+import {
+  failedLoading,
+  finishLoading,
+  startLoading,
+} from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
@@ -101,10 +105,15 @@ const GraphTab = ({ floorCode }: Props) => {
 
     if (!result.ok) {
       console.error(body.error);
+      dispatch(
+        failedLoading(
+          "Failed to relink rooms and doors! Check the Console for detailed error."
+        )
+      );
       return;
     }
 
-    dispatch(setDoors({ body }));
+    dispatch(setDoors(body));
     dispatch(finishLoading());
   };
 

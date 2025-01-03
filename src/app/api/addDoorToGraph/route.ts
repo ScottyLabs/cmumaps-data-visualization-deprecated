@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Node, DoorInfo } from "../../../components/shared/types";
 import { dist } from "../../../components/utils/utils";
 import { getGraphJsonFilePath, getOutlineJsonFilePath } from "../apiUtils";
-import { AsEdge, AsNode } from "./addDoorToGraphTypes";
+import { AS_EDGE, AS_NODE } from "./addDoorToGraphTypes";
 
 const handleRoomDoNotHaveNodeError = async (floorCode, roomId1, roomId2) => {
   const roomId = !roomId1 ? roomId1 : roomId2;
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       }
 
       // add as a node
-      if (type == AsNode) {
+      if (type == AS_NODE) {
         const newNodeId = uuidv4();
 
         newNode.neighbors[closestNode1] = {
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
         graphJSON[newNodeId] = newNode;
       }
       // add as a edge
-      else if (type == AsEdge) {
+      else if (type == AS_EDGE) {
         const newDist = dist(
           graphJSON[closestNode1].pos,
           graphJSON[closestNode2].pos

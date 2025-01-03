@@ -5,8 +5,8 @@ import { BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
 
 import {
-  AsEdge,
-  AsNode,
+  AS_EDGE,
+  AS_NODE,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
 import { setMst } from "../../lib/features/dataSlice";
@@ -97,14 +97,14 @@ const GraphTab = ({ floorCode }: Props) => {
       <SidePanelButton
         text="Nodes"
         handleClick={() =>
-          addDoorsToGraph(floorCode, doorInfos, AsNode, setNodes)
+          addDoorsToGraph(floorCode, doorInfos, AS_NODE, setNodes)
         }
         style="ml-2 px-2 py-1 border"
       />
       <SidePanelButton
         text="Edges"
         handleClick={() =>
-          addDoorsToGraph(floorCode, doorInfos, AsEdge, setNodes)
+          addDoorsToGraph(floorCode, doorInfos, AS_EDGE, setNodes)
         }
         style="ml-2 px-2 py-1 border"
       />

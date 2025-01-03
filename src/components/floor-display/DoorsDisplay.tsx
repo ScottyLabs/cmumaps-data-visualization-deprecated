@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useContext } from "react";
 import { Line } from "react-konva";
 
-import { AsNode } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
+import { AS_NODE } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import {
   ADD_DOOR_NODE,
   GRAPH_SELECT,
@@ -40,7 +40,7 @@ const DoorsDisplay = ({ floorCode }: Props) => {
     const handleDoorClick = (doorId) => {
       if (!editPolygon) {
         if (mode == ADD_DOOR_NODE) {
-          addDoorsToGraph(floorCode, [doors[doorId]], AsNode, setNodes);
+          addDoorsToGraph(floorCode, [doors[doorId]], AS_NODE, setNodes);
           dispatch(setMode(GRAPH_SELECT));
         } else {
           router.push(`?doorId=${doorId}`);

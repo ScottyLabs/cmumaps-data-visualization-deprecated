@@ -1,2 +1,2 @@
-export const AsNode = "Node";
-export const AsEdge = "Edge";
+export const AS_NODE = "Node";
+export const AS_EDGE = "Edge";

@@ -10,9 +10,8 @@ interface DataState {
   floorLevels: string[] | null;
   nodes: Graph | null;
   mst: Mst | null;
-  // all operations <= editIndex are reversed operations
-  // all operations >  editIndex are original operations
   editHistory: Operation[][];
+  reversedEditHistory: Operation[][];
   editIndex: number; // points to the edit to undo
 }
 
@@ -21,6 +20,7 @@ const initialState: DataState = {
   nodes: null,
   mst: null,
   editHistory: [],
+  reversedEditHistory: [],
   editIndex: -1,
 };
 
@@ -41,6 +41,10 @@ const dataSlice = createSlice({
         state.nodes = applyPatch(state.nodes, action.payload).newDocument;
         state.editHistory = [
           ...state.editHistory.slice(0, state.editIndex + 1),
+          action.payload,
+        ];
+        state.reversedEditHistory = [
+          ...state.reversedEditHistory.slice(0, state.editIndex + 1),
           reversedPatch,
         ];
         state.editIndex = state.editHistory.length - 1;
@@ -57,11 +61,7 @@ const dataSlice = createSlice({
       }
 
       try {
-        const reversedPatch = state.editHistory[state.editIndex];
-        // replace with the orig patch
-        const orig = reversePatch(state.nodes, reversedPatch);
-        state.editHistory[state.editIndex] = orig;
-        // apply the reveresed patch to nodes
+        const reversedPatch = state.reversedEditHistory[state.editIndex];
         state.nodes = applyPatch(state.nodes, reversedPatch).newDocument;
         state.editIndex -= 1;
       } catch (error) {
@@ -78,10 +78,6 @@ const dataSlice = createSlice({
       try {
         state.editIndex += 1;
         const patch = state.editHistory[state.editIndex];
-        // replace with the reversed patch
-        const reversedPatch = reversePatch(state.nodes, patch);
-        state.editHistory[state.editIndex] = reversedPatch;
-        // redo by applying the orig patch
         state.nodes = applyPatch(state.nodes, patch).newDocument;
       } catch (error) {
         console.error("Error redoing patch:", error);

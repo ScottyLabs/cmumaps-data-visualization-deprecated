@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type LoadingStatus = "Succeeded" | "Loading" | "Failed";
 export const LOADED: LoadingStatus = "Succeeded";
-const LOADING: LoadingStatus = "Loading";
+export const LOADING: LoadingStatus = "Loading";
 export const FAILED_LOAD: LoadingStatus = "Failed";
 
 export type SaveStatus = "Saved" | "Saving..." | "Failed to Save!";

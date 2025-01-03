@@ -6,9 +6,9 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 import buildings from "../../../public/cmumaps-data/buildings.json";
-import Loader from "../../components/common/Loader";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
 import LiveblocksWrapper from "../../components/layouts/LiveblocksWrapper";
+import LoadingText from "../../components/layouts/LoadingText";
 import MainDisplay from "../../components/layouts/MainDisplay";
 import ModeDisplay from "../../components/layouts/ModeDisplay";
 import NavBar from "../../components/layouts/NavBar";
@@ -26,7 +26,7 @@ import {
   POLYGON_DELETE_VERTEX,
   setMode,
 } from "../../lib/features/modeSlice";
-import { FAILED_LOAD, LOADED, SAVED } from "../../lib/features/statusSlice";
+import { SAVED } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
@@ -36,7 +36,6 @@ import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
  *
  * - Responsible for:
  *   - Validating that the params refers to a valid floor and redirect if needed
- *   - Displaying the loading screen when loading
  *   - Toasting error message based on session storage
  *   - Displaying warning before closing tab if needed using saveStatus
  *   - Resetting mode when switching floor and toasting when mode changes
@@ -47,8 +46,6 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   const mode = useAppSelector((state) => state.mode.mode);
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
-  const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
-  const loadingText = useAppSelector((state) => state.status.loadingText);
 
   // get floor info
   const floorCode = params.id;
@@ -151,23 +148,11 @@ const Page = ({ params }: { params: { id: string } }) => {
   }
   //#endregion
 
-  const renderLoadingText = () => {
-    if (loadingStatus === FAILED_LOAD) {
-      return (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2">
-          <p className="text-nowrap text-3xl text-red-500">{loadingText}</p>
-        </div>
-      );
-    } else {
-      return <Loader loadingText={loadingText} />;
-    }
-  };
-
   return (
     <LiveblocksWrapper floorCode={floorCode}>
       <NavBar buildingCode={buildingCode} />
       {LIVEBLOCKS_ENABLED && <UserCount />}
-      {loadingStatus !== LOADED && renderLoadingText()}
+      <LoadingText />
       <MainDisplay floorCode={floorCode} />
       <ModeDisplay />
       <FloorSwitcher

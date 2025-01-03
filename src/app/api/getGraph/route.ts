@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { Edge, Graph, ID } from "../../../components/shared/types";
-import { dist } from "../../../components/utils/utils";
 import prisma from "../../../lib/prisma";
 import { extractBuildingCode, extractFloorLevel } from "../apiUtils";
 
@@ -54,12 +53,7 @@ export async function GET(request: Request) {
       // Process outNeighbors
       for (const neighbor of node.outNeighbors) {
         const outNode = neighbor.outNode;
-        const distance = dist(
-          { x: node.posX, y: node.posY },
-          { x: outNode.posX, y: outNode.posY }
-        );
-
-        neighbors[outNode.id] = { dist: distance };
+        neighbors[outNode.id] = {};
 
         // Check if the node and neighbor are on different floors
         if (
@@ -70,8 +64,6 @@ export async function GET(request: Request) {
           if (node.room?.type === outNode.room?.type) {
             toFloorType = node.room?.type || "";
           }
-
-          neighbors[outNode.id].dist = -1;
           neighbors[outNode.id].toFloorInfo = {
             toFloor: `${outNode.room?.buildingCode}-${outNode.room?.floorLevel}`,
             type: toFloorType,
@@ -81,7 +73,7 @@ export async function GET(request: Request) {
 
       let roomId = "";
       if (node.room) {
-        roomId = `${buildingCode}-${node.room?.name}`;
+        roomId = `${buildingCode}-${node.room.name}`;
       }
 
       graph[node.id] = {

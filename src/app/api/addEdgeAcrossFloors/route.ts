@@ -110,12 +110,10 @@ export async function POST(request: Request) {
     }
 
     node1.neighbors[nodeId2] = {
-      dist: -1,
       toFloorInfo: { toFloor: floorCode2, type: type },
     };
 
     node2.neighbors[nodeId1] = {
-      dist: -1,
       toFloorInfo: { toFloor: floorCode1, type: type },
     };
 

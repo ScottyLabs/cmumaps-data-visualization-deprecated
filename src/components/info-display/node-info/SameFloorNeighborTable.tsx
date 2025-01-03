@@ -11,7 +11,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { Edge } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import { savingHelper } from "../../utils/utils";
+import { dist, savingHelper } from "../../utils/utils";
 
 interface Props {
   floorCode: string;
@@ -24,6 +24,10 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
 
   const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
+
+  if (!nodes) {
+    return;
+  }
 
   const deleteEdge = (nodeId, neighborID) => {
     dispatch(unHoverNode());
@@ -64,7 +68,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   const renderSameFloorNeighbors = (
     sameFloorNeighbors: Record<string, Edge>
   ) => {
-    return Object.entries(sameFloorNeighbors).map(([neighborID, neighbor]) => {
+    return Object.keys(sameFloorNeighbors).map((neighborID) => {
       const selectHandleClick = () => {
         router.push(`?nodeId=${neighborID}`);
       };
@@ -74,7 +78,9 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
       return (
         <tr key={neighborID}>
           {renderButtonCell("select", neighborID, selectHandleClick)}
-          <td className="border p-2"> {neighbor.dist.toPrecision(3)}</td>
+          <td className="border p-2">
+            {dist(nodes[nodeId].pos, nodes[neighborID].pos).toPrecision(3)}
+          </td>
           {renderButtonCell("delete", neighborID, deleteHandleClick)}
         </tr>
       );

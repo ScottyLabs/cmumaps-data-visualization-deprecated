@@ -38,7 +38,7 @@ import { ID, Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
-import { dist, distPointToLine, getRoomId, savingHelper } from "../utils/utils";
+import { distPointToLine, getRoomId, savingHelper } from "../utils/utils";
 import LiveCursors from "../zoom-pan/LiveCursors";
 import DoorsDisplay from "./DoorsDisplay";
 import EdgesDisplay from "./EdgesDisplay";
@@ -189,12 +189,8 @@ const FloorDisplay = ({
 
     // create an edge between the selected node and the new node
     if (nodeIdSelected) {
-      const newDist = dist(
-        newNodes[newNodeId].pos,
-        newNodes[nodeIdSelected].pos
-      );
-      newNodes[newNodeId].neighbors[nodeIdSelected] = { dist: newDist };
-      newNodes[nodeIdSelected].neighbors[newNodeId] = { dist: newDist };
+      newNodes[newNodeId].neighbors[nodeIdSelected] = {};
+      newNodes[nodeIdSelected].neighbors[newNodeId] = {};
     }
 
     router.push(`?nodeId=${newNodeId}`);

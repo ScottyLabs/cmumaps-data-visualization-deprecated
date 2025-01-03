@@ -28,9 +28,8 @@ export const removeOverlappingsNodes = (nodes: Graph, nodeSize: number) => {
 
           // make sure both neighbors are not deleted already
           if (node0 && node1) {
-            const curDist = dist(node0.pos, node1.pos);
-            node0.neighbors[neighbors[1]] = { dist: curDist };
-            node1.neighbors[neighbors[0]] = { dist: curDist };
+            node0.neighbors[neighbors[1]] = {};
+            node1.neighbors[neighbors[0]] = {};
           }
         }
         delete newNodes[nodeId];
@@ -76,7 +75,7 @@ export const calcMst = (
 
         pq.enqueue({
           value: [nodeId, neighborId],
-          priority: edges[neighborId].dist,
+          priority: dist(nodes[nodeId].pos, nodes[neighborId].pos),
         });
       }
     }

@@ -80,19 +80,11 @@ export async function POST(request: Request) {
       if (type == AS_NODE) {
         const newNodeId = uuidv4();
 
-        newNode.neighbors[closestNode1] = {
-          dist: Number(minDistance1.toFixed(2)),
-        };
-        graphJSON[closestNode1].neighbors[newNodeId] = {
-          dist: Number(minDistance1.toFixed(2)),
-        };
+        newNode.neighbors[closestNode1] = {};
+        graphJSON[closestNode1].neighbors[newNodeId] = {};
 
-        newNode.neighbors[closestNode2] = {
-          dist: Number(minDistance2.toFixed(2)),
-        };
-        graphJSON[closestNode2].neighbors[newNodeId] = {
-          dist: Number(minDistance2.toFixed(2)),
-        };
+        newNode.neighbors[closestNode2] = {};
+        graphJSON[closestNode2].neighbors[newNodeId] = {};
 
         // delete the edge between these two nodes
         delete graphJSON[closestNode1].neighbors[closestNode2];
@@ -102,13 +94,8 @@ export async function POST(request: Request) {
       }
       // add as a edge
       else if (type == AS_EDGE) {
-        const newDist = dist(
-          graphJSON[closestNode1].pos,
-          graphJSON[closestNode2].pos
-        );
-
-        graphJSON[closestNode2].neighbors[closestNode1] = { dist: newDist };
-        graphJSON[closestNode1].neighbors[closestNode2] = { dist: newDist };
+        graphJSON[closestNode2].neighbors[closestNode1] = {};
+        graphJSON[closestNode1].neighbors[closestNode2] = {};
       }
     }
 

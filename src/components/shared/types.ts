@@ -39,10 +39,6 @@ export interface ToFloorInfo {
  * Graph types
  */
 export interface Edge {
-  /**
-   * distance between the two nodes this edge connects or the floor to floor info
-   */
-  dist: number;
   toFloorInfo?: ToFloorInfo;
 }
 

@@ -40,3 +40,25 @@ export const getBuildingCodes = async (): Promise<string[] | null> => {
     return null;
   }
 };
+
+export const relinkDoorsAndRooms = async (floorCode: string) => {
+  try {
+    const result = await fetch("/api/relinkRoomsAndDoors", {
+      method: "POST",
+      body: JSON.stringify({
+        floorCode: floorCode,
+      }),
+    });
+
+    const body = await result.json();
+    if (!result.ok) {
+      console.error(body.error);
+      return null;
+    } else {
+      return body;
+    }
+  } catch (e) {
+    console.error("Check the Network tab for more details:", e);
+    return null;
+  }
+};

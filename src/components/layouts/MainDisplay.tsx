@@ -106,11 +106,9 @@ const MainDisplay = ({ floorCode }: Props) => {
       // handle error
       if (!parseResponse.ok) {
         console.error(parsedBody.error);
-        dispatch(
-          failedLoading(
-            "Failed to parse the PDF! Check the Console for detailed error."
-          )
-        );
+        const errMessage =
+          "Failed to parse the PDF! Check the Console for detailed error.";
+        dispatch(failedLoading(errMessage));
         return;
       }
 

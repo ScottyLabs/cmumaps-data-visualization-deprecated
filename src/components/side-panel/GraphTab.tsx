@@ -2,11 +2,13 @@ import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
 import { BiHide } from "react-icons/bi";
+import { toast } from "react-toastify";
 
 import {
   AsEdge,
   AsNode,
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
+import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
 import { setMst } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setDoors } from "../../lib/features/outlineSlice";
@@ -51,32 +53,20 @@ const GraphTab = ({ floorCode }: Props) => {
     );
   };
 
-  const relinkDoorsAndRooms = async () => {
+  const handleRelinkDoorsAndRooms = async () => {
     router.push("?");
-
     dispatch(startLoading("Relinking rooms and doors"));
-
-    const result = await fetch("/api/relinkRoomsAndDoors", {
-      method: "POST",
-      body: JSON.stringify({
-        floorCode: floorCode,
-      }),
+    relinkDoorsAndRooms(floorCode).then((body) => {
+      if (!body) {
+        const errMessage =
+          "Failed to relink rooms and doors! Check the Console for detailed error.";
+        dispatch(failedLoading(errMessage));
+      } else {
+        dispatch(setDoors(body));
+        dispatch(finishLoading());
+        toast.success("Finished relinking!");
+      }
     });
-
-    const body = await result.json();
-
-    if (!result.ok) {
-      console.error(body.error);
-      dispatch(
-        failedLoading(
-          "Failed to relink rooms and doors! Check the Console for detailed error."
-        )
-      );
-      return;
-    }
-
-    dispatch(setDoors(body));
-    dispatch(finishLoading());
   };
 
   if (!doors) {
@@ -148,7 +138,7 @@ const GraphTab = ({ floorCode }: Props) => {
       {renderMstRow()}
       <SidePanelButton
         text="Relink Rooms and Doors"
-        handleClick={relinkDoorsAndRooms}
+        handleClick={handleRelinkDoorsAndRooms}
         style="block"
       />
       <SidePanelButton

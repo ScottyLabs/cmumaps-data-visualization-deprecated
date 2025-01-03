@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -35,10 +35,11 @@ import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
  * Entry point to the floor plan editting page.
  *
  * - Responsible for:
- *   - validating that the params referes to a valid floor
- *   - toasting error message based on session storage
- *   - loading display
- *   - mode related handling
+ *   - Validating that the params refers to a valid floor and redirect if needed
+ *   - Displaying the loading screen when loading
+ *   - Toasting error message based on session storage
+ *   - Displaying warning before closing tab if needed using saveStatus
+ *   - Resetting mode when switching floor and toasting when mode changes
  */
 const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -48,46 +49,16 @@ const Page = ({ params }: { params: { id: string } }) => {
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
   const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
   const loadingText = useAppSelector((state) => state.status.loadingText);
-  const floorLevels = useAppSelector((state) => state.data.floorLevels);
 
   // get floor info
   const floorCode = params.id;
   const buildingCode = extractBuildingCode(floorCode);
   const floorLevel = extractFloorLevel(floorCode);
 
-  // Validate floor level and get floor levels
+  // Get floor levels
   useEffect(() => {
-    // handle invalid building code
-    if (!buildings[buildingCode]) {
-      sessionStorage.setItem("error", "InvalidBuildingCode");
-      router.push("/");
-      return;
-    }
-
-    if (!buildings[buildingCode].defaultFloor) {
-      sessionStorage.setItem("error", "NoDefaultFloor");
-      router.push("/");
-      return;
-    }
-
-    const defaultFloorUrl =
-      buildingCode + "-" + buildings[buildingCode].defaultFloor;
-
-    // go to the default floor of the building if the floor is unspecified in the url
-    if (!floorLevel) {
-      router.push(defaultFloorUrl);
-      return;
-    }
-
-    // handle invalid floor level
-    if (!buildings[buildingCode].floors.includes(floorLevel)) {
-      sessionStorage.setItem("error", "InvalidFloorLevel");
-      router.push(defaultFloorUrl);
-      return;
-    }
-
     dispatch(setFloorLevels(buildings[buildingCode].floors));
-  }, [buildingCode, floorLevel, router]);
+  }, [buildingCode, dispatch, floorLevel, router]);
 
   // Toast the error message based on session storage
   useEffect(() => {
@@ -154,6 +125,32 @@ const Page = ({ params }: { params: { id: string } }) => {
     }
   }, [mode]);
 
+  //#region Validate floor level and redirect if invalid
+  if (!buildings[buildingCode]) {
+    sessionStorage.setItem("error", "InvalidBuildingCode");
+    redirect("/");
+  }
+
+  if (!buildings[buildingCode].defaultFloor) {
+    sessionStorage.setItem("error", "NoDefaultFloor");
+    redirect("/");
+  }
+
+  const defaultFloorUrl =
+    buildingCode + "-" + buildings[buildingCode].defaultFloor;
+
+  // go to the default floor of the building if the floor is unspecified in the url
+  if (!floorLevel) {
+    redirect(defaultFloorUrl);
+  }
+
+  // handle invalid floor level
+  if (!buildings[buildingCode].floors.includes(floorLevel)) {
+    sessionStorage.setItem("error", "InvalidFloorLevel");
+    redirect(defaultFloorUrl);
+  }
+  //#endregion
+
   const renderLoadingText = () => {
     if (loadingStatus === FAILED_LOAD) {
       return (
@@ -165,10 +162,6 @@ const Page = ({ params }: { params: { id: string } }) => {
       return <Loader loadingText={loadingText} />;
     }
   };
-
-  if (!floorLevels) {
-    return;
-  }
 
   return (
     <LiveblocksWrapper floorCode={floorCode}>

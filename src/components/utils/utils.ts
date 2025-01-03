@@ -1,6 +1,5 @@
-import { UnknownAction } from "@reduxjs/toolkit";
+import { Dispatch } from "@reduxjs/toolkit";
 
-import { Dispatch } from "react";
 import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
@@ -138,7 +137,7 @@ export const setCursor = (e, cursor) => {
 export const savingHelper = async (
   apiPath: string,
   body: BodyInit,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch
 ): Promise<boolean> => {
   dispatch(startSaving());
   const response = await fetch(apiPath, { method: "POST", body });

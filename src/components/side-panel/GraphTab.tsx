@@ -9,10 +9,10 @@ import {
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { setMst } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
+import { setDoors } from "../../lib/features/outlineSlice";
 import { finishLoading, startLoading } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
-import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import QuestionCircle from "../shared/QuestionCircle";
 import { calcMst } from "../utils/graphUtils";
@@ -29,8 +29,8 @@ const GraphTab = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const nodeSize = useAppSelector((state) => state.nodeSize.nodeSize);
+  const doors = useAppSelector((state) => state.outline.doors);
 
-  const { doors, setDoors, setRoomlessDoors } = useContext(OutlineContext);
   const { nodes, setNodes } = useContext(GraphContext);
   const { rooms } = useContext(RoomsContext);
 
@@ -104,11 +104,13 @@ const GraphTab = ({ floorCode }: Props) => {
       return;
     }
 
-    setDoors(body.doors);
-    setRoomlessDoors(body.roomlessDoors);
-
+    dispatch(setDoors({ body }));
     dispatch(finishLoading());
   };
+
+  if (!doors) {
+    return;
+  }
 
   // used for addDoorToGraph api
   const doorInfos = Object.values(doors).filter(

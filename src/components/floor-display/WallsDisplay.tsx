@@ -1,14 +1,17 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Line } from "react-konva";
 
-import { OutlineContext } from "../contexts/OutlineProvider";
+import { useAppSelector } from "../../lib/hooks";
 
 const WallsDisplay = () => {
-  const { walls } = useContext(OutlineContext);
+  const walls = useAppSelector((state) => state.outline.walls);
 
-  return walls.map((points: number[], index: number) => (
-    <Line key={index} points={points} stroke="black" strokeWidth={1} />
-  ));
+  return (
+    walls &&
+    walls.map((points: number[], index: number) => (
+      <Line key={index} points={points} stroke="black" strokeWidth={1} />
+    ))
+  );
 };
 
 export default WallsDisplay;

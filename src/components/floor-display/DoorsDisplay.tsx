@@ -12,7 +12,6 @@ import {
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
-import { OutlineContext } from "../contexts/OutlineProvider";
 import { DoorInfo, ID } from "../shared/types";
 import { addDoorsToGraph, setCursor } from "../utils/utils";
 
@@ -22,14 +21,20 @@ interface Props {
 
 const DoorsDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
-
   const dispatch = useAppDispatch();
+
   const mode = useAppSelector((state) => state.mode.mode);
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
 
+  const doors = useAppSelector((state) => state.outline.doors);
+  const roomlessDoors = useAppSelector((state) => state.outline.roomlessDoors);
+
   const { nodes, setNodes } = useContext(GraphContext);
-  const { doors, roomlessDoors } = useContext(OutlineContext);
+
+  if (!doors || !roomlessDoors) {
+    return;
+  }
 
   const drawDoors = () => {
     const handleDoorClick = (doorId) => {

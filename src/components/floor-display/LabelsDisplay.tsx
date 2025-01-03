@@ -7,7 +7,6 @@ import { Group, Path, Rect } from "react-konva";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
-import { OutlineContext } from "../contexts/OutlineProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { RoomInfo } from "../shared/types";
 import { getRoomId, savingHelper, setCursor } from "../utils/utils";
@@ -24,7 +23,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
   const showLabels = useAppSelector((state) => state.visibility.showLabels);
 
-  const { doors } = useContext(OutlineContext);
+  const doors = useAppSelector((state) => state.outline.doors);
   const { rooms, setRooms } = useContext(RoomsContext);
   const { nodes } = useContext(GraphContext);
 
@@ -36,6 +35,10 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const viewBox = TfiLocationPin({}).props.attr.viewBox.split(" ");
   const width = Number(viewBox[2]);
   const height = Number(viewBox[3]);
+
+  if (!doors) {
+    return;
+  }
 
   return Object.entries(rooms).map(([roomId, roomInfo]) => {
     // selected if it is edit label mode and it is the label of the selected room

@@ -4,6 +4,7 @@ import dataSlice from "./features/dataSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
 import nodeSizeSlice from "./features/nodeSizeSlice";
+import outlineSlice from "./features/outlineSlice";
 import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
 import visibilitySlice from "./features/visibilitySlice";
@@ -18,6 +19,7 @@ export const makeStore = () => {
       status: statusSlice,
       data: dataSlice,
       visibility: visibilitySlice,
+      outline: outlineSlice,
     },
   });
 };

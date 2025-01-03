@@ -8,6 +8,48 @@ import { setMst } from "../../lib/features/dataSlice";
 import { Graph, ID, Mst, Rooms } from "../shared/types";
 import { dist } from "./utils";
 
+export const removeOverlappingsNodes = (nodes: Graph, nodeSize: number) => {
+  const nodeIds = Object.keys(nodes);
+
+  const newNodes = { ...nodes };
+
+  const nodeIdsRemoved: string[] = [];
+
+  for (let i = 0; i < nodeIds.length; i++) {
+    const nodeId = nodeIds[i];
+    const p1 = nodes[nodeId].pos;
+    for (const j of nodeIds.slice(i + 1)) {
+      if (dist(p1, nodes[j].pos) < nodeSize * 2) {
+        // connect the two neighbor nodes if possible
+        if (Object.values(newNodes[nodeId].neighbors).length == 2) {
+          const neighbors = Object.keys(newNodes[nodeId].neighbors);
+          const node0 = newNodes[neighbors[0]];
+          const node1 = newNodes[neighbors[1]];
+
+          // make sure both neighbors are not deleted already
+          if (node0 && node1) {
+            const curDist = dist(node0.pos, node1.pos);
+            node0.neighbors[neighbors[1]] = { dist: curDist };
+            node1.neighbors[neighbors[0]] = { dist: curDist };
+          }
+        }
+        delete newNodes[nodeId];
+        nodeIdsRemoved.push(nodeId);
+        break;
+      }
+    }
+  }
+
+  // remove neighbors
+  for (const node of Object.values(nodes)) {
+    for (const removedNodeId of nodeIdsRemoved) {
+      delete node.neighbors[removedNodeId];
+    }
+  }
+
+  return newNodes;
+};
+
 // calculate mst for each connected components of the graph
 export const calcMst = (
   nodes: Graph,

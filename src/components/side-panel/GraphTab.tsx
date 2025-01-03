@@ -19,8 +19,8 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { GraphContext } from "../contexts/GraphProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import QuestionCircle from "../shared/QuestionCircle";
-import { calcMst } from "../utils/graphUtils";
-import { addDoorsToGraph, dist, savingHelper } from "../utils/utils";
+import { calcMst, removeOverlappingsNodes } from "../utils/graphUtils";
+import { addDoorsToGraph, savingHelper } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
 
@@ -38,47 +38,9 @@ const GraphTab = ({ floorCode }: Props) => {
   const { nodes, setNodes } = useContext(GraphContext);
   const { rooms } = useContext(RoomsContext);
 
-  const removeOverlappingsNodes = () => {
-    const nodeIds = Object.keys(nodes);
-
-    const newNodes = { ...nodes };
-
-    const nodeIdsRemoved: string[] = [];
-
-    for (let i = 0; i < nodeIds.length; i++) {
-      const nodeId = nodeIds[i];
-      const p1 = nodes[nodeId].pos;
-      for (const j of nodeIds.slice(i + 1)) {
-        if (dist(p1, nodes[j].pos) < nodeSize * 2) {
-          // connect the two neighbor nodes if possible
-          if (Object.values(newNodes[nodeId].neighbors).length == 2) {
-            const neighbors = Object.keys(newNodes[nodeId].neighbors);
-            const node0 = newNodes[neighbors[0]];
-            const node1 = newNodes[neighbors[1]];
-
-            // make sure both neighbors are not deleted already
-            if (node0 && node1) {
-              const curDist = dist(node0.pos, node1.pos);
-              node0.neighbors[neighbors[1]] = { dist: curDist };
-              node1.neighbors[neighbors[0]] = { dist: curDist };
-            }
-          }
-          delete newNodes[nodeId];
-          nodeIdsRemoved.push(nodeId);
-          break;
-        }
-      }
-    }
-
-    // remove neighbors
-    for (const node of Object.values(nodes)) {
-      for (const removedNodeId of nodeIdsRemoved) {
-        delete node.neighbors[removedNodeId];
-      }
-    }
-
+  const handleRemoveOverlappingsNodes = () => {
+    const newNodes = removeOverlappingsNodes(nodes, nodeSize);
     setNodes(newNodes);
-
     savingHelper(
       "/api/updateGraph",
       JSON.stringify({
@@ -191,7 +153,7 @@ const GraphTab = ({ floorCode }: Props) => {
       />
       <SidePanelButton
         text="Remove Overlapping Nodes"
-        handleClick={removeOverlappingsNodes}
+        handleClick={handleRemoveOverlappingsNodes}
         style="block"
       />
       <NodeSizeSlider text="Node" />

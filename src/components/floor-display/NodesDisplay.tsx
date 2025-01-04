@@ -190,7 +190,7 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
     }
   };
 
-  const handleOnDragEnd = (e, nodeId) => {
+  const handleOnDragEnd = (e, nodeId: ID) => {
     updateMyPresenceWrapper({ onDragNodeId: null });
     dispatch(releaseNode());
 

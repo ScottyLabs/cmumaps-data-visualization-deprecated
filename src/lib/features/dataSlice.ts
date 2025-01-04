@@ -4,9 +4,20 @@ import { applyPatch, Operation } from "fast-json-patch";
 import { toast } from "react-toastify";
 
 import { Graph, Mst } from "../../components/shared/types";
-import { reversePatch } from "../../components/utils/editHistoryUtils";
 
 const MAX_UNDO_LIMIT = 50;
+
+interface Query {
+  apiPath: string;
+  body: string;
+}
+
+interface Patch {
+  jsonPatch: Operation[];
+  reversedJsonPatch: Operation[];
+  dbPatch: Query;
+  reversedDbPatch: Query;
+}
 
 interface DataState {
   floorLevels: string[] | null;
@@ -14,6 +25,8 @@ interface DataState {
   mst: Mst | null;
   editHistory: Operation[][];
   reversedEditHistory: Operation[][];
+  queryHistory: Query[];
+  reversedQueyHistory: Query[];
   editIndex: number; // points to the edit to undo
 }
 
@@ -23,7 +36,16 @@ const initialState: DataState = {
   mst: null,
   editHistory: [],
   reversedEditHistory: [],
+  queryHistory: [],
+  reversedQueyHistory: [],
   editIndex: -1,
+};
+
+const getUpdatedHistory = <T>(history: T[], patch: T, index: number) => {
+  const updatedHistory = [...history.slice(0, index + 1), patch];
+
+  // Trim the history arrays to maintain the maximum undo limit
+  return updatedHistory.slice(-MAX_UNDO_LIMIT);
 };
 
 const dataSlice = createSlice({
@@ -37,30 +59,40 @@ const dataSlice = createSlice({
     setNodes(state, action) {
       state.nodes = action.payload;
     },
-    applyPatchToGraph(state, action: PayloadAction<Operation[]>) {
+    applyPatchToGraph(state, action: PayloadAction<Patch>) {
       try {
-        // Reverse the patch for undo functionality
-        const reversedPatch = reversePatch(state.nodes, action.payload);
+        const jsonPatch = action.payload.jsonPatch;
+        const reversedPatch = action.payload.reversedJsonPatch;
+        const dbPatch = action.payload.dbPatch;
+        const reversedDbPatch = action.payload.reversedDbPatch;
 
         // Apply the patch to the graph
-        state.nodes = applyPatch(state.nodes, action.payload).newDocument;
+        state.nodes = applyPatch(state.nodes, jsonPatch).newDocument;
 
-        // Update the edit history and reversed edit history with the new patch
-        state.editHistory = [
-          ...state.editHistory.slice(0, state.editIndex + 1),
-          action.payload,
-        ];
-        state.reversedEditHistory = [
-          ...state.reversedEditHistory.slice(0, state.editIndex + 1),
+        // Update the history arrays with the new patch
+        state.editHistory = getUpdatedHistory(
+          state.editHistory,
+          jsonPatch,
+          state.editIndex + 1
+        );
+
+        state.reversedEditHistory = getUpdatedHistory(
+          state.reversedEditHistory,
           reversedPatch,
-        ];
+          state.editIndex + 1
+        );
 
-        // Trim the history arrays to maintain the maximum undo limit
-        if (state.editHistory.length > MAX_UNDO_LIMIT) {
-          state.editHistory = state.editHistory.slice(-MAX_UNDO_LIMIT);
-          state.reversedEditHistory =
-            state.reversedEditHistory.slice(-MAX_UNDO_LIMIT);
-        }
+        state.queryHistory = getUpdatedHistory(
+          state.queryHistory,
+          dbPatch,
+          state.editIndex + 1
+        );
+
+        state.reversedQueyHistory = getUpdatedHistory(
+          state.reversedQueyHistory,
+          reversedDbPatch,
+          state.editIndex + 1
+        );
 
         // Update the edit index
         state.editIndex = state.editHistory.length - 1;

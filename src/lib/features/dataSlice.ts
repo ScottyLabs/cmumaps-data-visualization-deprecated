@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import { Graph, Mst } from "../../components/shared/types";
 import { reversePatch } from "../../components/utils/editHistoryUtils";
 
+const MAX_UNDO_LIMIT = 50;
+
 interface DataState {
   floorLevels: string[] | null;
   nodes: Graph | null;
@@ -37,8 +39,13 @@ const dataSlice = createSlice({
     },
     applyPatchToGraph(state, action: PayloadAction<Operation[]>) {
       try {
+        // Reverse the patch for undo functionality
         const reversedPatch = reversePatch(state.nodes, action.payload);
+
+        // Apply the patch to the graph
         state.nodes = applyPatch(state.nodes, action.payload).newDocument;
+
+        // Update the edit history and reversed edit history with the new patch
         state.editHistory = [
           ...state.editHistory.slice(0, state.editIndex + 1),
           action.payload,
@@ -47,6 +54,15 @@ const dataSlice = createSlice({
           ...state.reversedEditHistory.slice(0, state.editIndex + 1),
           reversedPatch,
         ];
+
+        // Trim the history arrays to maintain the maximum undo limit
+        if (state.editHistory.length > MAX_UNDO_LIMIT) {
+          state.editHistory = state.editHistory.slice(-MAX_UNDO_LIMIT);
+          state.reversedEditHistory =
+            state.reversedEditHistory.slice(-MAX_UNDO_LIMIT);
+        }
+
+        // Update the edit index
         state.editIndex = state.editHistory.length - 1;
       } catch (error) {
         console.error("Error applying patch:", error);

@@ -1,11 +1,13 @@
 import { PriorityQueue } from "@datastructures-js/priority-queue";
 import { Dispatch } from "@reduxjs/toolkit";
+import { compare } from "fast-json-patch";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 import { toast } from "react-toastify";
 
-import { setMst } from "../../lib/features/dataSlice";
-import { Graph, ID, Mst, Rooms } from "../shared/types";
+import { savingHelper } from "../../lib/apiRoutes";
+import { applyPatchToGraph, setMst } from "../../lib/features/dataSlice";
+import { Graph, ID, Mst, Rooms, Node } from "../shared/types";
 import { dist } from "./utils";
 
 export const removeOverlappingsNodes = (nodes: Graph, nodeSize: number) => {
@@ -140,4 +142,25 @@ export const calcMst = (
 
 export const addDoorNodeErrToast = () => {
   toast.error("Click on a purple door to add a door node!");
+};
+
+export const updateNode = (
+  nodeId: ID,
+  newNode: Node,
+  nodes: Graph,
+  dispatch: Dispatch
+) => {
+  const newNodes = { ...nodes };
+  newNodes[nodeId] = newNode;
+  const patch = compare(nodes, newNodes);
+  dispatch(applyPatchToGraph(patch));
+
+  savingHelper(
+    "/api/node/update",
+    JSON.stringify({
+      nodeId: nodeId,
+      nodeData: newNode,
+    }),
+    dispatch
+  );
 };

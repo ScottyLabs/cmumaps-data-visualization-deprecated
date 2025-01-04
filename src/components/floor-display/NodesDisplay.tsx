@@ -1,4 +1,3 @@
-import { compare } from "fast-json-patch";
 import { useRouter } from "next/navigation";
 
 import React, { useContext } from "react";
@@ -6,7 +5,7 @@ import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
 import { savingHelper } from "../../lib/apiRoutes";
-import { applyPatchToGraph, setNodes } from "../../lib/features/dataSlice";
+import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -22,7 +21,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID } from "../shared/types";
-import { addDoorNodeErrToast } from "../utils/graphUtils";
+import { addDoorNodeErrToast, updateNode } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { dist, getRoomId, setCursor } from "../utils/utils";
 
@@ -195,29 +194,15 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
     updateMyPresenceWrapper({ onDragNodeId: null });
     dispatch(releaseNode());
 
-    const newNodes = { ...nodes };
-    const newNode = JSON.parse(JSON.stringify(newNodes[nodeId]));
-
+    // create new node
+    const newNode = JSON.parse(JSON.stringify(nodes[nodeId]));
     newNode.pos = {
       x: Number(e.target.x().toFixed(2)),
       y: Number(e.target.y().toFixed(2)),
     };
-
     newNode.roomId = findRoomId(rooms, newNode.pos);
 
-    newNodes[nodeId] = newNode;
-
-    const patch = compare(nodes, newNodes);
-    dispatch(applyPatchToGraph(patch));
-
-    savingHelper(
-      "/api/node/update",
-      JSON.stringify({
-        nodeId: nodeId,
-        nodeData: newNode,
-      }),
-      dispatch
-    );
+    updateNode(nodeId, newNode, nodes, dispatch);
   };
 
   return Object.entries(nodes).map(

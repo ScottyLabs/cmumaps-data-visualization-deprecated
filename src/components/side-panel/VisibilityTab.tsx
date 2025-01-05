@@ -25,12 +25,14 @@ const VisibilityTab = ({ parsePDF }: Props) => {
   const dispatch = useAppDispatch();
 
   const editPolygon = useAppSelector((state) => state.mode.editPolygon);
-  const showFile = useAppSelector((state) => state.visibility.showFile);
-  const showOutline = useAppSelector((state) => state.visibility.showOutline);
-  const showNodes = useAppSelector((state) => state.visibility.showNodes);
-  const showEdges = useAppSelector((state) => state.visibility.showEdges);
-  const showLabels = useAppSelector((state) => state.visibility.showLabels);
-  const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
+  const {
+    showFile,
+    showOutline,
+    showNodes,
+    showEdges,
+    showLabels,
+    showPolygons,
+  } = useAppSelector((state) => state.visibility);
 
   const renderToggle = (
     text: string,

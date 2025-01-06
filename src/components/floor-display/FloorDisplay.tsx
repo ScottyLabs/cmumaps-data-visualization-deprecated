@@ -1,9 +1,16 @@
 import { useUser } from "@clerk/nextjs";
 import { Polygon } from "geojson";
+import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import React, { Suspense, useCallback, useContext, useEffect } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -32,7 +39,7 @@ import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { Node } from "../shared/types";
+import { Node, PDFCoordinate } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -122,14 +129,28 @@ const FloorDisplay = ({
     updateMyPresenceWrapper({ name: user?.firstName });
   }, [updateMyPresenceWrapper, user?.firstName]);
 
-  function handleMouseMove(e) {
+  const cursorPosRef = useRef<PDFCoordinate[]>([]);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (cursorPosRef.current.length > 0) {
+        console.log(cursorPosRef.current);
+        cursorPosRef.current = [];
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const handleMouseMove = throttle((e) => {
     const cursor = adjustPosition(
       e.currentTarget.getPointerPosition(),
       offset,
       scale
     );
-    updateMyPresenceWrapper({ cursor });
-  }
+    cursorPosRef.current.push(cursor);
+  }, 20);
 
   const addNewNode = (newNode: Node) => {
     const newNodes = { ...nodes };
@@ -263,8 +284,6 @@ const FloorDisplay = ({
         width={window.innerWidth}
         height={window.innerHeight}
         onMouseMove={handleMouseMove}
-        onMouseEnter={() => updateMyPresenceWrapper({ active: true })}
-        onMouseLeave={() => updateMyPresenceWrapper({ active: false })}
         onMouseDown={handleOnMouseDown}
         onMouseUp={() => setCanPan(true)}
         onClick={(e) => handleStageClick(e)}

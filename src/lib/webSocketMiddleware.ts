@@ -1,4 +1,5 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
+import { Patch } from "immer";
 
 export const WEBSOCKET_CONNECT = "socket/connect";
 export const WEBSOCKET_DISCONNECT = "socket/disconnect";
@@ -7,8 +8,16 @@ export const WEBSOCKET_MESSAGE = "socket/message";
 interface WebSocketConnectAction {
   type: string;
   payload: {
+    floorCode: string;
     url: string;
-    floorCode?: string;
+  };
+}
+
+interface WebSocketMessageAction {
+  type: string;
+  payload: {
+    floorCode: string;
+    patch: Patch;
   };
 }
 
@@ -25,7 +34,7 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
         return next(action);
       }
       const { payload } = action as WebSocketConnectAction;
-      const { url, floorCode } = payload;
+      const { floorCode, url } = payload;
 
       socket = new WebSocket(url);
 
@@ -61,9 +70,15 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
 
     case WEBSOCKET_MESSAGE:
       if (socket && socket.readyState === WebSocket.OPEN) {
-        // Send message if WebSocket is open
-        socket.send(JSON.stringify({ action: "sendMessage", floorCode }));
-        console.log("Message sent:", { action: "sendMessage", floorCode });
+        const { payload } = action as WebSocketMessageAction;
+        const { floorCode, patch } = payload;
+        socket.send(
+          JSON.stringify({
+            action: "message",
+            floorCode,
+            payload: { type: "patch", patch },
+          })
+        );
       } else {
         console.error("WebSocket is not open. Cannot send message.");
       }

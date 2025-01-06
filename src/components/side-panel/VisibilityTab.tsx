@@ -2,6 +2,7 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 
+import { selectEditPolygon } from "../../lib/features/modeSlice";
 import {
   toggleShowEdges,
   toggleShowFile,
@@ -24,7 +25,7 @@ const VisibilityTab = ({ parsePDF }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
+  const editPolygon = useAppSelector(selectEditPolygon);
   const {
     showFile,
     showOutline,

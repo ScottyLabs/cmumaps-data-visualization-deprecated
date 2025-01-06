@@ -23,6 +23,7 @@ import {
   GRAPH_SELECT,
   POLYGON_ADD_VERTEX,
   POLYGON_SELECT,
+  selectEditPolygon,
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
@@ -94,7 +95,7 @@ const FloorDisplay = ({
   const nodes = useAppSelector((state) => state.data.nodes);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
-  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
+  const editPolygon = useAppSelector(selectEditPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =

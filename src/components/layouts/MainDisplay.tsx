@@ -14,6 +14,7 @@ import {
   ADD_NODE,
   DELETE_EDGE,
   GRAPH_SELECT,
+  selectEditPolygon,
   setMode,
 } from "../../lib/features/modeSlice";
 import {
@@ -61,7 +62,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
-  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
+  const editPolygon = useAppSelector(selectEditPolygon);
   const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
   const shortcutsDisabled = useAppSelector(
     (state) => state.status.shortcutsDisabled

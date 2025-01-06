@@ -3,6 +3,7 @@ import { Polygon } from "geojson";
 import React from "react";
 import { Line } from "react-konva";
 
+import { selectEditPolygon } from "../../lib/features/modeSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { ID } from "../shared/types";
 import PolygonEditor from "./PolygonEditor";
@@ -19,7 +20,7 @@ const SelectedPolygonDisplay = ({
   polygon,
 }: Props) => {
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
-  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
+  const editPolygon = useAppSelector(selectEditPolygon);
 
   if (!polygon) {
     return;

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { selectEditPolygon } from "../../lib/features/modeSlice";
 import { useAppSelector } from "../../lib/hooks";
 import GraphTab from "./GraphTab";
 import PolygonTab from "./PolygonTab";
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const SidePanel = ({ floorCode, parsePDF }: Props) => {
-  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
+  const editPolygon = useAppSelector(selectEditPolygon);
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 

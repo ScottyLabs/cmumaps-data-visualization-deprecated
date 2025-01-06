@@ -7,6 +7,7 @@ import { AS_NODE } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import {
   ADD_DOOR_NODE,
   GRAPH_SELECT,
+  selectEditPolygon,
   setMode,
 } from "../../lib/features/modeSlice";
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
@@ -24,7 +25,7 @@ const DoorsDisplay = ({ floorCode }: Props) => {
 
   const mode = useAppSelector((state) => state.mode.mode);
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
-  const editPolygon = useAppSelector((state) => state.mode.editPolygon);
+  const editPolygon = useAppSelector(selectEditPolygon);
 
   const nodes = useAppSelector((state) => state.data.nodes);
   const doors = useAppSelector((state) => state.outline.doors);

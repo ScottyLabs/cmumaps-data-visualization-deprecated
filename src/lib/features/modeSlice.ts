@@ -22,12 +22,10 @@ export const POLYGON_DELETE_VERTEX: Mode = "Polygon Delete Vertex";
 
 interface ModeState {
   mode: Mode;
-  editPolygon: boolean;
 }
 
 const initialState: ModeState = {
   mode: GRAPH_SELECT,
-  editPolygon: false,
 };
 
 const modeSlice = createSlice({
@@ -36,14 +34,19 @@ const modeSlice = createSlice({
   reducers: {
     setMode(state, action: PayloadAction<Mode>) {
       state.mode = action.payload;
-      if (state.mode === GRAPH_SELECT) {
-        state.editPolygon = false;
-      } else if (state.mode === POLYGON_SELECT) {
-        state.editPolygon = true;
-      }
+    },
+  },
+  selectors: {
+    selectEditPolygon(state) {
+      return (
+        state.mode === POLYGON_SELECT ||
+        state.mode === POLYGON_ADD_VERTEX ||
+        state.mode === POLYGON_DELETE_VERTEX
+      );
     },
   },
 });
 
 export const { setMode } = modeSlice.actions;
+export const { selectEditPolygon } = modeSlice.selectors;
 export default modeSlice.reducer;

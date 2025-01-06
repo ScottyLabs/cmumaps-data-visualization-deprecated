@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
 
   // join WebSocket
-  useWebSocket();
+  useWebSocket(null);
 
   // fetch building codes
   useEffect(() => {

@@ -29,7 +29,7 @@ import {
 } from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
-import { LIVEBLOCKS_ENABLED, WEBSOCKET_ENABLED } from "../../settings";
+import { LIVEBLOCKS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { Node } from "../shared/types";
@@ -98,7 +98,7 @@ const FloorDisplay = ({
     useContext(PolygonContext);
 
   // join WebSocket
-  useWebSocket();
+  useWebSocket(floorCode);
 
   const [_myPresence, updateMyPresence] = LIVEBLOCKS_ENABLED
     ? // eslint-disable-next-line react-hooks/rules-of-hooks

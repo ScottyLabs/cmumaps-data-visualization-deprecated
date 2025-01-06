@@ -6,7 +6,7 @@ import { useAppDispatch } from "../lib/hooks";
 import { WEBSOCKET_JOIN } from "../lib/webSocketMiddleware";
 import { WEBSOCKET_ENABLED } from "../settings";
 
-const useWebSocket = () => {
+const useWebSocket = (floorCode: string | null) => {
   const { user } = useUser();
   const { session, isLoaded } = useSession();
   const dispatch = useAppDispatch();
@@ -19,8 +19,11 @@ const useWebSocket = () => {
 
     (async () => {
       const token = await session?.getToken();
-      const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userName=${user?.firstName || ""}&floorCode=${null}&token=${token}`;
-      dispatch({ type: WEBSOCKET_JOIN, payload: { url, floorCode: null } });
+      const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userName=${user?.firstName || ""}&floorCode=${floorCode}&token=${token}`;
+      dispatch({
+        type: WEBSOCKET_JOIN,
+        payload: { url, floorCode },
+      });
     })();
     // No need to refresh the token when session changes since
     // only used to establish connection with the WebSocket

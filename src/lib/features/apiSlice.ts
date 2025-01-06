@@ -30,12 +30,13 @@ export const apiSlice = createApi({
         { dispatch, getState, queryFulfilled }
       ) {
         try {
-          const nodes =
+          let nodes =
             apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
 
           if (!nodes) {
-            console.error("Invalid cache!");
-            return;
+            nodes = await dispatch(
+              apiSlice.endpoints.getGraph.initiate(floorCode)
+            ).unwrap();
           }
 
           const { patches: jsonPatch, inversePatches: reversedJsonPatch } =

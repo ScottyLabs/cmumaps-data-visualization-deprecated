@@ -32,6 +32,10 @@ import {
   setEditRoomLabel,
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
+import {
+  connectWebSocket,
+  disconnectWebSocket,
+} from "../../lib/features/webSocketSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
@@ -126,30 +130,13 @@ const FloorDisplay = ({
       return;
     }
 
-    const socket = new WebSocket(
-      `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userName=${user?.firstName || ""}&floorCode=${floorCode}&token=${token}`
-    );
-
-    // Set up event listeners for the WebSocket
-    socket.onopen = () => {
-      console.log("WebSocket connection established");
-      socket.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
-    };
-
-    socket.onmessage = (event) => {
-      console.log("Received message:", event.data);
-    };
-
-    socket.onerror = (error) => {
-      console.log("WebSocket error:", error);
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+    const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userName=${user?.firstName || ""}&floorCode=${floorCode}&token=${token}`;
+    dispatch(connectWebSocket({ url, floorCode }));
 
     // Cleanup function to close the WebSocket
-    return () => socket.close();
+    return () => {
+      dispatch(disconnectWebSocket());
+    };
   }, [floorCode, token, user?.firstName]);
 
   const [_myPresence, updateMyPresence] = LIVEBLOCKS_ENABLED

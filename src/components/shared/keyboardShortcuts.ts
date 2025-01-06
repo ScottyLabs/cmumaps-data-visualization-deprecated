@@ -2,7 +2,6 @@ import { savingHelper } from "../../lib/apiRoutes";
 import { setNodes } from "../../lib/features/dataSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { deselect } from "../../lib/features/mouseEventSlice";
-import { dist } from "../utils/utils";
 import { Edge, Graph } from "./types";
 
 export const deleteNode = async (
@@ -27,9 +26,8 @@ export const deleteNode = async (
 
     // make sure both neighbors are not deleted already
     if (node0 && node1) {
-      const curDist = dist(node0.pos, node1.pos);
-      node0.neighbors[neighbors[1]] = { dist: curDist };
-      node1.neighbors[neighbors[0]] = { dist: curDist };
+      node0.neighbors[neighbors[1]] = {};
+      node1.neighbors[neighbors[0]] = {};
     }
   }
 

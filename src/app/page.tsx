@@ -31,7 +31,10 @@ const App: React.FC = () => {
   // Toast the error message based on session storage
   useEffect(() => {
     // make sure on client side
-    if (typeof window === "undefined") {
+    if (
+      typeof window === "undefined" ||
+      typeof sessionStorage === "undefined"
+    ) {
       return;
     }
 

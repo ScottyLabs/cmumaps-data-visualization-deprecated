@@ -20,10 +20,10 @@ export const apiSlice = createApi({
       transformResponse: (response: { data: Graph }) => response.data,
     }),
     moveNode: builder.mutation<Graph, MoveNodeArgType>({
-      query: ({ node }) => ({
+      query: ({ nodeId, node }) => ({
         url: "/node/update",
         method: "POST",
-        body: node,
+        body: { nodeId, node },
       }),
       async onQueryStarted(
         { floorCode, nodeId, node },
@@ -47,14 +47,8 @@ export const apiSlice = createApi({
 
           // create db patches
           const apiPath = "/api/node/update";
-          const body = JSON.stringify({
-            nodeId: nodeId,
-            nodeData: node,
-          });
-          const reversedBody = JSON.stringify({
-            nodeId: nodeId,
-            nodeData: nodes[nodeId],
-          });
+          const body = JSON.stringify({ nodeId, node });
+          const reversedBody = JSON.stringify({ nodeId, node: nodes[nodeId] });
           const dbPatch = { apiPath, body };
           const reversedDbPatch = { apiPath, body: reversedBody };
 

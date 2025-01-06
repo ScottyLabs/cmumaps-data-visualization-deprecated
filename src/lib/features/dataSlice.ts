@@ -48,18 +48,33 @@ export const undo = createAppAsyncThunk(
   async (floorCode: string, { dispatch, getState }) => {
     try {
       const dataState = getState().data;
-      if (dataState.editIndex == -1) {
+      const editIndex = dataState.editIndex;
+      if (editIndex == -1) {
         toast.error("Can't undo anymore!");
         return;
       }
 
-      const reversedPatch = dataState.reversedEditHistory[dataState.editIndex];
+      // undo locally
+      const reversedPatch = dataState.reversedEditHistory[editIndex];
       dispatch(
         apiSlice.util.patchQueryData("getGraph", floorCode, reversedPatch)
       );
+
+      // undo in database
+      const reversedQuery = dataState.reversedQueyHistory[editIndex];
+      const response = await fetch(reversedQuery.apiPath, {
+        method: "POST",
+        body: reversedQuery.body,
+      });
+
+      const body = await response.json();
+      if (!response.ok) {
+        toast.error("Failed to save undone change!");
+        console.error(body.error);
+      }
     } catch (error) {
-      console.error("Error undoing:", error);
       toast.error("Failed to undo change!");
+      console.error("Error undoing:", error);
     }
   }
 );

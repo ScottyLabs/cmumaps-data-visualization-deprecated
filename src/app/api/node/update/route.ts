@@ -11,17 +11,17 @@ export async function POST(request: Request) {
   try {
     const requestData = await request.json();
     const nodeId = requestData.nodeId;
-    const nodeData: Node = requestData.nodeData;
+    const node: Node = requestData.node;
 
     await prisma.node.update({
       where: {
         id: nodeId,
       },
       data: {
-        posX: nodeData.pos.x,
-        posY: nodeData.pos.y,
-        buildingCode: getBuildingCodeFromRoomId(nodeData.roomId),
-        roomName: getRoomNameFromRoomId(nodeData.roomId),
+        posX: node.pos.x,
+        posY: node.pos.y,
+        buildingCode: getBuildingCodeFromRoomId(node.roomId),
+        roomName: getRoomNameFromRoomId(node.roomId),
       },
     });
 

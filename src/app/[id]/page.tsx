@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 
 import buildings from "../../../public/cmumaps-data/buildings.json";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
-import LiveblocksWrapper from "../../components/layouts/LiveblocksWrapper";
 import LoadingText from "../../components/layouts/LoadingText";
 import MainDisplay from "../../components/layouts/MainDisplay";
 import ModeDisplay from "../../components/layouts/ModeDisplay";
@@ -95,7 +94,7 @@ const Page = ({ params }: { params: { id: string } }) => {
   })();
 
   return (
-    <LiveblocksWrapper floorCode={floorCode}>
+    <>
       <NavBar buildingCode={buildingCode} />
       {WEBSOCKET_ENABLED && <UserCount />}
       <LoadingText />
@@ -107,7 +106,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       />
       <HelpInfo />
       <MyToastContainer />
-    </LiveblocksWrapper>
+    </>
   );
 };
 

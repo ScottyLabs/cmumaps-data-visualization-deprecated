@@ -16,8 +16,6 @@
   "dependencies": {
     "@clerk/nextjs": "^6.9.6",
     "@datastructures-js/priority-queue": "^6.3.1",
-    "@liveblocks/client": "^2.15.1",
-    "@liveblocks/react": "^2.15.1",
     "@prisma/client": "^6.1.0",
     "@prisma/extension-pulse": "^1.2.0",
     "@reduxjs/toolkit": "^2.5.0",

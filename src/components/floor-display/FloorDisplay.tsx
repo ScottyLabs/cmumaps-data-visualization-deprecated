@@ -1,10 +1,9 @@
-import { useUser } from "@clerk/nextjs";
 import { Polygon } from "geojson";
 import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import React, { useCallback, useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -30,8 +29,7 @@ import {
 } from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
-import { useMyPresence } from "../../liveblocks.config";
-import { LIVE_CURSORS_ENABLED, LIVEBLOCKS_ENABLED } from "../../settings";
+import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { Node, PDFCoordinate } from "../shared/types";
@@ -75,7 +73,6 @@ const FloorDisplay = ({
   stageRef,
 }: Props) => {
   const router = useRouter();
-  const { user } = useUser();
   const dispatch = useAppDispatch();
 
   const { data: nodes } = useGetGraphQuery(floorCode);
@@ -101,28 +98,6 @@ const FloorDisplay = ({
 
   // join WebSocket
   useWebSocket(floorCode);
-
-  const [_myPresence, updateMyPresence] = LIVEBLOCKS_ENABLED
-    ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useMyPresence()
-    : [null, null];
-
-  // Wrapped to disable all updateMyPresence if Liveblocks not enabled
-  // Delay is useful for local testing with two tabs
-  const updateMyPresenceWrapper = useCallback(
-    (data) => {
-      if (updateMyPresence) {
-        // setTimeout(() => {
-        updateMyPresence(data);
-        // }, 5000);
-      }
-    },
-    [updateMyPresence]
-  );
-
-  useEffect(() => {
-    updateMyPresenceWrapper({ name: user?.firstName });
-  }, [updateMyPresenceWrapper, user?.firstName]);
 
   const cursorPosRef = useRef<PDFCoordinate[]>([]);
   useEffect(() => {
@@ -304,11 +279,7 @@ const FloorDisplay = ({
             <EdgesDisplay nodes={nodes} />
           )}
           {showNodes && !editPolygon && !editRoomLabel && (
-            <NodesDisplay
-              floorCode={floorCode}
-              nodes={nodes}
-              updateMyPresenceWrapper={updateMyPresenceWrapper}
-            />
+            <NodesDisplay floorCode={floorCode} nodes={nodes} />
           )}
 
           {roomIdSelected && (

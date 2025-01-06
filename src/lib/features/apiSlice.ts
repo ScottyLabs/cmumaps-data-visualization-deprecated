@@ -64,7 +64,7 @@ export const apiSlice = createApi({
           dispatch(addPatchesToHistory(patch));
           dispatch({
             type: WEBSOCKET_MESSAGE,
-            payload: { floorCode, patch: jsonPatch },
+            payload: { patch: jsonPatch },
           });
         } catch (e) {
           toast.error("Check the Console for detailed error.");

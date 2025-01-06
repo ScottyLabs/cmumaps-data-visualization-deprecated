@@ -23,7 +23,6 @@ interface WebSocketConnectAction {
 interface WebSocketMessageAction {
   type: string;
   payload: {
-    floorCode: string;
     patch: Patch;
   };
 }
@@ -37,10 +36,10 @@ const handleWebSocketJoin = (
 ) => {
   const { payload } = action;
   const { floorCode, url } = payload;
+  dispatch(setFloorCode(floorCode));
 
   // switch floor if socket already connected
   if (socket) {
-    dispatch(setFloorCode(floorCode));
     socket.send(JSON.stringify({ action: "switchFloor", floorCode }));
     return;
   }
@@ -60,6 +59,12 @@ const handleWebSocketJoin = (
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
     console.log(message);
+
+    const floorCode = getStore().floor.floorCode;
+    if (!floorCode) {
+      return;
+    }
+
     switch (message.type) {
       // patch the graph
       case PATCH_TYPE:
@@ -70,22 +75,13 @@ const handleWebSocketJoin = (
 
       // refresh user count in both floors when leaving a floor
       case LEAVE_FLOOR:
-        const newFloorCode = getStore().floor.floorCode;
         socket?.send(
           JSON.stringify({
             action: "refreshUserCount",
             floorCode: message.oldFloorCode,
           })
         );
-
-        if (newFloorCode) {
-          socket?.send(
-            JSON.stringify({
-              action: "refreshUserCount",
-              floorCode: newFloorCode,
-            })
-          );
-        }
+        socket?.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
         break;
     }
   };
@@ -124,7 +120,8 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
     case WEBSOCKET_MESSAGE:
       if (socket && socket.readyState === WebSocket.OPEN) {
         const { payload } = action as WebSocketMessageAction;
-        const { floorCode, patch } = payload;
+        const { patch } = payload;
+        const floorCode = getState().floor.floorCode;
         socket.send(
           JSON.stringify({
             action: "message",

@@ -14,6 +14,7 @@ import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
 import { savingHelper } from "../../lib/apiRoutes";
+import { useGetGraphQuery } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -81,6 +82,8 @@ const FloorDisplay = ({
   const { session } = useSession();
   const dispatch = useAppDispatch();
 
+  const { data: nodes } = useGetGraphQuery(floorCode);
+
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
@@ -92,7 +95,6 @@ const FloorDisplay = ({
   const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
 
   const { rooms, setRooms } = useContext(RoomsContext);
-  const nodes = useAppSelector((state) => state.data.nodes);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const editPolygon = useAppSelector(selectEditPolygon);

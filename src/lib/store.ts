@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
+import { apiSlice } from "./features/apiSlice";
 import dataSlice from "./features/dataSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
@@ -19,9 +20,12 @@ export const makeStore = () => {
       data: dataSlice,
       visibility: visibilitySlice,
       outline: outlineSlice,
+      [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+      getDefaultMiddleware()
+        .prepend(listenerMiddleware.middleware)
+        .concat(apiSlice.middleware),
   });
 };
 

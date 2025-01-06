@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
 import { savingHelper } from "../../lib/apiRoutes";
+import { useGetGraphQuery } from "../../lib/features/apiSlice";
 import { redo, setNodes, undo } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -58,6 +59,8 @@ const MainDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  const { data: nodes, isFetching } = useGetGraphQuery(floorCode);
+
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
@@ -68,7 +71,6 @@ const MainDisplay = ({ floorCode }: Props) => {
     (state) => state.status.shortcutsDisabled
   );
 
-  const nodes = useAppSelector((state) => state.data.nodes);
   const [rooms, setRooms] = useState<Record<ID, RoomInfo>>({});
 
   // polygon editing history
@@ -155,18 +157,6 @@ const MainDisplay = ({ floorCode }: Props) => {
         }
       }
 
-      const graphResult = await fetch(`/api/getGraph?floorCode=${floorCode}`, {
-        method: "GET",
-      });
-
-      const graphBody = await graphResult.json();
-
-      if (!graphResult.ok) {
-        console.error(graphBody.error);
-        return;
-      }
-
-      dispatch(setNodes(graphBody.result));
       dispatch(finishLoading());
     },
     [dispatch, floorCode]
@@ -335,7 +325,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     return;
   }
 
-  if (loadingStatus !== LOADED) {
+  if (isFetching || loadingStatus !== LOADED) {
     return;
   }
 

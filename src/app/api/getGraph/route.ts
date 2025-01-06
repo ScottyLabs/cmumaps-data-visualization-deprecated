@@ -85,7 +85,7 @@ export async function GET(request: Request) {
 
     return new NextResponse(
       JSON.stringify({
-        result: graph,
+        data: graph,
       }),
       {
         status: 200,

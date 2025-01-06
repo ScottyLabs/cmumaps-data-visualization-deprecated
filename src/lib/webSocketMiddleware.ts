@@ -2,7 +2,7 @@ import { Action, Middleware } from "@reduxjs/toolkit";
 
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
-import { setOtherUsers } from "./features/usersSlice";
+import { setOtherUsers, updateLiveCursors } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
@@ -85,7 +85,7 @@ const handleWebSocketJoin = (
 
       // update cursor
       case CURSOR:
-        console.log(message);
+        dispatch(updateLiveCursors(message));
         break;
 
       // for now just set other users

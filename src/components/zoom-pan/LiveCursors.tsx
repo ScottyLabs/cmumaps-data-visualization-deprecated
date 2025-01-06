@@ -17,29 +17,31 @@ export const CURSOR_INTERVAL = 20;
 const LiveCursors = ({ scale }: Props) => {
   // const dispatch = useAppDispatch();
   const otherUsers = useAppSelector((state) => state.users.otherUsers);
-
   const cursorPosList = useAppSelector((state) => state.users.liveCursors);
   const [cursorPosIndex, setCursorPosIndex] = useState(0);
+
+  console.log(cursorPosList);
+  return <></>;
 
   const [textWidth, setTextWidth] = useState(0);
   const [textHeight, setTextHeight] = useState(0);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCursorPosIndex((prev) => {
-        if (prev < cursorPosList.length - 1) {
-          return prev + 1;
-        } else {
-          return prev;
-        }
-      });
-    }, CURSOR_INTERVAL);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     setCursorPosIndex((prev) => {
+  //       if (prev < cursorPosList.length - 1) {
+  //         return prev + 1;
+  //       } else {
+  //         return prev;
+  //       }
+  //     });
+  //   }, CURSOR_INTERVAL);
 
-    return () => {
-      setCursorPosIndex(0);
-      clearInterval(intervalId);
-    };
-  }, [cursorPosList]);
+  //   return () => {
+  //     setCursorPosIndex(0);
+  //     clearInterval(intervalId);
+  //   };
+  // }, [cursorPosList]);
 
   // // update node position if dragged by a user
   // useEffect(() => {

@@ -28,13 +28,12 @@ def lambda_handler(event, context):
 
         # send message to all users except the sender
         payload = body["payload"]
+        payload["sender"] = sender_connection_id
         for connection in response["Items"]:
             if connection["Token"] != sender_connection_id:
                 client.post_to_connection(
                     ConnectionId=connection["Token"],
-                    Data=json.dumps(
-                        {"sender": sender_connection_id, "payload": payload}
-                    ),
+                    Data=json.dumps(payload),
                 )
 
         return {"statusCode": 200}

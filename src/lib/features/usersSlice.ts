@@ -9,12 +9,12 @@ interface User {
 
 interface UsersState {
   otherUsers: Record<string, User>;
-  liveCursors: PDFCoordinate[];
+  liveCursors: Record<string, PDFCoordinate[]>;
 }
 
 const initialState: UsersState = {
   otherUsers: {},
-  liveCursors: [],
+  liveCursors: {},
 };
 
 const usersSlice = createSlice({
@@ -24,11 +24,11 @@ const usersSlice = createSlice({
     setOtherUsers(state, action: PayloadAction<Record<string, User>>) {
       state.otherUsers = action.payload;
     },
-    setLiveCursors(state, action: PayloadAction<PDFCoordinate[]>) {
-      state.liveCursors = action.payload;
+    updateLiveCursors(state, action) {
+      state.liveCursors[action.payload.sender] = action.payload.cursorPos;
     },
   },
 });
 
-export const { setOtherUsers, setLiveCursors } = usersSlice.actions;
+export const { setOtherUsers, updateLiveCursors } = usersSlice.actions;
 export default usersSlice.reducer;

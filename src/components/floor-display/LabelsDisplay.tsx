@@ -8,15 +8,16 @@ import { savingHelper } from "../../lib/apiRoutes";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { RoomInfo } from "../shared/types";
+import { Graph, RoomInfo } from "../shared/types";
 import { getRoomId, setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;
+  nodes: Graph;
   addNewNode;
 }
 
-const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
+const LabelsDisplay = ({ floorCode, nodes, addNewNode }: Props) => {
   const router = useRouter();
 
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
@@ -24,7 +25,6 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
 
   const doors = useAppSelector((state) => state.outline.doors);
   const { rooms, setRooms } = useContext(RoomsContext);
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -35,7 +35,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const width = Number(viewBox[2]);
   const height = Number(viewBox[3]);
 
-  if (!doors || !nodes) {
+  if (!doors) {
     return;
   }
 

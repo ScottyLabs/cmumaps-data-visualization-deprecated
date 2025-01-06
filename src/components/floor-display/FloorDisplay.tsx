@@ -303,6 +303,10 @@ const FloorDisplay = ({
     setCanPan(newCanPan);
   };
 
+  if (!nodes) {
+    return;
+  }
+
   return (
     <>
       <Stage
@@ -325,14 +329,17 @@ const FloorDisplay = ({
       >
         <Layer>
           {showOutline && <WallsDisplay />}
-          {showOutline && <DoorsDisplay floorCode={floorCode} />}
+          {showOutline && <DoorsDisplay floorCode={floorCode} nodes={nodes} />}
 
           {showPolygons && <PolygonsDisplay />}
 
-          {showEdges && !editPolygon && !editRoomLabel && <EdgesDisplay />}
+          {showEdges && !editPolygon && !editRoomLabel && (
+            <EdgesDisplay nodes={nodes} />
+          )}
           {showNodes && !editPolygon && !editRoomLabel && (
             <NodesDisplay
               floorCode={floorCode}
+              nodes={nodes}
               updateMyPresenceWrapper={updateMyPresenceWrapper}
             />
           )}
@@ -345,10 +352,16 @@ const FloorDisplay = ({
             />
           )}
 
-          {<LabelsDisplay floorCode={floorCode} addNewNode={addNewNode} />}
+          {
+            <LabelsDisplay
+              floorCode={floorCode}
+              nodes={nodes}
+              addNewNode={addNewNode}
+            />
+          }
 
           <Suspense fallback={<></>}>
-            {LIVEBLOCKS_ENABLED && <LiveCursors scale={scale} />}
+            {LIVEBLOCKS_ENABLED && <LiveCursors nodes={nodes} scale={scale} />}
           </Suspense>
         </Layer>
       </Stage>

@@ -12,18 +12,19 @@ import {
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { deleteNode } from "../../shared/keyboardShortcuts";
+import { Graph } from "../../shared/types";
 import { RED_BUTTON_STYLE } from "../../utils/displayUtils";
 
 interface Props {
   floorCode: string;
+  nodes: Graph;
 }
 
-const GraphInfoButtons = ({ floorCode }: Props) => {
+const GraphInfoButtons = ({ floorCode, nodes }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   const renderButton = (text, handleClick, style?) => {
     return (

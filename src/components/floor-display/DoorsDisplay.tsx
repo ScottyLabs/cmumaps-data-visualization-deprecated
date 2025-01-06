@@ -12,14 +12,15 @@ import {
 } from "../../lib/features/modeSlice";
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { DoorInfo, ID } from "../shared/types";
+import { DoorInfo, Graph, ID } from "../shared/types";
 import { addDoorsToGraph, setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;
+  nodes: Graph;
 }
 
-const DoorsDisplay = ({ floorCode }: Props) => {
+const DoorsDisplay = ({ floorCode, nodes }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -27,11 +28,10 @@ const DoorsDisplay = ({ floorCode }: Props) => {
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const editPolygon = useAppSelector(selectEditPolygon);
 
-  const nodes = useAppSelector((state) => state.data.nodes);
   const doors = useAppSelector((state) => state.outline.doors);
   const roomlessDoors = useAppSelector((state) => state.outline.roomlessDoors);
 
-  if (!nodes || !doors || !roomlessDoors) {
+  if (!doors || !roomlessDoors) {
     return;
   }
 

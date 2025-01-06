@@ -234,7 +234,7 @@ const MainDisplay = ({ floorCode }: Props) => {
         event.key === "Delete" ||
         event.key === "Escape"
       ) {
-        if (nodeIdSelected) {
+        if (nodeIdSelected && nodes) {
           deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
         } else {
           toastNodeNotSelectedErr();

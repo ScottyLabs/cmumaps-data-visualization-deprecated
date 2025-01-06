@@ -20,17 +20,18 @@ import {
 } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { EdgeTypeList, Node, ID } from "../shared/types";
+import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
 import { addDoorNodeErrToast, updateNode } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { dist, getRoomId, setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;
+  nodes: Graph;
   updateMyPresenceWrapper;
 }
 
-const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
+const NodesDisplay = ({ floorCode, nodes, updateMyPresenceWrapper }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -39,7 +40,6 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
 
   const { rooms } = useContext(RoomsContext);
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   const nodeIdHovered = useAppSelector(
     (state) => state.mouseEvent.nodeIdOnHover

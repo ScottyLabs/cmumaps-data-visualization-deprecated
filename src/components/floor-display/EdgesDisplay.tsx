@@ -3,10 +3,14 @@ import { Line } from "react-konva";
 
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
-import { ID } from "../shared/types";
+import { Graph, ID } from "../shared/types";
 import { getRoomId } from "../utils/utils";
 
-const EdgesDisplay = () => {
+interface Props {
+  nodes: Graph;
+}
+
+const EdgesDisplay = ({ nodes }: Props) => {
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const mst = useAppSelector((state) => state.data.mst);
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
@@ -14,16 +18,11 @@ const EdgesDisplay = () => {
     getNodeIdSelected(state.mouseEvent)
   );
 
-  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeIdOnDrag = useAppSelector((state) => state.mouseEvent.nodeIdOnDrag);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const includedNodes = new Set();
   const edges: [number[], string][] = [];
-
-  if (!nodes) {
-    return;
-  }
 
   const shouldRender = (curId: ID, neighborId: ID) => {
     // don't display an edge twice

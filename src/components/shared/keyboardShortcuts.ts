@@ -3,10 +3,10 @@ import { setNodes } from "../../lib/features/dataSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { deselect } from "../../lib/features/mouseEventSlice";
 import { dist } from "../utils/utils";
-import { Edge } from "./types";
+import { Edge, Graph } from "./types";
 
 export const deleteNode = async (
-  nodes,
+  nodes: Graph,
   nodeId,
   floorCode,
   router,

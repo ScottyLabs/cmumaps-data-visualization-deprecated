@@ -3,18 +3,19 @@ import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
 import { setNodes } from "../../lib/features/dataSlice";
-import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import { useAppDispatch } from "../../lib/hooks";
 import { Presence, useOthers } from "../../liveblocks.config";
+import { Graph } from "../shared/types";
 
 interface Props {
   scale: number;
+  nodes: Graph;
 }
 
-const LiveCursors = ({ scale }: Props) => {
+const LiveCursors = ({ scale, nodes }: Props) => {
   const others = useOthers();
 
   const dispatch = useAppDispatch();
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   // const [myPresence, _updateMyPresence] = useMyPresence();
 

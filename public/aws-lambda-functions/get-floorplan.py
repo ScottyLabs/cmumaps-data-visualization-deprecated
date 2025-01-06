@@ -9,8 +9,7 @@ bucket_name = "cmu-floorplans"
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event["body"])
-        file_path = body["filePath"]
+        file_path = event["queryStringParameters"]["filePath"]
         s3_response = s3_client.get_object(Bucket=bucket_name, Key=file_path)
         file_data = s3_response["Body"].read()
         pdf_base64 = base64.b64encode(file_data).decode("utf-8")

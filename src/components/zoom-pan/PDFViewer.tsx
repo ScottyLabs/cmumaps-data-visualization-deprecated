@@ -40,15 +40,15 @@ const PDFViewer = ({ floorCode, scale, offset }: Props) => {
 
         const buildingCode = extractBuildingCode(floorCode);
 
-        const result = await fetch(`${AWS_API_INVOKE_URL}/get-floorplan`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          method: "POST",
-          body: JSON.stringify({
-            filePath: `pdf/${buildingCode}/${floorCode}.pdf`,
-          }),
-        });
+        const result = await fetch(
+          `${AWS_API_INVOKE_URL}/get-floorplan?filePath=pdf/${buildingCode}/${floorCode}.pdf`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            method: "Get",
+          }
+        );
 
         const body = await result.json();
 

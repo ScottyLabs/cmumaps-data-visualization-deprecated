@@ -1,5 +1,7 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
 
+import { toast } from "react-toastify";
+
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { setOtherUsers, updateLiveCursors } from "./features/usersSlice";
@@ -96,6 +98,7 @@ const handleWebSocketJoin = (
   };
 
   socket.onerror = (error) => {
+    toast.error("WebSocket error! Check the Console for detailed error.");
     console.log("WebSocket error:", error);
   };
 

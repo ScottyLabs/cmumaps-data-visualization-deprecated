@@ -68,6 +68,10 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   // Validate floor level and redirect if invalid
   (() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     if (!buildings[buildingCode]) {
       sessionStorage.setItem("error", "InvalidBuildingCode");
       redirect("/");

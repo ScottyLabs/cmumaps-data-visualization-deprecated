@@ -4,13 +4,7 @@ import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import React, {
-  Suspense,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useCallback, useContext, useEffect, useRef } from "react";
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -34,9 +28,10 @@ import {
   setEditRoomLabel,
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
+import { setLiveCursors } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useMyPresence } from "../../liveblocks.config";
-import { LIVEBLOCKS_ENABLED } from "../../settings";
+import { LIVE_CURSORS_ENABLED, LIVEBLOCKS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { Node, PDFCoordinate } from "../shared/types";
@@ -44,7 +39,7 @@ import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { distPointToLine, getRoomId } from "../utils/utils";
-import LiveCursors from "../zoom-pan/LiveCursors";
+import LiveCursors, { CURSOR_INTERVAL } from "../zoom-pan/LiveCursors";
 import DoorsDisplay from "./DoorsDisplay";
 import EdgesDisplay from "./EdgesDisplay";
 import LabelsDisplay from "./LabelsDisplay";
@@ -133,7 +128,7 @@ const FloorDisplay = ({
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (cursorPosRef.current.length > 0) {
-        console.log(cursorPosRef.current);
+        dispatch(setLiveCursors(cursorPosRef.current));
         cursorPosRef.current = [];
       }
     }, 500);
@@ -141,7 +136,7 @@ const FloorDisplay = ({
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [dispatch]);
 
   const handleMouseMove = throttle((e) => {
     const cursor = adjustPosition(
@@ -150,7 +145,7 @@ const FloorDisplay = ({
       scale
     );
     cursorPosRef.current.push(cursor);
-  }, 20);
+  }, CURSOR_INTERVAL);
 
   const addNewNode = (newNode: Node) => {
     const newNodes = { ...nodes };
@@ -329,9 +324,7 @@ const FloorDisplay = ({
             />
           }
 
-          <Suspense fallback={<></>}>
-            {LIVEBLOCKS_ENABLED && <LiveCursors nodes={nodes} scale={scale} />}
-          </Suspense>
+          {LIVE_CURSORS_ENABLED && <LiveCursors nodes={nodes} scale={scale} />}
         </Layer>
       </Stage>
     </>

@@ -6,6 +6,6 @@ export const LIVEBLOCKS_ENABLED = process.env.NODE_ENV === "production";
 const WEBSOCKET_DEV_ENABLED = false;
 export const WEBSOCKET_ENABLED =
   process.env.NODE_ENV === "production" || WEBSOCKET_DEV_ENABLED;
-const CURSOR_SHARING_DEV_ENABLED = false;
-export const CURSOR_SHARING_ENABLED =
-  WEBSOCKET_ENABLED && CURSOR_SHARING_DEV_ENABLED;
+const LIVE_CURSORS_DEV_ENABLED = false;
+export const LIVE_CURSORS_ENABLED = true;
+// WEBSOCKET_ENABLED && LIVE_CURSORS_DEV_ENABLED;

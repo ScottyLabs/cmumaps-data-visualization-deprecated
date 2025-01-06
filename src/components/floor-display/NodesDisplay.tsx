@@ -147,8 +147,7 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
         JSON.stringify({
           floorCode: floorCode,
           newGraph: JSON.stringify(newNodes),
-        }),
-        dispatch
+        })
       );
 
       dispatch(setMode(GRAPH_SELECT));
@@ -180,8 +179,7 @@ const NodesDisplay = ({ floorCode, updateMyPresenceWrapper }: Props) => {
         JSON.stringify({
           floorCode: floorCode,
           newGraph: JSON.stringify(newNodes),
-        }),
-        dispatch
+        })
       );
 
       dispatch(setMode(GRAPH_SELECT));

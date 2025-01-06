@@ -17,8 +17,7 @@ import MyToastContainer from "../../components/shared/MyToastContainer";
 import HelpInfo from "../../components/zoom-pan/HelpInfo";
 import { setFloorLevels } from "../../lib/features/dataSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
-import { SAVED } from "../../lib/features/statusSlice";
-import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import { useAppDispatch } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 
@@ -34,8 +33,6 @@ import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  const saveStatus = useAppSelector((state) => state.status.saveStatus);
 
   // get floor info
   const floorCode = params.id;
@@ -64,19 +61,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     // clear storage so it is not toasted again when refreshed
     sessionStorage.setItem("error", "");
   }, []);
-
-  // Warn before closing tab
-  useEffect(() => {
-    const handleWindowClose = (e) => {
-      if (saveStatus !== SAVED) {
-        e.preventDefault();
-      }
-    };
-    window.addEventListener("beforeunload", handleWindowClose);
-    return () => {
-      window.removeEventListener("beforeunload", handleWindowClose);
-    };
-  }, [saveStatus]);
 
   // Reset mode when switching floor
   useEffect(() => {

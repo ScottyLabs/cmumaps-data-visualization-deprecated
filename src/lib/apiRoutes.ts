@@ -1,13 +1,6 @@
-import { Dispatch } from "@reduxjs/toolkit";
-
 import { toast } from "react-toastify";
 
 import { buildingCodeToName } from "../components/shared/buildings";
-import {
-  failedSaving,
-  finishSaving,
-  startSaving,
-} from "./features/statusSlice";
 
 export const AWS_API_INVOKE_URL = `${process.env.NEXT_PUBLIC_AWS_API_INVOKE_URL}/${process.env.NODE_ENV}`;
 
@@ -22,16 +15,11 @@ export const AWS_API_INVOKE_URL = `${process.env.NEXT_PUBLIC_AWS_API_INVOKE_URL}
  */
 export const savingHelper = async (
   apiPath: string,
-  body: BodyInit,
-  dispatch: Dispatch
+  body: BodyInit
 ): Promise<boolean> => {
-  dispatch(startSaving());
   const response = await fetch(apiPath, { method: "POST", body });
 
-  if (response.ok) {
-    dispatch(finishSaving());
-  } else {
-    dispatch(failedSaving());
+  if (!response.ok) {
     const body = await response.json();
     console.error(body.error);
     if (body.errorMessage) {

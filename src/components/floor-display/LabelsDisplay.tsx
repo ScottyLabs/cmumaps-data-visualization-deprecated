@@ -6,7 +6,7 @@ import { Group, Path, Rect } from "react-konva";
 
 import { savingHelper } from "../../lib/apiRoutes";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
-import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { RoomInfo } from "../shared/types";
 import { getRoomId, setCursor } from "../utils/utils";
@@ -18,7 +18,6 @@ interface Props {
 
 const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
   const showLabels = useAppSelector((state) => state.visibility.showLabels);
@@ -69,8 +68,7 @@ const LabelsDisplay = ({ floorCode, addNewNode }: Props) => {
             floorCode: floorCode,
             roomId: roomId,
             newRoomInfo: newRoomInfo,
-          }),
-          dispatch
+          })
         );
       };
 

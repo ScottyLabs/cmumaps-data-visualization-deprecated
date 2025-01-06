@@ -62,8 +62,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
           floorCode: floorCode,
           roomId: newRoomId,
           newRoomInfo: newRoomInfo,
-        }),
-        dispatch
+        })
       );
 
       savingHelper(
@@ -71,8 +70,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
         JSON.stringify({
           floorCode: floorCode,
           newGraph: JSON.stringify(newNodes),
-        }),
-        dispatch
+        })
       );
     };
 
@@ -128,8 +126,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
         floorCode,
         roomId,
         roomData: roomInfo,
-      }),
-      dispatch
+      })
     );
 
     return succeeded;

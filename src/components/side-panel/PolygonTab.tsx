@@ -55,7 +55,7 @@ const PolygonTab = ({ floorCode }: Props) => {
         newPolygon
       );
 
-      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
+      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
     };
 
     const deleteHole = () => {
@@ -71,7 +71,7 @@ const PolygonTab = ({ floorCode }: Props) => {
         newPolygon
       );
 
-      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
+      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
     };
 
     if (coordsIndex == 0) {
@@ -119,7 +119,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       setHistoryIndex,
       newPolygon
     );
-    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
+    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
   };
 
   const deletePolygon = async () => {
@@ -134,7 +134,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       setHistoryIndex,
       newPolygon
     );
-    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
+    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
   };
 
   return (

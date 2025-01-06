@@ -51,9 +51,9 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
 
   const saveToRoomsHelper = useCallback(
     (newPolygon: Polygon) => {
-      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon, dispatch);
+      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
     },
-    [dispatch, floorCode, roomId, rooms, setRooms]
+    [floorCode, roomId, rooms, setRooms]
   );
 
   useEffect(() => {

@@ -67,8 +67,7 @@ const DifferentFloorNeighborTable = ({
           JSON.stringify({
             floorCode: floorCode,
             newGraph: JSON.stringify(newNodes),
-          }),
-          dispatch
+          })
         );
 
         // update neighbor floor's graph json
@@ -82,8 +81,7 @@ const DifferentFloorNeighborTable = ({
             nodeId: neighborId,
             neighborId: nodeId,
             newToFloorInfo: neighborFloorInfo,
-          }),
-          dispatch
+          })
         );
       };
 
@@ -100,8 +98,7 @@ const DifferentFloorNeighborTable = ({
         JSON.stringify({
           floorCode: floorCode,
           newGraph: JSON.stringify(newNodes),
-        }),
-        dispatch
+        })
       );
 
       // update neighbor floor's graph json
@@ -111,8 +108,7 @@ const DifferentFloorNeighborTable = ({
           floorCode: neighbors[neighborId].toFloorInfo?.toFloor,
           nodeId: neighborId,
           neighborId: nodeId,
-        }),
-        dispatch
+        })
       );
     };
 

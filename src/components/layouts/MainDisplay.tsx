@@ -313,8 +313,7 @@ const MainDisplay = ({ floorCode }: Props) => {
           JSON.stringify({
             floorCode: floorCode,
             newGraph: JSON.stringify(newNodes),
-          }),
-          dispatch
+          })
         );
       }
     }

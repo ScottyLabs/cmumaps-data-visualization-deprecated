@@ -171,5 +171,5 @@ export const updateNode = (
 
   const patch = { jsonPatch, reversedJsonPatch, dbPatch, reversedDbPatch };
   dispatch(applyPatchToGraph(patch));
-  savingHelper(apiPath, body, dispatch);
+  savingHelper(apiPath, body);
 };

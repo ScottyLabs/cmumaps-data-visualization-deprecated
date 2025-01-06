@@ -2,9 +2,7 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 
-import { useAppSelector } from "../../lib/hooks";
 import { buildingCodeToName } from "../shared/buildings";
-import { leavePage } from "../utils/routerUtils";
 
 interface Props {
   buildingCode: string;
@@ -12,7 +10,6 @@ interface Props {
 
 const NavBar = ({ buildingCode }: Props) => {
   const router = useRouter();
-  const saveStatus = useAppSelector((state) => state.status.saveStatus);
 
   return (
     <nav className="absolute inset-0 z-50 h-min bg-gray-800 p-4">
@@ -24,7 +21,7 @@ const NavBar = ({ buildingCode }: Props) => {
           {buildingCodeToName[buildingCode]}
         </div>
         <button
-          onClick={() => leavePage("/", saveStatus, router)}
+          onClick={() => router.push("/")}
           className="mr-2 cursor-pointer text-lg text-white hover:text-gray-400"
         >
           Back

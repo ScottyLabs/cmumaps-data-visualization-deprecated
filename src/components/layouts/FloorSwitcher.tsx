@@ -5,7 +5,6 @@ import { FaArrowUp } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
 
 import { useAppSelector } from "../../lib/hooks";
-import { leavePage } from "../utils/routerUtils";
 
 interface Props {
   buildingCode: string;
@@ -14,9 +13,8 @@ interface Props {
 
 const FloorSwitcher = ({ buildingCode, floorLevelSelected }: Props) => {
   const router = useRouter();
-  const floorLevels = useAppSelector((state) => state.data.floorLevels);
 
-  const saveStatus = useAppSelector((state) => state.status.saveStatus);
+  const floorLevels = useAppSelector((state) => state.data.floorLevels);
   const [fullDisplayMode, setFullDisplayMode] = useState<boolean>(false);
 
   if (!floorLevels) {
@@ -34,7 +32,7 @@ const FloorSwitcher = ({ buildingCode, floorLevelSelected }: Props) => {
         onClick={() => {
           // exit full display mode in case clicking on the same floor level
           setFullDisplayMode(false);
-          leavePage(`${buildingCode}-${floorLevel}`, saveStatus, router);
+          router.push(`${buildingCode}-${floorLevel}`);
         }}
       >
         {floorLevel}
@@ -46,11 +44,7 @@ const FloorSwitcher = ({ buildingCode, floorLevelSelected }: Props) => {
 
     const handleDownClick = () => {
       if (index != 0) {
-        leavePage(
-          `${buildingCode}-${floorLevels[index - 1]}`,
-          saveStatus,
-          router
-        );
+        router.push(`${buildingCode}-${floorLevels[index - 1]}`);
       }
     };
 
@@ -87,11 +81,7 @@ const FloorSwitcher = ({ buildingCode, floorLevelSelected }: Props) => {
 
     const handleUpClick = () => {
       if (index != floorLevels.length - 1) {
-        leavePage(
-          `${buildingCode}-${floorLevels[index + 1]}`,
-          saveStatus,
-          router
-        );
+        router.push(`${buildingCode}-${floorLevels[index + 1]}`);
       }
     };
 

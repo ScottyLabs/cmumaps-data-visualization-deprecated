@@ -70,7 +70,6 @@ export const deleteNode = async (
     JSON.stringify({
       floorCode: floorCode,
       newGraph: JSON.stringify(newNodes),
-    }),
-    dispatch
+    })
   );
 };

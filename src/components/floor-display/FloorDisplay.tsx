@@ -202,8 +202,7 @@ const FloorDisplay = ({
       JSON.stringify({
         floorCode: floorCode,
         newGraph: JSON.stringify(newNodes),
-      }),
-      dispatch
+      })
     );
   };
 
@@ -275,14 +274,7 @@ const FloorDisplay = ({
         setHistoryIndex,
         newPolygon
       );
-      saveToRooms(
-        floorCode,
-        roomIdSelected,
-        rooms,
-        setRooms,
-        newPolygon,
-        dispatch
-      );
+      saveToRooms(floorCode, roomIdSelected, rooms, setRooms, newPolygon);
 
       dispatch(setMode(POLYGON_SELECT));
     }

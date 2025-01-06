@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { applyPatch, Operation } from "fast-json-patch";
+import { applyPatch } from "fast-json-patch";
+import { Patch } from "immer";
 
 import { toast } from "react-toastify";
 
@@ -12,9 +13,9 @@ interface Query {
   body: string;
 }
 
-interface Patch {
-  jsonPatch: Operation[];
-  reversedJsonPatch: Operation[];
+interface Patches {
+  jsonPatch: Patch[];
+  reversedJsonPatch: Patch[];
   dbPatch: Query;
   reversedDbPatch: Query;
 }
@@ -23,8 +24,8 @@ interface DataState {
   floorLevels: string[] | null;
   nodes: Graph | null;
   mst: Mst | null;
-  editHistory: Operation[][];
-  reversedEditHistory: Operation[][];
+  editHistory: Patch[][];
+  reversedEditHistory: Patch[][];
   queryHistory: Query[];
   reversedQueyHistory: Query[];
   editIndex: number; // points to the edit to undo
@@ -59,47 +60,39 @@ const dataSlice = createSlice({
     setNodes(state, action) {
       state.nodes = action.payload;
     },
-    applyPatchToGraph(state, action: PayloadAction<Patch>) {
-      try {
-        const jsonPatch = action.payload.jsonPatch;
-        const reversedPatch = action.payload.reversedJsonPatch;
-        const dbPatch = action.payload.dbPatch;
-        const reversedDbPatch = action.payload.reversedDbPatch;
+    addPatchesToHistory(state, action: PayloadAction<Patches>) {
+      const jsonPatch = action.payload.jsonPatch;
+      const reversedPatch = action.payload.reversedJsonPatch;
+      const dbPatch = action.payload.dbPatch;
+      const reversedDbPatch = action.payload.reversedDbPatch;
 
-        // Apply the patch to the graph
-        state.nodes = applyPatch(state.nodes, jsonPatch).newDocument;
+      // Update the history arrays with the new patch
+      state.editHistory = getUpdatedHistory(
+        state.editHistory,
+        jsonPatch,
+        state.editIndex + 1
+      );
 
-        // Update the history arrays with the new patch
-        state.editHistory = getUpdatedHistory(
-          state.editHistory,
-          jsonPatch,
-          state.editIndex + 1
-        );
+      state.reversedEditHistory = getUpdatedHistory(
+        state.reversedEditHistory,
+        reversedPatch,
+        state.editIndex + 1
+      );
 
-        state.reversedEditHistory = getUpdatedHistory(
-          state.reversedEditHistory,
-          reversedPatch,
-          state.editIndex + 1
-        );
+      state.queryHistory = getUpdatedHistory(
+        state.queryHistory,
+        dbPatch,
+        state.editIndex + 1
+      );
 
-        state.queryHistory = getUpdatedHistory(
-          state.queryHistory,
-          dbPatch,
-          state.editIndex + 1
-        );
+      state.reversedQueyHistory = getUpdatedHistory(
+        state.reversedQueyHistory,
+        reversedDbPatch,
+        state.editIndex + 1
+      );
 
-        state.reversedQueyHistory = getUpdatedHistory(
-          state.reversedQueyHistory,
-          reversedDbPatch,
-          state.editIndex + 1
-        );
-
-        // Update the edit index
-        state.editIndex = state.editHistory.length - 1;
-      } catch (error) {
-        console.error("Error applying patch:", error);
-        toast.error("Failed to apply change!");
-      }
+      // Update the edit index
+      state.editIndex = state.editHistory.length - 1;
     },
 
     undo(state) {
@@ -142,7 +135,7 @@ const dataSlice = createSlice({
 export const {
   setFloorLevels,
   setNodes,
-  applyPatchToGraph,
+  addPatchesToHistory,
   setMst,
   undo,
   redo,

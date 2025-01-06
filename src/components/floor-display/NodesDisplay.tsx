@@ -5,6 +5,7 @@ import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
 import { savingHelper } from "../../lib/apiRoutes";
+import { useMoveNodeMutation } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -21,7 +22,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
-import { addDoorNodeErrToast, updateNode } from "../utils/graphUtils";
+import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { dist, getRoomId, setCursor } from "../utils/utils";
 
@@ -34,6 +35,8 @@ interface Props {
 const NodesDisplay = ({ floorCode, nodes, updateMyPresenceWrapper }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  const [moveNode] = useMoveNodeMutation();
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
@@ -193,14 +196,14 @@ const NodesDisplay = ({ floorCode, nodes, updateMyPresenceWrapper }: Props) => {
     dispatch(releaseNode());
 
     // create new node
-    const newNode = JSON.parse(JSON.stringify(nodes[nodeId]));
+    const newNode: Node = JSON.parse(JSON.stringify(nodes[nodeId]));
     newNode.pos = {
       x: Number(e.target.x().toFixed(2)),
       y: Number(e.target.y().toFixed(2)),
     };
     newNode.roomId = findRoomId(rooms, newNode.pos);
 
-    updateNode(nodeId, newNode, nodes, dispatch);
+    moveNode({ floorCode, nodeId, node: newNode });
   };
 
   return Object.entries(nodes).map(

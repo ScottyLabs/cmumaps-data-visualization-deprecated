@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "@clerk/nextjs";
 import { redirect, useRouter } from "next/navigation";
 
 import { useEffect } from "react";
@@ -14,6 +15,7 @@ import NavBar from "../../components/layouts/NavBar";
 import UserCount from "../../components/layouts/UserCount";
 import MyToastContainer from "../../components/shared/MyToastContainer";
 import HelpInfo from "../../components/zoom-pan/HelpInfo";
+import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
 import { setFloorLevels } from "../../lib/features/floorSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { useAppDispatch } from "../../lib/hooks";
@@ -96,6 +98,27 @@ const Page = ({ params }: { params: { id: string } }) => {
       redirect(defaultFloorUrl);
     }
   })();
+
+  const { session, isLoaded } = useSession();
+  useEffect(() => {
+    (async () => {
+      if (session) {
+        const token = await session.getToken();
+        const res = await fetch(
+          `${AWS_API_INVOKE_URL}/get-user-count?floorCode=${floorCode}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            method: "GET",
+          }
+        );
+
+        const body = await res.json();
+        console.log(body);
+      }
+    })();
+  }, [isLoaded]);
 
   return (
     <>

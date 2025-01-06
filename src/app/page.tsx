@@ -12,6 +12,10 @@ import { buildingCodeToName } from "../components/shared/buildings";
 import useWebSocket from "../hooks/useWebSocket";
 import { getBuildingCodes } from "../lib/apiRoutes";
 
+export const INVALID_BUILDING_CODE = "InvalidBuildingCode";
+export const NO_DEFAULT_FLOOR = "NoDefaultFloor";
+export const FULL_FLOOR = "FullFloor";
+
 const App: React.FC = () => {
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
 
@@ -35,21 +39,23 @@ const App: React.FC = () => {
   // Toast the error message based on session storage
   useEffect(() => {
     // make sure on client side
-    if (
-      typeof window === "undefined" ||
-      typeof sessionStorage === "undefined"
-    ) {
+    if (typeof window === "undefined") {
       return;
     }
 
     const error = sessionStorage.getItem("error");
+    console.log(error);
     switch (error) {
-      case "InvalidBuildingCode":
+      case INVALID_BUILDING_CODE:
         toast.error("The building code is invalid!");
         break;
 
-      case "NoDefaultFloor":
+      case NO_DEFAULT_FLOOR:
         toast.error("Please add a default floor for this building!");
+        break;
+
+      case FULL_FLOOR:
+        toast.error("Too many people on the floor!");
         break;
     }
 

@@ -22,6 +22,9 @@ import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { useAppDispatch } from "../../lib/hooks";
 import { WEBSOCKET_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
+import { FULL_FLOOR, INVALID_BUILDING_CODE, NO_DEFAULT_FLOOR } from "../page";
+
+const MAX_USERS_PER_FLOOR = 1;
 
 /**
  * Entry point to the floor plan editting page.
@@ -31,6 +34,7 @@ import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
  *   - Toasting error message based on session storage
  *   - Displaying warning before closing tab if needed using saveStatus
  *   - Resetting mode when switching floor and toasting when mode changes
+ *   - Prevent too many users on a floor
  */
 const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -76,12 +80,12 @@ const Page = ({ params }: { params: { id: string } }) => {
     }
 
     if (!buildings[buildingCode]) {
-      sessionStorage.setItem("error", "InvalidBuildingCode");
+      sessionStorage.setItem("error", INVALID_BUILDING_CODE);
       redirect("/");
     }
 
     if (!buildings[buildingCode].defaultFloor) {
-      sessionStorage.setItem("error", "NoDefaultFloor");
+      sessionStorage.setItem("error", NO_DEFAULT_FLOOR);
       redirect("/");
     }
 
@@ -95,21 +99,22 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     // handle invalid floor level
     if (!buildings[buildingCode].floors.includes(floorLevel)) {
-      sessionStorage.setItem("error", "InvalidFloorLevel");
       redirect(defaultFloorUrl);
     }
   })();
 
+  // Prevent too many users on a floor
   const token = useClerkToken();
   const { data: userCount } = useGetUserCountQuery(
     token ? { floorCode, token } : skipToken
   );
-
-  if (userCount) {
-    console.log(userCount);
+  if (userCount && userCount >= MAX_USERS_PER_FLOOR) {
+    if (typeof window === "undefined") {
+      return;
+    }
+    sessionStorage.setItem("error", FULL_FLOOR);
+    redirect("/");
   }
-
-  return;
 
   return (
     <>

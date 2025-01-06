@@ -13,7 +13,7 @@ const useWebSocket = (floorCode: string | null) => {
 
   // join WebSocket
   useEffect(() => {
-    if (!WEBSOCKET_ENABLED || !isLoaded) {
+    if (!WEBSOCKET_ENABLED || !isLoaded || !user?.firstName) {
       return;
     }
 

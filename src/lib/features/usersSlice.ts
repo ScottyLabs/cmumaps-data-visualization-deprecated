@@ -2,13 +2,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { PDFCoordinate } from "../../components/shared/types";
 
+interface User {
+  userName: string;
+  color: string;
+}
+
 interface UsersState {
-  userCount: number;
+  users: Record<string, User>;
   liveCursors: PDFCoordinate[];
 }
 
 const initialState: UsersState = {
-  userCount: 0,
+  users: {},
   liveCursors: [],
 };
 
@@ -16,8 +21,8 @@ const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    setUserCount(state, action: PayloadAction<number>) {
-      state.userCount = action.payload;
+    setUsers(state, action: PayloadAction<Record<string, User>>) {
+      state.users = action.payload;
     },
     setLiveCursors(state, action: PayloadAction<PDFCoordinate[]>) {
       state.liveCursors = action.payload;
@@ -25,5 +30,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { setUserCount, setLiveCursors } = usersSlice.actions;
+export const { setUsers, setLiveCursors } = usersSlice.actions;
 export default usersSlice.reducer;

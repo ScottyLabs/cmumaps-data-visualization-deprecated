@@ -3,7 +3,6 @@ import { Patch } from "immer";
 
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
-import { setUserCount } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
@@ -85,7 +84,8 @@ const handleWebSocketJoin = (
         break;
 
       case USERS:
-        dispatch(setUserCount(message.userCount));
+        console.log(message);
+        // dispatch(setUsers(message.users));
         break;
     }
   };

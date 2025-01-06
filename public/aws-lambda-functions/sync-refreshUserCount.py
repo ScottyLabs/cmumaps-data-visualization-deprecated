@@ -16,6 +16,7 @@ dynamo = boto3.resource("dynamodb").Table("cmumaps-data-visualization-connection
 def lambda_handler(event, context):
     try:
         # get sender's floor
+        sender_connection_id = event["requestContext"]["connectionId"]
         body = json.loads(event["body"])
         floor_code = body["floorCode"]
 
@@ -25,11 +26,32 @@ def lambda_handler(event, context):
             ExpressionAttributeValues={":floorCodeValue": floor_code},
         )
 
+        # create users data to send
+        users = {
+            connection["Token"]: {
+                "userName": connection["UserName"],
+                "color": connection["Color"],
+            }
+            for connection in response["Items"]
+        }
+
+        # check if the user leave the floor or join the floor
+        action = "join" if sender_connection_id in users else "leave"
+
         # send user count to all users on this floor
         for connection in response["Items"]:
+            filtered_users = dict(users)
+            del filtered_users[connection["Token"]]
             client.post_to_connection(
                 ConnectionId=connection["Token"],
-                Data=json.dumps({"userCount": len(response["Items"])}).encode("utf-8"),
+                Data=json.dumps(
+                    {
+                        "type": "users",
+                        "sender": sender_connection_id,
+                        "action": action,
+                        "users": filtered_users,
+                    }
+                ),
             )
         return {"statusCode": 200}
     except Exception as e:

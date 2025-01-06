@@ -1,11 +1,16 @@
 import boto3  # type: ignore
 import json
 import logging
+import random
 
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
 dynamo = boto3.resource("dynamodb").Table("cmumaps-data-visualization-connections")
+
+
+def generate_random_color():
+    return "#" + "".join([random.choice("0123456789ABCDEF") for j in range(6)])
 
 
 def lambda_handler(event, context):
@@ -18,6 +23,7 @@ def lambda_handler(event, context):
             "UserName": user_name,
             "FloorCode": floor_code,
             "Token": connection_id,
+            "Color": generate_random_color(),
         }
         dynamo.put_item(Item=json_obj)
         return {"statusCode": 200}

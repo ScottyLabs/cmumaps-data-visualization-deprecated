@@ -32,11 +32,11 @@ import {
   setEditRoomLabel,
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
-import {
-  connectWebSocket,
-  disconnectWebSocket,
-} from "../../lib/features/webSocketSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import {
+  WEBSOCKET_CONNECT,
+  WEBSOCKET_DISCONNECT,
+} from "../../lib/webSocketMiddleware";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
@@ -131,11 +131,11 @@ const FloorDisplay = ({
     }
 
     const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userName=${user?.firstName || ""}&floorCode=${floorCode}&token=${token}`;
-    dispatch(connectWebSocket({ url, floorCode }));
+    dispatch({ type: WEBSOCKET_CONNECT, payload: { url, floorCode } });
 
     // Cleanup function to close the WebSocket
     return () => {
-      dispatch(disconnectWebSocket());
+      dispatch({ type: WEBSOCKET_DISCONNECT });
     };
   }, [floorCode, token, user?.firstName]);
 

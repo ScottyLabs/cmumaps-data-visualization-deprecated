@@ -9,6 +9,7 @@ import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
 import visibilitySlice from "./features/visibilitySlice";
 import { listenerMiddleware } from "./listenerMiddleware";
+import { socketMiddleware } from "./webSocketMiddleware";
 
 export const makeStore = () => {
   return configureStore({
@@ -25,6 +26,7 @@ export const makeStore = () => {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
         .prepend(listenerMiddleware.middleware)
+        .concat(socketMiddleware)
         .concat(apiSlice.middleware),
   });
 };

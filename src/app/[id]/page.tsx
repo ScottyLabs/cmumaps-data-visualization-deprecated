@@ -15,7 +15,7 @@ import NavBar from "../../components/layouts/NavBar";
 import UserCount from "../../components/layouts/UserCount";
 import MyToastContainer from "../../components/shared/MyToastContainer";
 import HelpInfo from "../../components/zoom-pan/HelpInfo";
-import { setFloorLevels } from "../../lib/features/dataSlice";
+import { setFloorLevels } from "../../lib/features/floorSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { useAppDispatch } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";

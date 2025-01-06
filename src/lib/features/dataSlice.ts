@@ -22,7 +22,6 @@ interface Patches {
 }
 
 interface DataState {
-  floorLevels: string[] | null;
   nodes: Graph | null;
   mst: Mst | null;
   editHistory: Patch[][];
@@ -33,7 +32,6 @@ interface DataState {
 }
 
 const initialState: DataState = {
-  floorLevels: null,
   nodes: null,
   mst: null,
   editHistory: [],
@@ -118,10 +116,6 @@ const dataSlice = createSlice({
   name: "data",
   initialState,
   reducers: {
-    setFloorLevels(state, action: PayloadAction<string[]>) {
-      state.floorLevels = action.payload;
-    },
-
     setNodes(state, action) {
       state.nodes = action.payload;
     },
@@ -176,6 +170,5 @@ const dataSlice = createSlice({
   },
 });
 
-export const { setFloorLevels, setNodes, addPatchesToHistory, setMst } =
-  dataSlice.actions;
+export const { setNodes, addPatchesToHistory, setMst } = dataSlice.actions;
 export default dataSlice.reducer;

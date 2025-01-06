@@ -15,7 +15,7 @@ interface Props {
 const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
-  const floorLevels = useAppSelector((state) => state.data.floorLevels);
+  const floorLevels = useAppSelector((state) => state.floor.floorLevels);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );

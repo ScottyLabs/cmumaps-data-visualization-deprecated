@@ -14,7 +14,7 @@ interface Props {
 const FloorSwitcher = ({ buildingCode, floorLevelSelected }: Props) => {
   const router = useRouter();
 
-  const floorLevels = useAppSelector((state) => state.data.floorLevels);
+  const floorLevels = useAppSelector((state) => state.floor.floorLevels);
   const [fullDisplayMode, setFullDisplayMode] = useState<boolean>(false);
 
   if (!floorLevels) {

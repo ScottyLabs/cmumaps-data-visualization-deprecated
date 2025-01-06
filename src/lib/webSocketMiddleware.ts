@@ -5,11 +5,11 @@ import { apiSlice } from "./features/apiSlice";
 import { AppDispatch } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
-export const WEBSOCKET_DISCONNECT = "socket/disconnect";
 export const WEBSOCKET_MESSAGE = "socket/message";
 
 // message types
 export const PATCH_TYPE = "patch";
+const LEAVE_FLOOR = "leaveFloor";
 
 interface WebSocketConnectAction {
   type: string;
@@ -34,41 +34,48 @@ const handleWebSocketJoin = (
   dispatch: AppDispatch
 ) => {
   const { payload } = action;
-  const { floorCode, url } = payload;
+  const { floorCode: curFloorCode, url } = payload;
+  const floorCode = curFloorCode;
 
   // switch floor if socket already connected
   if (socket) {
-    if (socket.readyState === WebSocket.OPEN) {
-      socket.send(
-        JSON.stringify({
-          action: "switchFloor",
-          floorCode,
-        })
-      );
-    }
+    socket.send(JSON.stringify({ action: "switchFloor", floorCode }));
     return;
   }
 
-  // otherwise create new socket
+  // otherwise create new socket and set up event listeners for the WebSocket
   socket = new WebSocket(url);
 
-  // Set up event listeners for the WebSocket
+  // refresh user count when socket is connected
   socket.onopen = () => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      console.log("WebSocket connection established");
-      if (floorCode) {
-        socket.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
-      }
+    console.log("WebSocket connection established");
+    if (floorCode) {
+      socket?.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
     }
   };
 
+  // handle messages
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
     console.log(message);
-    if (message.type === PATCH_TYPE) {
-      dispatch(
-        apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
-      );
+    switch (message.type) {
+      // patch the graph
+      case PATCH_TYPE:
+        dispatch(
+          apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+        );
+        break;
+
+      // refresh user count in both floors when leaving a floor
+      case LEAVE_FLOOR:
+        socket?.send(
+          JSON.stringify({
+            action: "refreshUserCount",
+            floorCode: message.oldFloorCode,
+          })
+        );
+        socket?.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
+        break;
     }
   };
 
@@ -79,6 +86,14 @@ const handleWebSocketJoin = (
   socket.onclose = () => {
     console.log("WebSocket connection closed");
   };
+
+  // close WebSocket connection when closing window
+  window.addEventListener("beforeunload", () => {
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+  });
 };
 
 export const socketMiddleware: Middleware = (params) => (next) => (action) => {
@@ -88,13 +103,6 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
   switch (type) {
     case WEBSOCKET_JOIN:
       handleWebSocketJoin(action as WebSocketConnectAction, dispatch);
-      break;
-
-    case WEBSOCKET_DISCONNECT:
-      if (socket) {
-        socket.close();
-        socket = null;
-      }
       break;
 
     case WEBSOCKET_MESSAGE:

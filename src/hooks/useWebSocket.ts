@@ -1,6 +1,6 @@
 import { useSession, useUser } from "@clerk/nextjs";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useAppDispatch } from "../lib/hooks";
 import { WEBSOCKET_JOIN } from "../lib/webSocketMiddleware";
@@ -11,8 +11,18 @@ const useWebSocket = (floorCode: string | null) => {
   const { session, isLoaded } = useSession();
   const dispatch = useAppDispatch();
 
+  // Ref to prevent the calling twice in Strict Mode
+  const hasMounted = useRef(false);
+
   // join WebSocket
   useEffect(() => {
+    // Skip if Strict Mode is calling twice in development
+    if (hasMounted.current) {
+      return;
+    }
+
+    hasMounted.current = true;
+
     if (!WEBSOCKET_ENABLED || !isLoaded || !user?.firstName) {
       return;
     }

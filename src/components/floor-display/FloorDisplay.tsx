@@ -1,18 +1,13 @@
-import { useSession, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Polygon } from "geojson";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import React, {
-  Suspense,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { Suspense, useCallback, useContext, useEffect } from "react";
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
+import useWebSocket from "../../hooks/useWebSocket";
 import { savingHelper } from "../../lib/apiRoutes";
 import { useGetGraphQuery } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
@@ -33,12 +28,8 @@ import {
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import {
-  WEBSOCKET_CONNECT,
-  WEBSOCKET_DISCONNECT,
-} from "../../lib/webSocketMiddleware";
 import { useMyPresence } from "../../liveblocks.config";
-import { LIVEBLOCKS_ENABLED, WEBSOCKET_DEV_ENABLED } from "../../settings";
+import { LIVEBLOCKS_ENABLED, WEBSOCKET_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { Node } from "../shared/types";
@@ -83,7 +74,6 @@ const FloorDisplay = ({
 }: Props) => {
   const router = useRouter();
   const { user } = useUser();
-  const { session } = useSession();
   const dispatch = useAppDispatch();
 
   const { data: nodes } = useGetGraphQuery(floorCode);
@@ -107,37 +97,8 @@ const FloorDisplay = ({
   const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
     useContext(PolygonContext);
 
-  const [token, setToken] = useState<string | null | undefined>(null);
-
-  // get token
-  useEffect(() => {
-    (async () => {
-      const token = await session?.getToken();
-      setToken(token);
-    })();
-    // No need to refresh the token when session changes since
-    // only used to establish connection with the WebSocket
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // websocket
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-
-    if (process.env.NODE_ENV === "development" && !WEBSOCKET_DEV_ENABLED) {
-      return;
-    }
-
-    const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userName=${user?.firstName || ""}&floorCode=${floorCode}&token=${token}`;
-    dispatch({ type: WEBSOCKET_CONNECT, payload: { url, floorCode } });
-
-    // Cleanup function to close the WebSocket
-    return () => {
-      dispatch({ type: WEBSOCKET_DISCONNECT });
-    };
-  }, [floorCode, token, user?.firstName]);
+  // join WebSocket
+  useWebSocket();
 
   const [_myPresence, updateMyPresence] = LIVEBLOCKS_ENABLED
     ? // eslint-disable-next-line react-hooks/rules-of-hooks

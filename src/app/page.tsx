@@ -9,10 +9,14 @@ import { toast } from "react-toastify";
 
 import MyToastContainer from "../components/shared/MyToastContainer";
 import { buildingCodeToName } from "../components/shared/buildings";
+import useWebSocket from "../hooks/useWebSocket";
 import { getBuildingCodes } from "../lib/apiRoutes";
 
 const App: React.FC = () => {
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
+
+  // join WebSocket
+  useWebSocket();
 
   // fetch building codes
   useEffect(() => {

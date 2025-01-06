@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { PDFCoordinate } from "../../components/shared/types";
 
-interface User {
+export interface User {
   userName: string;
   color: string;
 }

@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { toast } from "react-toastify";
 
 import { Graph, Node } from "../../components/shared/types";
+import { AWS_API_INVOKE_URL } from "../apiRoutes";
 import { GRAPH_PATCH, WEBSOCKET_MESSAGE } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
 
@@ -12,17 +13,32 @@ interface MoveNodeArgType {
   node: Node;
 }
 
+interface GetUserCountArgType {
+  floorCode: string;
+  token: string;
+}
+
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "/",
+  }),
   endpoints: (builder) => ({
+    getUserCount: builder.query<number, GetUserCountArgType>({
+      query: ({ floorCode, token }) => ({
+        url: `${AWS_API_INVOKE_URL}/get-user-count?floorCode=${floorCode}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
     getGraph: builder.query<Graph, string>({
-      query: (floorCode) => `/getGraph?floorCode=${floorCode}`,
+      query: (floorCode) => `/api/getGraph?floorCode=${floorCode}`,
       transformResponse: (response: { data: Graph }) => response.data,
     }),
     moveNode: builder.mutation<Graph, MoveNodeArgType>({
       query: ({ nodeId, node }) => ({
-        url: "/node/update",
+        url: "/api/node/update",
         method: "POST",
         body: { nodeId, node },
       }),
@@ -84,4 +100,5 @@ export const apiSlice = createApi({
 });
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useGetGraphQuery, useMoveNodeMutation } = apiSlice;
+export const { useGetUserCountQuery, useGetGraphQuery, useMoveNodeMutation } =
+  apiSlice;

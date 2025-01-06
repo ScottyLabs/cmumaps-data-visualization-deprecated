@@ -236,7 +236,7 @@ const MainDisplay = ({ floorCode }: Props) => {
       // eidt history
       else if ((event.metaKey || event.ctrlKey) && event.key === "z") {
         if (event.shiftKey) {
-          dispatch(redo());
+          dispatch(redo(floorCode));
         } else {
           dispatch(undo(floorCode));
         }

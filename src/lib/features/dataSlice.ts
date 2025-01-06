@@ -43,6 +43,19 @@ const initialState: DataState = {
   editIndex: -1,
 };
 
+const applyQuery = async (dbPatch: Query) => {
+  const response = await fetch(dbPatch.apiPath, {
+    method: "POST",
+    body: dbPatch.body,
+  });
+
+  const body = await response.json();
+  if (!response.ok) {
+    toast.error("Failed to save change!");
+    console.error(body.error);
+  }
+};
+
 export const undo = createAppAsyncThunk(
   "data/undo",
   async (floorCode: string, { dispatch, getState }) => {
@@ -62,16 +75,7 @@ export const undo = createAppAsyncThunk(
 
       // undo in database
       const reversedQuery = dataState.reversedQueyHistory[editIndex];
-      const response = await fetch(reversedQuery.apiPath, {
-        method: "POST",
-        body: reversedQuery.body,
-      });
-
-      const body = await response.json();
-      if (!response.ok) {
-        toast.error("Failed to save undone change!");
-        console.error(body.error);
-      }
+      await applyQuery(reversedQuery);
     } catch (error) {
       toast.error("Failed to undo change!");
       console.error("Error undoing:", error);
@@ -79,9 +83,33 @@ export const undo = createAppAsyncThunk(
   }
 );
 
+export const redo = createAppAsyncThunk(
+  "data/redo",
+  async (floorCode: string, { dispatch, getState }) => {
+    try {
+      const dataState = getState().data;
+      const editIndex = dataState.editIndex;
+      if (editIndex == dataState.editHistory.length) {
+        toast.error("Can't redo anymore!");
+        return;
+      }
+
+      // redo locally
+      const patch = dataState.editHistory[editIndex];
+      dispatch(apiSlice.util.patchQueryData("getGraph", floorCode, patch));
+
+      // redo in database
+      const query = dataState.queryHistory[editIndex];
+      await applyQuery(query);
+    } catch (error) {
+      toast.error("Failed to redo change!");
+      console.error("Error redoing patch:", error);
+    }
+  }
+);
+
 const getUpdatedHistory = <T>(history: T[], patch: T, index: number) => {
   const updatedHistory = [...history.slice(0, index + 1), patch];
-
   // Trim the history arrays to maintain the maximum undo limit
   return updatedHistory.slice(-MAX_UNDO_LIMIT);
 };
@@ -131,37 +159,6 @@ const dataSlice = createSlice({
       // Update the edit index
       state.editIndex = state.editHistory.length - 1;
     },
-    undo(state, action: PayloadAction<string>) {
-      if (state.editIndex == -1) {
-        toast.error("Can't undo anymore!");
-        return;
-      }
-
-      try {
-        const floorCode = action.payload;
-        const reversedPatch = state.reversedEditHistory[state.editIndex];
-        apiSlice.util.patchQueryData("getGraph", floorCode, reversedPatch);
-        state.editIndex -= 1;
-      } catch (error) {
-        console.error("Error undoing patch:", error);
-        toast.error("Failed to undo change!");
-      }
-    },
-    redo(state) {
-      if (state.editIndex == state.editHistory.length - 1) {
-        toast.error("Can't redo anymore!");
-        return;
-      }
-
-      try {
-        state.editIndex += 1;
-        // const patch = state.editHistory[state.editIndex];
-        // state.nodes = applyPatch(state.nodes, patch).newDocument;
-      } catch (error) {
-        console.error("Error redoing patch:", error);
-        toast.error("Failed to redo change!");
-      }
-    },
 
     setMst(state, action: PayloadAction<Mst | null>) {
       state.mst = action.payload;
@@ -171,9 +168,14 @@ const dataSlice = createSlice({
     builder.addCase(undo.fulfilled, (state) => {
       state.editIndex--;
     });
+    builder.addCase(redo.pending, (state) => {
+      if (state.editIndex !== state.editHistory.length - 1) {
+        state.editIndex++;
+      }
+    });
   },
 });
 
-export const { setFloorLevels, setNodes, addPatchesToHistory, setMst, redo } =
+export const { setFloorLevels, setNodes, addPatchesToHistory, setMst } =
   dataSlice.actions;
 export default dataSlice.reducer;

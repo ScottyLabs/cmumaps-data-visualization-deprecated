@@ -16,16 +16,7 @@ import UserCount from "../../components/layouts/UserCount";
 import MyToastContainer from "../../components/shared/MyToastContainer";
 import HelpInfo from "../../components/zoom-pan/HelpInfo";
 import { setFloorLevels } from "../../lib/features/dataSlice";
-import {
-  ADD_DOOR_NODE,
-  ADD_EDGE,
-  ADD_NODE,
-  DELETE_EDGE,
-  GRAPH_SELECT,
-  POLYGON_ADD_VERTEX,
-  POLYGON_DELETE_VERTEX,
-  setMode,
-} from "../../lib/features/modeSlice";
+import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { SAVED } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { LIVEBLOCKS_ENABLED } from "../../settings";
@@ -44,7 +35,6 @@ const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const mode = useAppSelector((state) => state.mode.mode);
   const saveStatus = useAppSelector((state) => state.status.saveStatus);
 
   // get floor info
@@ -92,35 +82,6 @@ const Page = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     dispatch(setMode(GRAPH_SELECT));
   }, [dispatch, floorLevel]);
-
-  // Toast when mode changes
-  useEffect(() => {
-    switch (mode) {
-      case ADD_EDGE:
-        toast.info("Click on another node to add an edge!");
-        break;
-
-      case DELETE_EDGE:
-        toast.info("Click on another node to delete an edge!");
-        break;
-
-      case ADD_NODE:
-        toast.info("Click to add a node!");
-        break;
-
-      case ADD_DOOR_NODE:
-        toast.info("Click on a purple door to add a door node!");
-        break;
-
-      case POLYGON_DELETE_VERTEX:
-        toast.info("Click on vertex to delete it!");
-        break;
-
-      case POLYGON_ADD_VERTEX:
-        toast.info("Click to add a vertex!");
-        break;
-    }
-  }, [mode]);
 
   // Validate floor level and redirect if invalid
   (() => {

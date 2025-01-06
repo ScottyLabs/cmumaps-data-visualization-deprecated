@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+import { toast } from "react-toastify";
+
+import { AppStartListening } from "../listenerMiddleware";
+
 export type Mode =
   | "Graph Select"
   | "Graph Add Edge"
@@ -46,6 +50,39 @@ const modeSlice = createSlice({
     },
   },
 });
+
+export const setModeListener = (startAppListening: AppStartListening) => {
+  startAppListening({
+    actionCreator: modeSlice.actions.setMode,
+    effect: (action) => {
+      switch (action.payload) {
+        case ADD_EDGE:
+          toast.info("Click on another node to add an edge!");
+          break;
+
+        case DELETE_EDGE:
+          toast.info("Click on another node to delete an edge!");
+          break;
+
+        case ADD_NODE:
+          toast.info("Click to add a node!");
+          break;
+
+        case ADD_DOOR_NODE:
+          toast.info("Click on a purple door to add a door node!");
+          break;
+
+        case POLYGON_DELETE_VERTEX:
+          toast.info("Click on vertex to delete it!");
+          break;
+
+        case POLYGON_ADD_VERTEX:
+          toast.info("Click to add a vertex!");
+          break;
+      }
+    },
+  });
+};
 
 export const { setMode } = modeSlice.actions;
 export const { selectEditPolygon } = modeSlice.selectors;

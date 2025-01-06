@@ -7,6 +7,7 @@ import outlineSlice from "./features/outlineSlice";
 import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
 import visibilitySlice from "./features/visibilitySlice";
+import { listenerMiddleware } from "./listenerMiddleware";
 
 export const makeStore = () => {
   return configureStore({
@@ -19,6 +20,8 @@ export const makeStore = () => {
       visibility: visibilitySlice,
       outline: outlineSlice,
     },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().prepend(listenerMiddleware.middleware),
   });
 };
 

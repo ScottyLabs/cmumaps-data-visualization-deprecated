@@ -66,11 +66,17 @@ export const apiSlice = createApi({
           };
 
           dispatch(addPatchesToHistory(patch));
-
-          await queryFulfilled;
         } catch (e) {
           toast.error("Check the Console for detailed error.");
           console.error(e);
+        }
+
+        try {
+          await queryFulfilled;
+        } catch (e) {
+          toast.error("Failed to save! Check the Console for detailed error.");
+          const error = e as { error: { data: { error: string } } };
+          console.error(error.error.data.error);
         }
       },
     }),

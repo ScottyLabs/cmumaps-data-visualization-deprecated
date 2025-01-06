@@ -3,6 +3,7 @@ import { Patch } from "immer";
 
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
+import { setUserCount } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
@@ -11,6 +12,7 @@ export const WEBSOCKET_MESSAGE = "socket/message";
 // Message types
 export const PATCH_TYPE = "patch";
 const LEAVE_FLOOR = "leaveFloor";
+const USERS = "users";
 
 interface WebSocketConnectAction {
   type: string;
@@ -58,8 +60,6 @@ const handleWebSocketJoin = (
   // handle messages
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    console.log(message);
-
     const floorCode = getStore().floor.floorCode;
     if (!floorCode) {
       return;
@@ -82,6 +82,10 @@ const handleWebSocketJoin = (
           })
         );
         socket?.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
+        break;
+
+      case USERS:
+        dispatch(setUserCount(message.userCount));
         break;
     }
   };

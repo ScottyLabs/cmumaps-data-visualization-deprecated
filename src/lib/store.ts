@@ -8,6 +8,7 @@ import mouseEventSlice from "./features/mouseEventSlice";
 import outlineSlice from "./features/outlineSlice";
 import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
+import usersSlice from "./features/usersSlice";
 import visibilitySlice from "./features/visibilitySlice";
 import { listenerMiddleware } from "./listenerMiddleware";
 import { socketMiddleware } from "./webSocketMiddleware";
@@ -23,6 +24,7 @@ export const makeStore = () => {
       visibility: visibilitySlice,
       outline: outlineSlice,
       floor: floorSlice,
+      users: usersSlice,
       [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>

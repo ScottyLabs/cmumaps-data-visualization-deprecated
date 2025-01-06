@@ -18,7 +18,7 @@ import HelpInfo from "../../components/zoom-pan/HelpInfo";
 import { setFloorLevels } from "../../lib/features/floorSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { useAppDispatch } from "../../lib/hooks";
-import { LIVEBLOCKS_ENABLED } from "../../settings";
+import { WEBSOCKET_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 
 /**
@@ -97,7 +97,7 @@ const Page = ({ params }: { params: { id: string } }) => {
   return (
     <LiveblocksWrapper floorCode={floorCode}>
       <NavBar buildingCode={buildingCode} />
-      {LIVEBLOCKS_ENABLED && <UserCount />}
+      {WEBSOCKET_ENABLED && <UserCount />}
       <LoadingText />
       <MainDisplay floorCode={floorCode} />
       <ModeDisplay />

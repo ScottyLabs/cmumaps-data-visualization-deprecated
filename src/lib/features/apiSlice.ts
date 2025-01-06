@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import { toast } from "react-toastify";
+
 import { Graph, Node } from "../../components/shared/types";
 import { addPatchesToHistory } from "./dataSlice";
 
@@ -23,7 +25,10 @@ export const apiSlice = createApi({
         method: "POST",
         body: node,
       }),
-      onQueryStarted({ floorCode, nodeId, node }, { dispatch, getState }) {
+      async onQueryStarted(
+        { floorCode, nodeId, node },
+        { dispatch, getState, queryFulfilled }
+      ) {
         try {
           const nodes =
             apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
@@ -61,7 +66,10 @@ export const apiSlice = createApi({
           };
 
           dispatch(addPatchesToHistory(patch));
+
+          await queryFulfilled;
         } catch (e) {
+          toast.error("Check the Console for detailed error.");
           console.error(e);
         }
       },

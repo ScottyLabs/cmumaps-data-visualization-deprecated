@@ -238,7 +238,7 @@ const MainDisplay = ({ floorCode }: Props) => {
         if (event.shiftKey) {
           dispatch(redo());
         } else {
-          dispatch(undo());
+          dispatch(undo(floorCode));
         }
       }
     };

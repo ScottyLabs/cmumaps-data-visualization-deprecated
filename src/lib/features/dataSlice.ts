@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { applyPatch } from "fast-json-patch";
 import { Patch } from "immer";
 
 import { toast } from "react-toastify";
 
 import { Graph, Mst } from "../../components/shared/types";
+import { createAppAsyncThunk } from "../withTypes";
+import { apiSlice } from "./apiSlice";
 
 const MAX_UNDO_LIMIT = 50;
 
@@ -41,6 +42,27 @@ const initialState: DataState = {
   reversedQueyHistory: [],
   editIndex: -1,
 };
+
+export const undo = createAppAsyncThunk(
+  "data/undo",
+  async (floorCode: string, { dispatch, getState }) => {
+    try {
+      const dataState = getState().data;
+      if (dataState.editIndex == -1) {
+        toast.error("Can't undo anymore!");
+        return;
+      }
+
+      const reversedPatch = dataState.reversedEditHistory[dataState.editIndex];
+      dispatch(
+        apiSlice.util.patchQueryData("getGraph", floorCode, reversedPatch)
+      );
+    } catch (error) {
+      console.error("Error undoing:", error);
+      toast.error("Failed to undo change!");
+    }
+  }
+);
 
 const getUpdatedHistory = <T>(history: T[], patch: T, index: number) => {
   const updatedHistory = [...history.slice(0, index + 1), patch];
@@ -94,16 +116,16 @@ const dataSlice = createSlice({
       // Update the edit index
       state.editIndex = state.editHistory.length - 1;
     },
-
-    undo(state) {
+    undo(state, action: PayloadAction<string>) {
       if (state.editIndex == -1) {
         toast.error("Can't undo anymore!");
         return;
       }
 
       try {
+        const floorCode = action.payload;
         const reversedPatch = state.reversedEditHistory[state.editIndex];
-        state.nodes = applyPatch(state.nodes, reversedPatch).newDocument;
+        apiSlice.util.patchQueryData("getGraph", floorCode, reversedPatch);
         state.editIndex -= 1;
       } catch (error) {
         console.error("Error undoing patch:", error);
@@ -118,8 +140,8 @@ const dataSlice = createSlice({
 
       try {
         state.editIndex += 1;
-        const patch = state.editHistory[state.editIndex];
-        state.nodes = applyPatch(state.nodes, patch).newDocument;
+        // const patch = state.editHistory[state.editIndex];
+        // state.nodes = applyPatch(state.nodes, patch).newDocument;
       } catch (error) {
         console.error("Error redoing patch:", error);
         toast.error("Failed to redo change!");
@@ -130,14 +152,13 @@ const dataSlice = createSlice({
       state.mst = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(undo.fulfilled, (state) => {
+      state.editIndex--;
+    });
+  },
 });
 
-export const {
-  setFloorLevels,
-  setNodes,
-  addPatchesToHistory,
-  setMst,
-  undo,
-  redo,
-} = dataSlice.actions;
+export const { setFloorLevels, setNodes, addPatchesToHistory, setMst, redo } =
+  dataSlice.actions;
 export default dataSlice.reducer;

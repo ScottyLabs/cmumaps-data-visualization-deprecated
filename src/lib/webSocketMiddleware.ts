@@ -1,9 +1,15 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
 import { Patch } from "immer";
 
+import { apiSlice } from "./features/apiSlice";
+import { AppDispatch } from "./store";
+
 export const WEBSOCKET_CONNECT = "socket/connect";
 export const WEBSOCKET_DISCONNECT = "socket/disconnect";
 export const WEBSOCKET_MESSAGE = "socket/message";
+
+// message types
+export const PATCH_TYPE = "patch";
 
 interface WebSocketConnectAction {
   type: string;
@@ -24,7 +30,7 @@ interface WebSocketMessageAction {
 let socket: WebSocket | null = null;
 
 export const socketMiddleware: Middleware = (params) => (next) => (action) => {
-  const {} = params;
+  const { dispatch } = params as { dispatch: AppDispatch };
   const { type } = action as Action;
 
   switch (type) {
@@ -49,7 +55,12 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
       };
 
       socket.onmessage = (event) => {
-        console.log("Received message:", event.data);
+        const message = JSON.parse(event.data);
+        if (message.type === PATCH_TYPE) {
+          dispatch(
+            apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+          );
+        }
       };
 
       socket.onerror = (error) => {
@@ -76,7 +87,7 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
           JSON.stringify({
             action: "message",
             floorCode,
-            payload: { type: "patch", patch },
+            payload: { type: PATCH_TYPE, patch },
           })
         );
       } else {

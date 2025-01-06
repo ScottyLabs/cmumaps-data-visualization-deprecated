@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type LoadingStatus = "Succeeded" | "Loading" | "Failed";
-export const LOADED: LoadingStatus = "Succeeded";
+export type LoadingStatus = "Loaded" | "Loading" | "Failed";
+export const LOADED: LoadingStatus = "Loaded";
 export const LOADING: LoadingStatus = "Loading";
 export const FAILED_LOAD: LoadingStatus = "Failed";
 

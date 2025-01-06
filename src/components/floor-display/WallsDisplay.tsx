@@ -1,9 +1,9 @@
-import React from "react";
+import React, { memo } from "react";
 import { Line } from "react-konva";
 
 import { useAppSelector } from "../../lib/hooks";
 
-const WallsDisplay = () => {
+const WallsDisplay = memo(() => {
   const walls = useAppSelector((state) => state.outline.walls);
 
   return (
@@ -12,6 +12,8 @@ const WallsDisplay = () => {
       <Line key={index} points={points} stroke="black" strokeWidth={1} />
     ))
   );
-};
+});
+
+WallsDisplay.displayName = "WallsDisplay";
 
 export default WallsDisplay;

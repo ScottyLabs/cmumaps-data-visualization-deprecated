@@ -11,12 +11,17 @@ import MyToastContainer from "../components/shared/MyToastContainer";
 import { buildingCodeToName } from "../components/shared/buildings";
 import useWebSocket from "../hooks/useWebSocket";
 import { getBuildingCodes } from "../lib/apiRoutes";
+import { setError } from "../lib/features/statusSlice";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
 
 export const INVALID_BUILDING_CODE = "InvalidBuildingCode";
 export const NO_DEFAULT_FLOOR = "NoDefaultFloor";
 export const FULL_FLOOR = "FullFloor";
 
 const App: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const error = useAppSelector((state) => state.status.error);
+
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
 
   // join WebSocket
@@ -36,14 +41,8 @@ const App: React.FC = () => {
     });
   }, []);
 
-  // Toast the error message based on session storage
+  // Toast the error message
   useEffect(() => {
-    // make sure on client side
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const error = sessionStorage.getItem("error");
     console.log(error);
     switch (error) {
       case INVALID_BUILDING_CODE:
@@ -60,8 +59,8 @@ const App: React.FC = () => {
     }
 
     // clear storage so it is not toasted again when refreshed
-    sessionStorage.setItem("error", "");
-  }, []);
+    // dispatch(setError(null));
+  }, [dispatch, error]);
 
   const renderTopBar = () => (
     <div className="m-2 flex justify-between">

@@ -19,7 +19,8 @@ import useClerkToken from "../../hooks/useClerkToken";
 import { useGetUserCountQuery } from "../../lib/features/apiSlice";
 import { setFloorLevels } from "../../lib/features/floorSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
-import { useAppDispatch } from "../../lib/hooks";
+import { INVALID_FLOOR_LEVEL, setError } from "../../lib/features/statusSlice";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { WEBSOCKET_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 import { FULL_FLOOR, INVALID_BUILDING_CODE, NO_DEFAULT_FLOOR } from "../page";
@@ -31,7 +32,7 @@ const MAX_USERS_PER_FLOOR = 1;
  *
  * - Responsible for:
  *   - Validating that the params refers to a valid floor and redirect if needed
- *   - Toasting error message based on session storage
+ *   - Toasting error message
  *   - Displaying warning before closing tab if needed using saveStatus
  *   - Resetting mode when switching floor and toasting when mode changes
  *   - Prevent too many users on a floor
@@ -39,6 +40,7 @@ const MAX_USERS_PER_FLOOR = 1;
 const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const error = useAppSelector((state) => state.status.error);
 
   // get floor info
   const floorCode = params.id;
@@ -52,21 +54,14 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   // Toast the error message based on session storage
   useEffect(() => {
-    // make sure on client side
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const error = sessionStorage.getItem("error");
+    console.log(error);
     switch (error) {
-      case "InvalidFloorLevel":
+      case INVALID_FLOOR_LEVEL:
         toast.error("The floor level is invalid!");
         break;
     }
-
-    // clear storage so it is not toasted again when refreshed
-    sessionStorage.setItem("error", "");
-  }, []);
+    // dispatch(setError(null));
+  }, [dispatch, error]);
 
   // Reset mode when switching floor
   useEffect(() => {
@@ -75,17 +70,13 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   // Validate floor level and redirect if invalid
   (() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
     if (!buildings[buildingCode]) {
-      sessionStorage.setItem("error", INVALID_BUILDING_CODE);
+      dispatch(setError(INVALID_BUILDING_CODE));
       redirect("/");
     }
 
     if (!buildings[buildingCode].defaultFloor) {
-      sessionStorage.setItem("error", NO_DEFAULT_FLOOR);
+      dispatch(setError(NO_DEFAULT_FLOOR));
       redirect("/");
     }
 
@@ -99,6 +90,7 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     // handle invalid floor level
     if (!buildings[buildingCode].floors.includes(floorLevel)) {
+      dispatch(setError(INVALID_FLOOR_LEVEL));
       redirect(defaultFloorUrl);
     }
   })();
@@ -109,10 +101,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     token ? { floorCode, token } : skipToken
   );
   if (userCount && userCount >= MAX_USERS_PER_FLOOR) {
-    if (typeof window === "undefined") {
-      return;
-    }
-    sessionStorage.setItem("error", FULL_FLOOR);
+    dispatch(setError(FULL_FLOOR));
     redirect("/");
   }
 

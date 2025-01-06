@@ -26,7 +26,12 @@ export const apiSlice = createApi({
       onQueryStarted({ floorCode, nodeId, node }, { dispatch, getState }) {
         try {
           const nodes =
-            getState().api.queries[`getGraph("${floorCode}")`]?.data;
+            apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
+
+          if (!nodes) {
+            console.error("Invalid cache!");
+            return;
+          }
 
           const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
             dispatch(

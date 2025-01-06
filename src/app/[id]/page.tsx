@@ -65,7 +65,7 @@ const Page = ({ params }: { params: { id: string } }) => {
   // Reset mode when switching floor
   useEffect(() => {
     dispatch(setMode(GRAPH_SELECT));
-  }, [dispatch, floorLevel]);
+  }, [dispatch, floorCode]);
 
   // Validate floor level and redirect if invalid
   (() => {

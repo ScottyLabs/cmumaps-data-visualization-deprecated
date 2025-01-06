@@ -2,12 +2,13 @@ import { Action, Middleware } from "@reduxjs/toolkit";
 import { Patch } from "immer";
 
 import { apiSlice } from "./features/apiSlice";
-import { AppDispatch } from "./store";
+import { setFloorCode } from "./features/floorSlice";
+import { AppDispatch, RootState } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
 export const WEBSOCKET_MESSAGE = "socket/message";
 
-// message types
+// Message types
 export const PATCH_TYPE = "patch";
 const LEAVE_FLOOR = "leaveFloor";
 
@@ -31,14 +32,15 @@ let socket: WebSocket | null = null;
 
 const handleWebSocketJoin = (
   action: WebSocketConnectAction,
+  getStore: () => RootState,
   dispatch: AppDispatch
 ) => {
   const { payload } = action;
-  const { floorCode: curFloorCode, url } = payload;
-  const floorCode = curFloorCode;
+  const { floorCode, url } = payload;
 
   // switch floor if socket already connected
   if (socket) {
+    dispatch(setFloorCode(floorCode));
     socket.send(JSON.stringify({ action: "switchFloor", floorCode }));
     return;
   }
@@ -68,13 +70,22 @@ const handleWebSocketJoin = (
 
       // refresh user count in both floors when leaving a floor
       case LEAVE_FLOOR:
+        const newFloorCode = getStore().floor.floorCode;
         socket?.send(
           JSON.stringify({
             action: "refreshUserCount",
             floorCode: message.oldFloorCode,
           })
         );
-        socket?.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
+
+        if (newFloorCode) {
+          socket?.send(
+            JSON.stringify({
+              action: "refreshUserCount",
+              floorCode: newFloorCode,
+            })
+          );
+        }
         break;
     }
   };
@@ -96,13 +107,18 @@ const handleWebSocketJoin = (
   });
 };
 
+interface ParamsType {
+  getState: () => RootState;
+  dispatch: AppDispatch;
+}
+
 export const socketMiddleware: Middleware = (params) => (next) => (action) => {
-  const { dispatch } = params as { dispatch: AppDispatch };
+  const { getState, dispatch } = params as ParamsType;
   const { type } = action as Action;
 
   switch (type) {
     case WEBSOCKET_JOIN:
-      handleWebSocketJoin(action as WebSocketConnectAction, dispatch);
+      handleWebSocketJoin(action as WebSocketConnectAction, getState, dispatch);
       break;
 
     case WEBSOCKET_MESSAGE:

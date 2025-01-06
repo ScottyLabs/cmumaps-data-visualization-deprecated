@@ -35,21 +35,17 @@ def lambda_handler(event, context):
             for connection in response["Items"]
         }
 
-        # check if the user leave the floor or join the floor
-        action = "join" if sender_connection_id in users else "leave"
-
         # send user count to all users on this floor
         for connection in response["Items"]:
-            filtered_users = dict(users)
-            del filtered_users[connection["Token"]]
+            other_users = dict(users)
+            del other_users[connection["Token"]]
             client.post_to_connection(
                 ConnectionId=connection["Token"],
                 Data=json.dumps(
                     {
                         "type": "users",
                         "sender": sender_connection_id,
-                        "action": action,
-                        "users": filtered_users,
+                        "otherUsers": other_users,
                     }
                 ),
             )

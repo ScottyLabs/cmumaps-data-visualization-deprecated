@@ -1,17 +1,19 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
-import { Patch } from "immer";
 
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
+import { setOtherUsers } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
 export const WEBSOCKET_MESSAGE = "socket/message";
 
 // Message types
-export const PATCH_TYPE = "patch";
-const LEAVE_FLOOR = "leaveFloor";
-const USERS = "users";
+export type MessageType = "patch" | "cursor" | "leaveFloor" | "users";
+export const GRAPH_PATCH: MessageType = "patch";
+export const CURSOR: MessageType = "cursor";
+const LEAVE_FLOOR: MessageType = "leaveFloor";
+const USERS: MessageType = "users";
 
 interface WebSocketConnectAction {
   type: string;
@@ -23,9 +25,7 @@ interface WebSocketConnectAction {
 
 interface WebSocketMessageAction {
   type: string;
-  payload: {
-    patch: Patch;
-  };
+  payload;
 }
 
 let socket: WebSocket | null = null;
@@ -66,7 +66,7 @@ const handleWebSocketJoin = (
 
     switch (message.type) {
       // patch the graph
-      case PATCH_TYPE:
+      case GRAPH_PATCH:
         dispatch(
           apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
         );
@@ -83,9 +83,14 @@ const handleWebSocketJoin = (
         socket?.send(JSON.stringify({ action: "refreshUserCount", floorCode }));
         break;
 
-      case USERS:
+      // update cursor
+      case CURSOR:
         console.log(message);
-        // dispatch(setUsers(message.users));
+        break;
+
+      // for now just set other users
+      case USERS:
+        dispatch(setOtherUsers(message.otherUsers));
         break;
     }
   };
@@ -124,15 +129,8 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
     case WEBSOCKET_MESSAGE:
       if (socket && socket.readyState === WebSocket.OPEN) {
         const { payload } = action as WebSocketMessageAction;
-        const { patch } = payload;
         const floorCode = getState().floor.floorCode;
-        socket.send(
-          JSON.stringify({
-            action: "message",
-            floorCode,
-            payload: { type: PATCH_TYPE, patch },
-          })
-        );
+        socket.send(JSON.stringify({ action: "message", floorCode, payload }));
       } else {
         console.error("WebSocket is not open. Cannot send message.");
       }

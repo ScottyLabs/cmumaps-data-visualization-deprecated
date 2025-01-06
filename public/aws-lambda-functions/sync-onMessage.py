@@ -16,6 +16,7 @@ dynamo = boto3.resource("dynamodb").Table("cmumaps-data-visualization-connection
 def lambda_handler(event, context):
     try:
         # get sender's floor
+        sender_connection_id = event["requestContext"]["connectionId"]
         body = json.loads(event["body"])
         floor_code = body["floorCode"]
 
@@ -28,13 +29,18 @@ def lambda_handler(event, context):
         # send message to all users except the sender
         payload = body["payload"]
         for connection in response["Items"]:
-            if connection["Token"] != event["requestContext"]["connectionId"]:
+            if connection["Token"] != sender_connection_id:
                 client.post_to_connection(
                     ConnectionId=connection["Token"],
-                    Data=json.dumps(payload).encode("utf-8"),
+                    Data=json.dumps(
+                        {"sender": sender_connection_id, "payload": payload}
+                    ),
                 )
 
         return {"statusCode": 200}
     except Exception as e:
         logger.error(e)
+        client.post_to_connection(
+            ConnectionId=sender_connection_id, Data=json.dumps({"error": str(e)})
+        )
         return {"statusCode": 400, "body": json.dumps({"error": str(e)})}

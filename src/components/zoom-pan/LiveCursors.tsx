@@ -16,6 +16,8 @@ export const CURSOR_INTERVAL = 20;
 
 const LiveCursors = ({ scale }: Props) => {
   // const dispatch = useAppDispatch();
+  const otherUsers = useAppSelector((state) => state.users.otherUsers);
+
   const cursorPosList = useAppSelector((state) => state.users.liveCursors);
   const [cursorPosIndex, setCursorPosIndex] = useState(0);
 

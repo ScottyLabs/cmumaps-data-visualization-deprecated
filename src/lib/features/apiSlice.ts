@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { toast } from "react-toastify";
 
 import { Graph, Node } from "../../components/shared/types";
-import { WEBSOCKET_MESSAGE } from "../webSocketMiddleware";
+import { GRAPH_PATCH, WEBSOCKET_MESSAGE } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
 
 interface MoveNodeArgType {
@@ -64,7 +64,7 @@ export const apiSlice = createApi({
           dispatch(addPatchesToHistory(patch));
           dispatch({
             type: WEBSOCKET_MESSAGE,
-            payload: { patch: jsonPatch },
+            payload: { type: GRAPH_PATCH, patch: jsonPatch },
           });
         } catch (e) {
           toast.error("Check the Console for detailed error.");

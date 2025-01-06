@@ -28,8 +28,8 @@ import {
   setEditRoomLabel,
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
-import { setLiveCursors } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { useMyPresence } from "../../liveblocks.config";
 import { LIVE_CURSORS_ENABLED, LIVEBLOCKS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
@@ -128,7 +128,10 @@ const FloorDisplay = ({
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (cursorPosRef.current.length > 0) {
-        dispatch(setLiveCursors(cursorPosRef.current));
+        dispatch({
+          type: WEBSOCKET_MESSAGE,
+          payload: { type: CURSOR, cursorPos: cursorPosRef.current },
+        });
         cursorPosRef.current = [];
       }
     }, 500);

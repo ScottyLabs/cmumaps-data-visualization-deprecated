@@ -1,6 +1,6 @@
-import { useSession } from "@clerk/nextjs";
+import { skipToken } from "@reduxjs/toolkit/query";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiZoomIn } from "react-icons/fi";
 import { FiZoomOut } from "react-icons/fi";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -8,8 +8,8 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
-import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
-import { useAppSelector } from "../../lib/hooks";
+import useClerkToken from "../../hooks/useClerkToken";
+import { useGetFileQuery } from "../../lib/features/apiSlice";
 import { DEFAULT_PDF_SCALE_INDEX } from "../../settings";
 import { PDFCoordinate } from "../shared/types";
 
@@ -24,46 +24,18 @@ interface Props {
 const PDF_SCALES = [1, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 const PDFViewer = ({ floorCode, scale, offset }: Props) => {
-  const { session } = useSession();
-
-  const showFile = useAppSelector((state) => state.visibility.showFile);
-
+  // pdf scale
   const [pdfScaleIndex, setPdfScaleIndex] = useState(DEFAULT_PDF_SCALE_INDEX);
   const pdfScale = PDF_SCALES[pdfScaleIndex];
   scale /= pdfScale;
 
-  const [pdfData, setPdfData] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      if (showFile && !pdfData) {
-        const token = await session?.getToken();
-
-        const buildingCode = extractBuildingCode(floorCode);
-
-        const result = await fetch(
-          `${AWS_API_INVOKE_URL}/get-floorplan?filePath=pdf/${buildingCode}/${floorCode}.pdf`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            method: "Get",
-          }
-        );
-
-        const body = await result.json();
-
-        if (!result.ok) {
-          console.error(body.error);
-          return;
-        }
-
-        setPdfData(body.data);
-      }
-    })();
-    // No need to refetch the pdf when session refreshes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [floorCode, pdfData, showFile]);
+  // get pdf data
+  const buildingCode = extractBuildingCode(floorCode);
+  const filePath = `pdf/${buildingCode}/${floorCode}.pdf`;
+  const token = useClerkToken();
+  const { data: pdfData } = useGetFileQuery(
+    token ? { filePath, token } : skipToken
+  );
 
   const renderZoomInButton = () => {
     const disabled = pdfScaleIndex == PDF_SCALES.length - 1;
@@ -93,7 +65,7 @@ const PDFViewer = ({ floorCode, scale, offset }: Props) => {
     );
   };
 
-  if (!pdfData || !showFile) {
+  if (!pdfData) {
     return;
   }
 

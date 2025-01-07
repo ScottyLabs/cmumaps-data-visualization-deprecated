@@ -2,6 +2,7 @@ import Konva from "konva";
 
 import React, { useRef, useState } from "react";
 
+import { useAppSelector } from "../../lib/hooks";
 import FloorDisplay from "../floor-display/FloorDisplay";
 import { PDFCoordinate } from "../shared/types";
 import PDFViewer from "./PdfViewer";
@@ -18,6 +19,8 @@ const MAX_SCALE = 20;
  * Handles zooming and panning for PDF and Canvas
  */
 const ZoomPanWrapper = ({ floorCode }: Props) => {
+  const showFile = useAppSelector((state) => state.visibility.showFile);
+
   const [canPan, setCanPan] = useState<boolean>(false);
 
   const stageRef = useRef<Konva.Stage>(null);
@@ -71,7 +74,9 @@ const ZoomPanWrapper = ({ floorCode }: Props) => {
     <>
       {/* PDFViewer can't be absolute so the zoom buttons can be displayed */}
       <div className="ml-52 mt-24 h-screen overflow-hidden">
-        <PDFViewer floorCode={floorCode} scale={scale} offset={offset} />
+        {showFile && (
+          <PDFViewer floorCode={floorCode} scale={scale} offset={offset} />
+        )}
       </div>
       <div className="absolute inset-0 z-10 ml-52 mt-24 overflow-hidden">
         <FloorDisplay

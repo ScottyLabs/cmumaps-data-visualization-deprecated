@@ -223,17 +223,16 @@ const NodesDisplay = ({
       return;
     }
 
-    cursorInfoListRef.current.push({
-      nodeId: nodeIdOnDrag,
-      cursorPos: getCursorPos(e, offset, scale),
-      nodePos: {
-        x: Number(e.target.x().toFixed(2)),
-        y: Number(e.target.y().toFixed(2)),
-      },
+    getCursorPos(e, offset, scale, (cursorPos) => {
+      cursorInfoListRef.current.push({
+        nodeId: nodeIdOnDrag,
+        cursorPos,
+        nodePos: {
+          x: Number(e.target.x().toFixed(2)),
+          y: Number(e.target.y().toFixed(2)),
+        },
+      });
     });
-
-    console.log(e);
-    console.log(cursorInfoListRef.current);
   }, CURSOR_INTERVAL);
 
   return Object.entries(nodes).map(

@@ -55,7 +55,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
   const { getToken } = await auth();
   const token = await getToken();
   const response = await fetch(
-    `${AWS_API_INVOKE_URL}/get-user-count?florCode=${floorCode}`,
+    `${AWS_API_INVOKE_URL}/get-user-count?floorCode=${floorCode}`,
     {
       method: "GET",
       headers: {

@@ -3,9 +3,15 @@
 import React from "react";
 
 import Loader from "../../components/common/Loader";
+import NavBar from "../../components/layouts/NavBar";
 
-const loading = () => {
-  return <Loader loadingText="Loading" />;
+const Loading = () => {
+  return (
+    <>
+      <NavBar buildingCode={""} />
+      <Loader loadingText="Loading" />
+    </>
+  );
 };
 
-export default loading;
+export default Loading;

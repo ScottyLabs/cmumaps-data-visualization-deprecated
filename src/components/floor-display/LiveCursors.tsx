@@ -4,6 +4,7 @@ import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
 import {
+  moveNodeWithCursor,
   selectCursorInfoList,
   updateCursorInfoList,
   User,
@@ -13,26 +14,34 @@ import { useAppDispatch } from "../../lib/hooks";
 import { Graph, PDFCoordinate } from "../shared/types";
 
 interface LiveCursorsProps {
+  floorCode: string;
   scale: number;
   nodes: Graph;
 }
 
 export const CURSOR_INTERVAL = 20;
 
-const LiveCursors = ({ scale }: LiveCursorsProps) => {
+const LiveCursors = ({ floorCode, scale }: LiveCursorsProps) => {
   const otherUsers = useAppSelector((state) => state.users.otherUsers);
   return Object.entries(otherUsers).map(([userId, user]) => (
-    <LiveCursor key={userId} userId={userId} user={user} scale={scale} />
+    <LiveCursor
+      key={userId}
+      floorCode={floorCode}
+      userId={userId}
+      user={user}
+      scale={scale}
+    />
   ));
 };
 
 interface LiveCursorProps {
+  floorCode: string;
   userId: string;
   user: User;
   scale: number;
 }
 
-const LiveCursor = ({ userId, user, scale }: LiveCursorProps) => {
+const LiveCursor = ({ floorCode, userId, user, scale }: LiveCursorProps) => {
   const dispatch = useAppDispatch();
   const cursorInfoList = useAppSelector((state) =>
     selectCursorInfoList(state, userId)
@@ -48,11 +57,17 @@ const LiveCursor = ({ userId, user, scale }: LiveCursorProps) => {
             cursorInfoList: cursorInfoList.slice(1),
           })
         );
+
+        if ("nodeId" in cursorInfoList[0]) {
+          dispatch(
+            moveNodeWithCursor({ cursorInfo: cursorInfoList[0], floorCode })
+          );
+        }
       }
     }, CURSOR_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [cursorInfoList]);
+  }, [cursorInfoList, dispatch, userId]);
 
   if (!cursorInfoList || cursorInfoList.length === 0) {
     return;

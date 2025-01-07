@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { ID, PDFCoordinate } from "../../components/shared/types";
+import { createAppAsyncThunk } from "../withTypes";
+import { apiSlice } from "./apiSlice";
 
 export interface User {
   userName: string;
@@ -63,6 +65,24 @@ const usersSlice = createSlice({
     },
   },
 });
+
+interface MoveNodeWithCursorArgType {
+  cursorInfo: CursorInfoOnDragNode;
+  floorCode: string;
+}
+
+// only changes the cache; used for syncing with cursor position
+export const moveNodeWithCursor = createAppAsyncThunk(
+  "users/moveNodeWithCursor",
+  ({ cursorInfo, floorCode }: MoveNodeWithCursorArgType, { dispatch }) => {
+    console.log(cursorInfo.nodeId);
+    dispatch(
+      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+        draft[cursorInfo.nodeId].pos = cursorInfo.nodePos;
+      })
+    );
+  }
+);
 
 export const { selectCursorInfoList } = usersSlice.selectors;
 export const { setOtherUsers, updateCursorInfoList } = usersSlice.actions;

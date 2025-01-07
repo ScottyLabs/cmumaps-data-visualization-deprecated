@@ -210,6 +210,8 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
 
   const handleDragMove = throttle(
     (nodeId: string) => (e) => {
+      console.log(nodeId);
+
       cursorInfoListRef.current.push({
         nodeId,
         cursorPos: {
@@ -227,7 +229,7 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
 
   return Object.entries(nodes).map(
     ([nodeId, node]: [ID, Node], index: number) => {
-      if (!showRoomSpecific || node.roomId == roomIdSelected) {
+      if (!(showRoomSpecific && node.roomId !== roomIdSelected)) {
         return (
           <Circle
             key={index}

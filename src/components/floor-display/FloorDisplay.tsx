@@ -111,7 +111,7 @@ const FloorDisplay = ({
         });
         cursorInfoListRef.current = [];
       }
-    }, 500);
+    }, 5000);
 
     return () => {
       clearInterval(intervalId);
@@ -304,7 +304,9 @@ const FloorDisplay = ({
             />
           }
 
-          {LIVE_CURSORS_ENABLED && <LiveCursors nodes={nodes} scale={scale} />}
+          {LIVE_CURSORS_ENABLED && (
+            <LiveCursors floorCode={floorCode} nodes={nodes} scale={scale} />
+          )}
         </Layer>
       </Stage>
     </>

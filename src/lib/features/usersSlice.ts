@@ -1,15 +1,37 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { PDFCoordinate } from "../../components/shared/types";
+import { ID, PDFCoordinate } from "../../components/shared/types";
 
 export interface User {
   userName: string;
   color: string;
 }
 
+interface BaseCursorInfo {
+  cursorPos: PDFCoordinate;
+}
+
+interface CursorInfoOnDragNode extends BaseCursorInfo {
+  nodeId: ID;
+  nodePos: PDFCoordinate;
+}
+
+interface CursorInfoOnDragVertex extends BaseCursorInfo {
+  vertexIndex: number;
+  vertexPos: PDFCoordinate;
+  cursorPos: PDFCoordinate;
+}
+
+type CursorInfoOnMove = BaseCursorInfo;
+
+export type CursorInfo =
+  | CursorInfoOnDragNode
+  | CursorInfoOnDragVertex
+  | CursorInfoOnMove;
+
 interface UsersState {
   otherUsers: Record<string, User>;
-  liveCursors: Record<string, PDFCoordinate[]>;
+  liveCursors: Record<string, CursorInfo[]>;
 }
 
 const initialState: UsersState = {

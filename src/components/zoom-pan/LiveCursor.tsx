@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
-import { User } from "../../lib/features/usersSlice";
-import { PDFCoordinate } from "../shared/types";
+import { CursorInfo, User } from "../../lib/features/usersSlice";
 import { CURSOR_INTERVAL } from "./LiveCursors";
 
 interface Props {
   user: User;
-  cursorPosList: PDFCoordinate[] | undefined;
+  cursorPosList: CursorInfo[] | undefined;
   scale: number;
 }
 
@@ -50,20 +49,20 @@ const LiveCursor = ({ user, cursorPosList, scale }: Props) => {
     const namePadding = 10;
 
     if (cursorPosIndex < cursorPosList.length) {
-      const cursor = cursorPosList[cursorPosIndex];
+      const cursorPos = cursorPosList[cursorPosIndex].cursorPos;
       return (
         <>
           <Path
-            x={cursor.x - 4 / scale}
-            y={cursor.y - 2 / scale}
+            x={cursorPos.x - 4 / scale}
+            y={cursorPos.y - 2 / scale}
             fill={user.color}
             data={path}
             scaleX={pathScale}
             scaleY={pathScale}
           />
           <Group
-            x={cursor.x + nameOffset.x / scale}
-            y={cursor.y + nameOffset.y / scale}
+            x={cursorPos.x + nameOffset.x / scale}
+            y={cursorPos.y + nameOffset.y / scale}
           >
             <Rect
               width={textWidth + namePadding / scale}

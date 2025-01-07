@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-import React, { useContext } from "react";
+import React, { MutableRefObject, useContext } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -19,6 +19,7 @@ import {
   getNodeIdSelected,
   releaseNode,
 } from "../../lib/features/mouseEventSlice";
+import { CursorInfo } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
@@ -29,10 +30,10 @@ import { dist, getRoomId, setCursor } from "../utils/utils";
 interface Props {
   floorCode: string;
   nodes: Graph;
-  updateMyPresenceWrapper;
+  cursorPosRef: MutableRefObject<CursorInfo[]>;
 }
 
-const NodesDisplay = ({ floorCode, nodes, updateMyPresenceWrapper }: Props) => {
+const NodesDisplay = ({ floorCode, nodes, cursorPosRef }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -192,7 +193,6 @@ const NodesDisplay = ({ floorCode, nodes, updateMyPresenceWrapper }: Props) => {
   };
 
   const handleOnDragEnd = (e, nodeId: ID) => {
-    updateMyPresenceWrapper({ onDragNodeId: null });
     dispatch(releaseNode());
 
     // create new node
@@ -222,14 +222,12 @@ const NodesDisplay = ({ floorCode, nodes, updateMyPresenceWrapper }: Props) => {
             onMouseLeave={(e) => setCursor(e, "default")}
             onClick={() => handleNodeClick(nodeId)}
             draggable
-            onDragStart={() => {
-              updateMyPresenceWrapper({ onDragNodeId: nodeId });
-              dispatch(dragNode(nodeId));
-            }}
+            onDragStart={() => dispatch(dragNode(nodeId))}
             onDragEnd={(e) => handleOnDragEnd(e, nodeId)}
             onDragMove={(e) => {
-              updateMyPresenceWrapper({
-                cursor: {
+              cursorPosRef.current.push({
+                nodeId,
+                cursorPos: {
                   x: Number(e.currentTarget.x().toFixed(2)),
                   y: Number(e.currentTarget.y().toFixed(2)),
                 },

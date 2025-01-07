@@ -29,7 +29,7 @@ import { useAppDispatch } from "../../lib/hooks";
 import { WEBSOCKET_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 
-const MAX_USERS_PER_FLOOR = 1;
+const MAX_USERS_PER_FLOOR = 7;
 
 /**
  * Entry point to the floor plan editting page.

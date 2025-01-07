@@ -27,12 +27,13 @@ import {
   setEditRoomLabel,
   setShowRoomSpecific,
 } from "../../lib/features/uiSlice";
+import { CursorInfo } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { Node, PDFCoordinate } from "../shared/types";
+import { Node } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -99,7 +100,8 @@ const FloorDisplay = ({
   // join WebSocket
   useWebSocket(floorCode);
 
-  const cursorPosRef = useRef<PDFCoordinate[]>([]);
+  // sync cursor position
+  const cursorPosRef = useRef<CursorInfo[]>([]);
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (cursorPosRef.current.length > 0) {
@@ -117,12 +119,12 @@ const FloorDisplay = ({
   }, [dispatch]);
 
   const handleMouseMove = throttle((e) => {
-    const cursor = adjustPosition(
+    const cursorPos = adjustPosition(
       e.currentTarget.getPointerPosition(),
       offset,
       scale
     );
-    cursorPosRef.current.push(cursor);
+    cursorPosRef.current.push({ cursorPos });
   }, CURSOR_INTERVAL);
 
   const addNewNode = (newNode: Node) => {
@@ -279,7 +281,11 @@ const FloorDisplay = ({
             <EdgesDisplay nodes={nodes} />
           )}
           {showNodes && !editPolygon && !editRoomLabel && (
-            <NodesDisplay floorCode={floorCode} nodes={nodes} />
+            <NodesDisplay
+              floorCode={floorCode}
+              nodes={nodes}
+              cursorPosRef={cursorPosRef}
+            />
           )}
 
           {roomIdSelected && (

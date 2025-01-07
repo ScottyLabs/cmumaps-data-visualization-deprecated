@@ -9,12 +9,13 @@ import { toast } from "react-toastify";
 
 import MyToastContainer from "../components/shared/MyToastContainer";
 import { buildingCodeToName } from "../components/shared/buildings";
+import {
+  FULL_FLOOR,
+  INVALID_BUILDING_CODE,
+  NO_DEFAULT_FLOOR,
+} from "../components/shared/types";
 import useWebSocket from "../hooks/useWebSocket";
 import { getBuildingCodes } from "../lib/apiRoutes";
-
-export const INVALID_BUILDING_CODE = "InvalidBuildingCode";
-export const NO_DEFAULT_FLOOR = "NoDefaultFloor";
-export const FULL_FLOOR = "FullFloor";
 
 const App: React.FC = () => {
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
@@ -44,7 +45,6 @@ const App: React.FC = () => {
     }
 
     const error = sessionStorage.getItem("error");
-    console.log(error);
     switch (error) {
       case INVALID_BUILDING_CODE:
         toast.error("The building code is invalid!");

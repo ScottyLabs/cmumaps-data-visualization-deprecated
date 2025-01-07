@@ -14,6 +14,12 @@ import ModeDisplay from "../../components/layouts/ModeDisplay";
 import NavBar from "../../components/layouts/NavBar";
 import UserCount from "../../components/layouts/UserCount";
 import MyToastContainer from "../../components/shared/MyToastContainer";
+import {
+  FULL_FLOOR,
+  INVALID_BUILDING_CODE,
+  INVALID_FLOOR_LEVEL,
+  NO_DEFAULT_FLOOR,
+} from "../../components/shared/types";
 import HelpInfo from "../../components/zoom-pan/HelpInfo";
 import useClerkToken from "../../hooks/useClerkToken";
 import { useGetUserCountQuery } from "../../lib/features/apiSlice";
@@ -22,7 +28,6 @@ import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { useAppDispatch } from "../../lib/hooks";
 import { WEBSOCKET_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
-import { FULL_FLOOR, INVALID_BUILDING_CODE, NO_DEFAULT_FLOOR } from "../page";
 
 const MAX_USERS_PER_FLOOR = 1;
 
@@ -59,7 +64,7 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     const error = sessionStorage.getItem("error");
     switch (error) {
-      case "InvalidFloorLevel":
+      case INVALID_FLOOR_LEVEL:
         toast.error("The floor level is invalid!");
         break;
     }
@@ -99,6 +104,7 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     // handle invalid floor level
     if (!buildings[buildingCode].floors.includes(floorLevel)) {
+      sessionStorage.setItem("error", INVALID_FLOOR_LEVEL);
       redirect(defaultFloorUrl);
     }
   })();

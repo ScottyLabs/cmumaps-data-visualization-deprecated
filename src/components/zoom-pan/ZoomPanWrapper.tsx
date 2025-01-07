@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 
 import FloorDisplay from "../floor-display/FloorDisplay";
 import { PDFCoordinate } from "../shared/types";
-import PDFViewer from "./PDFViewer";
+import PDFViewer from "./PdfViewer";
 
 interface Props {
   floorCode: string;

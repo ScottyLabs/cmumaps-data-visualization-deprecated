@@ -1,3 +1,4 @@
+import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 
 import React, { MutableRefObject, useContext } from "react";
@@ -26,6 +27,7 @@ import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { dist, getRoomId, setCursor } from "../utils/utils";
+import { CURSOR_INTERVAL } from "./LiveCursors";
 
 interface Props {
   floorCode: string;
@@ -206,6 +208,23 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
     moveNode({ floorCode, nodeId, node: newNode });
   };
 
+  const handleDragMove = throttle(
+    (nodeId: string) => (e) => {
+      cursorInfoListRef.current.push({
+        nodeId,
+        cursorPos: {
+          x: Number(e.currentTarget.x().toFixed(2)),
+          y: Number(e.currentTarget.y().toFixed(2)),
+        },
+        nodePos: {
+          x: Number(e.target.x().toFixed(2)),
+          y: Number(e.target.y().toFixed(2)),
+        },
+      });
+    },
+    CURSOR_INTERVAL
+  );
+
   return Object.entries(nodes).map(
     ([nodeId, node]: [ID, Node], index: number) => {
       if (!showRoomSpecific || node.roomId == roomIdSelected) {
@@ -224,19 +243,7 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
             draggable
             onDragStart={() => dispatch(dragNode(nodeId))}
             onDragEnd={(e) => handleOnDragEnd(e, nodeId)}
-            onDragMove={(e) => {
-              cursorInfoListRef.current.push({
-                nodeId,
-                cursorPos: {
-                  x: Number(e.currentTarget.x().toFixed(2)),
-                  y: Number(e.currentTarget.y().toFixed(2)),
-                },
-                nodePos: {
-                  x: Number(e.target.x().toFixed(2)),
-                  y: Number(e.target.y().toFixed(2)),
-                },
-              });
-            }}
+            onDragMove={handleDragMove(nodeId)}
           />
         );
       }

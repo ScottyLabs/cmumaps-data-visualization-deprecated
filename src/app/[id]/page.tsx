@@ -25,6 +25,7 @@ import useClerkToken from "../../hooks/useClerkToken";
 import { useGetUserCountQuery } from "../../lib/features/apiSlice";
 import { setFloorLevels } from "../../lib/features/floorSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
+import { setError } from "../../lib/features/statusSlice";
 import { useAppDispatch } from "../../lib/hooks";
 import { WEBSOCKET_ENABLED } from "../../settings";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
@@ -51,9 +52,9 @@ const Page = ({ params }: { params: { id: string } }) => {
   const floorLevel = extractFloorLevel(floorCode);
 
   // Get floor levels
-  useEffect(() => {
-    dispatch(setFloorLevels(buildings[buildingCode].floors));
-  }, [buildingCode, dispatch, floorLevel, router]);
+  // useEffect(() => {
+  //   dispatch(setFloorLevels(buildings[buildingCode].floors));
+  // }, [buildingCode, dispatch, floorLevel, router]);
 
   // Toast the error message based on session storage
   useEffect(() => {
@@ -79,13 +80,10 @@ const Page = ({ params }: { params: { id: string } }) => {
   }, [dispatch, floorCode]);
 
   // Validate floor level and redirect if invalid
-  (() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
+  useEffect(() => {
     if (!buildings[buildingCode]) {
       sessionStorage.setItem("error", INVALID_BUILDING_CODE);
+      dispatch(setError(INVALID_BUILDING_CODE));
       redirect("/");
     }
 
@@ -107,7 +105,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       sessionStorage.setItem("error", INVALID_FLOOR_LEVEL);
       redirect(defaultFloorUrl);
     }
-  })();
+  }, []);
 
   // Prevent too many users on a floor
   const token = useClerkToken();

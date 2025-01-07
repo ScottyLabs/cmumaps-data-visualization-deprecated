@@ -1,4 +1,5 @@
 import { Polygon } from "geojson";
+import Konva from "konva";
 import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
@@ -33,7 +34,8 @@ import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { Node } from "../shared/types";
+import { Node, PDFCoordinate } from "../shared/types";
+import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -50,19 +52,12 @@ import WallsDisplay from "./WallsDisplay";
 interface Props {
   floorCode: string;
   setCanPan: (canPan: boolean) => void;
-  handleWheel;
-  handleDragMove;
+  handleWheel: (evt: Konva.KonvaEventObject<WheelEvent>) => void;
+  handleDragMove: (evt: Konva.KonvaEventObject<DragEvent>) => void;
   scale: number;
-  offset;
-  stageRef;
+  offset: PDFCoordinate;
+  stageRef: React.RefObject<Konva.Stage>;
 }
-
-const adjustPosition = (pos, offset, scale) => {
-  return {
-    x: Number(((pos.x - offset.x) / scale).toFixed(2)),
-    y: Number(((pos.y - offset.y) / scale).toFixed(2)),
-  };
-};
 
 const FloorDisplay = ({
   floorCode,
@@ -100,6 +95,12 @@ const FloorDisplay = ({
   // join WebSocket
   useWebSocket(floorCode);
 
+  // store mouse positions
+  const handleMouseMove = throttle((e) => {
+    const cursorPos = getCursorPos(e, offset, scale);
+    cursorInfoListRef.current.push({ cursorPos });
+  }, CURSOR_INTERVAL);
+
   // sync cursor position
   const cursorInfoListRef = useRef<CursorInfo[]>([]);
   useEffect(() => {
@@ -117,15 +118,6 @@ const FloorDisplay = ({
       clearInterval(intervalId);
     };
   }, [dispatch]);
-
-  const handleMouseMove = throttle((e) => {
-    const cursorPos = adjustPosition(
-      e.currentTarget.getPointerPosition(),
-      offset,
-      scale
-    );
-    cursorInfoListRef.current.push({ cursorPos });
-  }, CURSOR_INTERVAL);
 
   const addNewNode = (newNode: Node) => {
     const newNodes = { ...nodes };
@@ -152,7 +144,7 @@ const FloorDisplay = ({
     );
   };
 
-  const handleStageClick = (e) => {
+  const handleStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const clickedOnStage = e.target == e.target.getStage();
 
     // errors for each mode relative to stage clicking
@@ -173,7 +165,7 @@ const FloorDisplay = ({
     }
 
     if (mode == ADD_NODE) {
-      const pos = adjustPosition(e.target.getPointerPosition(), offset, scale);
+      const pos = getCursorPos(e, offset, scale);
       const newNode: Node = {
         pos: pos,
         neighbors: {},
@@ -182,7 +174,7 @@ const FloorDisplay = ({
       addNewNode(newNode);
       dispatch(setMode(GRAPH_SELECT));
     } else if (mode == POLYGON_ADD_VERTEX) {
-      const pos = adjustPosition(e.target.getPointerPosition(), offset, scale);
+      const pos = getCursorPos(e, offset, scale);
       const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
 
       const polygon = rooms[roomIdSelected].polygon;
@@ -233,7 +225,8 @@ const FloorDisplay = ({
     }
   };
 
-  const handleOnMouseDown = (e) => {
+  // Disable panning when dragging node, vertex, or label
+  const handleOnMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     let newCanPan = true;
 
     // can't pan when dragging on node or vertex
@@ -261,10 +254,10 @@ const FloorDisplay = ({
         onMouseMove={handleMouseMove}
         onMouseDown={handleOnMouseDown}
         onMouseUp={() => setCanPan(true)}
-        onClick={(e) => handleStageClick(e)}
-        draggable
+        onClick={handleStageClick}
         onWheel={handleWheel}
         onDragMove={handleDragMove}
+        draggable
         scaleX={scale}
         scaleY={scale}
         x={offset.x}
@@ -285,6 +278,8 @@ const FloorDisplay = ({
               floorCode={floorCode}
               nodes={nodes}
               cursorInfoListRef={cursorInfoListRef}
+              offset={offset}
+              scale={scale}
             />
           )}
 
@@ -305,7 +300,7 @@ const FloorDisplay = ({
           }
 
           {LIVE_CURSORS_ENABLED && (
-            <LiveCursors floorCode={floorCode} nodes={nodes} scale={scale} />
+            <LiveCursors floorCode={floorCode} scale={scale} />
           )}
         </Layer>
       </Stage>

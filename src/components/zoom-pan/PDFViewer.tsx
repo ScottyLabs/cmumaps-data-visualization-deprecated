@@ -21,14 +21,15 @@ interface Props {
   offset: PDFCoordinate;
 }
 
+const PDF_SCALES = [1, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
 const PDFViewer = ({ floorCode, scale, offset }: Props) => {
   const { session } = useSession();
 
   const showFile = useAppSelector((state) => state.visibility.showFile);
 
   const [pdfScaleIndex, setPdfScaleIndex] = useState(DEFAULT_PDF_SCALE_INDEX);
-  const pdfScales = [1, 2, 2.5, 3, 3.5, 4, 4.5, 5];
-  const pdfScale = pdfScales[pdfScaleIndex];
+  const pdfScale = PDF_SCALES[pdfScaleIndex];
   scale /= pdfScale;
 
   const [pdfData, setPdfData] = useState<string | null>(null);
@@ -65,7 +66,7 @@ const PDFViewer = ({ floorCode, scale, offset }: Props) => {
   }, [floorCode, pdfData, showFile]);
 
   const renderZoomInButton = () => {
-    const disabled = pdfScaleIndex == pdfScales.length - 1;
+    const disabled = pdfScaleIndex == PDF_SCALES.length - 1;
 
     const zoomIn = () => {
       setPdfScaleIndex(pdfScaleIndex + 1);

@@ -1,22 +1,22 @@
 import Konva from "konva";
-import dynamic from "next/dynamic";
 
 import React, { useRef, useState } from "react";
 
+import FloorDisplay from "../floor-display/FloorDisplay";
 import { PDFCoordinate } from "../shared/types";
-
-// import PDFViewer from "./PDFViewer";
-const PDFViewer = dynamic(() => import("./PDFViewer"), { ssr: false });
-
-// import FloorDisplay from "./FloorDisplay";
-const FloorDisplay = dynamic(() => import("../floor-display/FloorDisplay"), {
-  ssr: false,
-});
+import PDFViewer from "./PDFViewer";
 
 interface Props {
   floorCode: string;
 }
 
+const SCALE_BY = 1.05;
+const MIN_SCALE = 1;
+const MAX_SCALE = 20;
+
+/**
+ * Handles zooming and panning for PDF and Canvas
+ */
 const ZoomPanWrapper = ({ floorCode }: Props) => {
   const [canPan, setCanPan] = useState<boolean>(false);
 
@@ -24,43 +24,41 @@ const ZoomPanWrapper = ({ floorCode }: Props) => {
   const [scale, setScale] = useState<number>(1);
   const [offset, setOffset] = useState<PDFCoordinate>({ x: 0, y: 0 });
 
-  const handleWheel = (e) => {
+  const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault();
 
-    const scaleBy = 1.05;
+    // only scale if stage and pointer are defined
     const stage = stageRef.current;
-
     if (stage == null) {
       return;
     }
 
     const oldScale = stage.scaleX();
-
     const pointer = stage.getPointerPosition();
-
     if (pointer == null) {
       return;
     }
 
+    // calculate the new scale
+    let newScale = e.evt.deltaY < 0 ? oldScale * SCALE_BY : oldScale / SCALE_BY;
+
+    // clamp the scale
+    newScale = Math.max(newScale, MIN_SCALE);
+    newScale = Math.min(newScale, MAX_SCALE);
+    setScale(newScale);
+
+    // calculate the offset
     const mousePointTo = {
       x: (pointer.x - stage.x()) / oldScale,
       y: (pointer.y - stage.y()) / oldScale,
     };
-
-    let newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-    newScale = Math.max(newScale, 1);
-
-    if (newScale >= 1 && newScale < 20) {
-      setScale(newScale);
-      setOffset({
-        x: pointer.x - mousePointTo.x * newScale,
-        y: pointer.y - mousePointTo.y * newScale,
-      });
-    }
+    setOffset({
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    });
   };
 
-  const handleDragMove = (e) => {
+  const handleDragMove = (e: Konva.KonvaEventObject<DragEvent>) => {
     if (canPan) {
       setOffset({
         x: e.target.x(),
@@ -71,6 +69,7 @@ const ZoomPanWrapper = ({ floorCode }: Props) => {
 
   return (
     <>
+      {/* PDFViewer can't be absolute so the zoom buttons can be displayed */}
       <div className="ml-52 mt-24 h-screen overflow-hidden">
         <PDFViewer floorCode={floorCode} scale={scale} offset={offset} />
       </div>

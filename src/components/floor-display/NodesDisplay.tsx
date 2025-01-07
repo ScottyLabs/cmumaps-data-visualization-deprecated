@@ -53,6 +53,7 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
+  const nodeIdOnDrag = useAppSelector((state) => state.mouseEvent.nodeIdOnDrag);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   if (!nodes) {
@@ -194,7 +195,7 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
     }
   };
 
-  const handleOnDragEnd = (e, nodeId: ID) => {
+  const handleOnDragEnd = (nodeId: ID) => (e) => {
     dispatch(releaseNode());
 
     // create new node
@@ -208,24 +209,23 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
     moveNode({ floorCode, nodeId, node: newNode });
   };
 
-  const handleDragMove = throttle(
-    (nodeId: string) => (e) => {
-      console.log(nodeId);
+  const handleDragMove = throttle((e) => {
+    if (!nodeIdOnDrag) {
+      return;
+    }
 
-      cursorInfoListRef.current.push({
-        nodeId,
-        cursorPos: {
-          x: Number(e.currentTarget.x().toFixed(2)),
-          y: Number(e.currentTarget.y().toFixed(2)),
-        },
-        nodePos: {
-          x: Number(e.target.x().toFixed(2)),
-          y: Number(e.target.y().toFixed(2)),
-        },
-      });
-    },
-    CURSOR_INTERVAL
-  );
+    cursorInfoListRef.current.push({
+      nodeId: nodeIdOnDrag,
+      cursorPos: {
+        x: Number(e.currentTarget.x().toFixed(2)),
+        y: Number(e.currentTarget.y().toFixed(2)),
+      },
+      nodePos: {
+        x: Number(e.target.x().toFixed(2)),
+        y: Number(e.target.y().toFixed(2)),
+      },
+    });
+  }, CURSOR_INTERVAL);
 
   return Object.entries(nodes).map(
     ([nodeId, node]: [ID, Node], index: number) => {
@@ -244,8 +244,8 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
             onClick={() => handleNodeClick(nodeId)}
             draggable
             onDragStart={() => dispatch(dragNode(nodeId))}
-            onDragEnd={(e) => handleOnDragEnd(e, nodeId)}
-            onDragMove={handleDragMove(nodeId)}
+            onDragEnd={handleOnDragEnd(nodeId)}
+            onDragMove={handleDragMove}
           />
         );
       }

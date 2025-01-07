@@ -75,7 +75,6 @@ interface MoveNodeWithCursorArgType {
 export const moveNodeWithCursor = createAppAsyncThunk(
   "users/moveNodeWithCursor",
   ({ cursorInfo, floorCode }: MoveNodeWithCursorArgType, { dispatch }) => {
-    console.log(cursorInfo.nodeId);
     dispatch(
       apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
         draft[cursorInfo.nodeId].pos = cursorInfo.nodePos;

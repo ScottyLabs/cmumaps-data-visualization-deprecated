@@ -1,3 +1,5 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -9,7 +11,9 @@ import {
   INVALID_BUILDING_CODE,
   INVALID_FLOOR_LEVEL,
   NO_DEFAULT_FLOOR,
-} from "../components/shared/types";
+  UNAUTHORIZED,
+  UNKNOWN,
+} from "./errorCodes";
 
 // Toast the error message based on search params
 const useErrorToast = (baseUrl: string) => {
@@ -28,17 +32,24 @@ const useErrorToast = (baseUrl: string) => {
         break;
 
       case FULL_FLOOR:
-        toast.error("Too many people on the floor!");
+        toast.error("Too many people are currently on that floor!");
         break;
 
       case INVALID_FLOOR_LEVEL:
         toast.error("The floor level is invalid!");
         break;
+
+      case UNAUTHORIZED:
+        toast.error("Please login in using Clerk before accessing a floor!");
+        break;
+
+      case UNKNOWN:
+        toast.error("Unknown Error!");
+        break;
     }
 
-    // use window history instead of router to prevent refreshing the page
-    // and getting rid of the error toast
-    window.history.pushState({}, "", baseUrl);
+    // clear the error in the url
+    router.push(baseUrl);
   }, [baseUrl, router, searchParam]);
 };
 

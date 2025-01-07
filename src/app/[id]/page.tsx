@@ -1,32 +1,29 @@
-// import { skipToken } from "@reduxjs/toolkit/query";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 import buildings from "../../../public/cmumaps-data/buildings.json";
 import MainLayout from "../../components/layouts/MainLayout";
 import {
-  // FULL_FLOOR,
+  FULL_FLOOR,
   INVALID_BUILDING_CODE,
   INVALID_FLOOR_LEVEL,
   NO_DEFAULT_FLOOR,
-} from "../../components/shared/types";
-// import useClerkToken from "../../hooks/useClerkToken";
-// import { useGetUserCountQuery } from "../../lib/features/apiSlice";
-// import { setFloorLevels } from "../../lib/features/floorSlice";
-// import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
-// import { useAppDispatch } from "../../lib/hooks";
-// import { WEBSOCKET_ENABLED } from "../../settings";
+  UNAUTHORIZED,
+  UNKNOWN,
+} from "../../hooks/errorCodes";
+import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
 import { extractBuildingCode, extractFloorLevel } from "../api/apiUtils";
 
-// const MAX_USERS_PER_FLOOR = 7;
+const MAX_USERS_PER_FLOOR = 7;
 
 /**
- * A server component serving as the entry point to the floor plan editting page.
+ * A server component serving as the entry point to the floor plan editing page.
  *
  * - Responsible for:
  *   - Validating that the params refers to a valid floor and redirect if needed
- *   - Checking the floor is not full
+ *   - Preventing more than MAX_USERS_PER_FLOOR number of users on the floor
  */
-const Page = ({ params }: { params: { id: string } }) => {
+const Page = async ({ params }: { params: { id: string } }) => {
   // get floor info
   const floorCode = params.id;
   const buildingCode = extractBuildingCode(floorCode);
@@ -54,17 +51,31 @@ const Page = ({ params }: { params: { id: string } }) => {
     redirect(defaultFloorUrl + `?error=${INVALID_FLOOR_LEVEL}`);
   }
 
-  // // Prevent too many users on a floor
-  // const { data: userCount } = useGetUserCountQuery(
-  //   token ? { floorCode, token } : skipToken
-  // );
-  // if (userCount && userCount >= MAX_USERS_PER_FLOOR) {
-  //   if (typeof window === "undefined") {
-  //     return;
-  //   }
-  //   sessionStorage.setItem("error", FULL_FLOOR);
-  //   redirect("/");
-  // }
+  // Prevent too many users on a floor
+  const { getToken } = await auth();
+  const token = await getToken();
+  const response = await fetch(
+    `${AWS_API_INVOKE_URL}/get-user-count?florCode=${floorCode}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (response.status === 401) {
+    redirect(`/?error=${UNAUTHORIZED}`);
+  }
+
+  const body = await response.json();
+  if (body.userCount === undefined) {
+    redirect(`/?error=${UNKNOWN}`);
+  }
+
+  if (body.userCount >= MAX_USERS_PER_FLOOR) {
+    redirect(`/?error=${FULL_FLOOR}`);
+  }
 
   return <MainLayout params={params} />;
 };

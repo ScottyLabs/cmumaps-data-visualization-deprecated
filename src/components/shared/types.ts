@@ -158,8 +158,3 @@ export type Rooms = Record<ID, RoomInfo>;
 export type Graph = Record<ID, Node>;
 
 export type Mst = Record<ID, Record<ID, boolean>>;
-
-export const INVALID_BUILDING_CODE = "InvalidBuildingCode";
-export const INVALID_FLOOR_LEVEL = "InvalidFloorLevel";
-export const NO_DEFAULT_FLOOR = "NoDefaultFloor";
-export const FULL_FLOOR = "FullFloor";

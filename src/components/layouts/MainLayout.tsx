@@ -21,7 +21,7 @@ import { useAppDispatch } from "../../lib/hooks";
 import { WEBSOCKET_ENABLED } from "../../settings";
 
 /**
- * Main client component
+ * Main client component for the floor editing page
  *
  * - Responsible for
  *   - Getting floor levels

@@ -21,7 +21,7 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
-            "body": len(response["Items"]),
+            "body": json.dumps({"userCount": len(response["Items"])}),
         }
     except Exception as e:
         logger.error(e)

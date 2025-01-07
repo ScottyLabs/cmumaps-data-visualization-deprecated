@@ -13,15 +13,8 @@ export const CURSOR_INTERVAL = 20;
 
 const LiveCursors = ({ scale }: Props) => {
   const otherUsers = useAppSelector((state) => state.users.otherUsers);
-  const liveCursors = useAppSelector((state) => state.users.liveCursors);
-
   return Object.entries(otherUsers).map(([userId, user]) => (
-    <LiveCursor
-      key={userId}
-      user={user}
-      cursorPosList={liveCursors[userId]}
-      scale={scale}
-    />
+    <LiveCursor key={userId} userId={userId} user={user} scale={scale} />
   ));
 
   // // update node position if dragged by a user

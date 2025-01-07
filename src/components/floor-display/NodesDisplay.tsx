@@ -30,10 +30,10 @@ import { dist, getRoomId, setCursor } from "../utils/utils";
 interface Props {
   floorCode: string;
   nodes: Graph;
-  cursorPosRef: MutableRefObject<CursorInfo[]>;
+  cursorInfoListRef: MutableRefObject<CursorInfo[]>;
 }
 
-const NodesDisplay = ({ floorCode, nodes, cursorPosRef }: Props) => {
+const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -225,7 +225,7 @@ const NodesDisplay = ({ floorCode, nodes, cursorPosRef }: Props) => {
             onDragStart={() => dispatch(dragNode(nodeId))}
             onDragEnd={(e) => handleOnDragEnd(e, nodeId)}
             onDragMove={(e) => {
-              cursorPosRef.current.push({
+              cursorInfoListRef.current.push({
                 nodeId,
                 cursorPos: {
                   x: Number(e.currentTarget.x().toFixed(2)),

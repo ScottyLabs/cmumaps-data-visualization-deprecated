@@ -17,6 +17,8 @@ interface CursorInfoOnDragNode extends BaseCursorInfo {
 }
 
 interface CursorInfoOnDragVertex extends BaseCursorInfo {
+  roomId: ID;
+  holeIndex: number;
   vertexIndex: number;
   vertexPos: PDFCoordinate;
   cursorPos: PDFCoordinate;
@@ -39,6 +41,11 @@ const initialState: UsersState = {
   liveCursors: {},
 };
 
+interface UpdateLiveCursorPayload {
+  sender: string;
+  cursorInfoList: CursorInfo[];
+}
+
 const usersSlice = createSlice({
   name: "users",
   initialState,
@@ -46,11 +53,17 @@ const usersSlice = createSlice({
     setOtherUsers(state, action: PayloadAction<Record<string, User>>) {
       state.otherUsers = action.payload;
     },
-    updateLiveCursors(state, action) {
-      state.liveCursors[action.payload.sender] = action.payload.cursorPos;
+    updateLiveCursor(state, action: PayloadAction<UpdateLiveCursorPayload>) {
+      state.liveCursors[action.payload.sender] = action.payload.cursorInfoList;
+    },
+  },
+  selectors: {
+    selectLiveCursor(state, userId: string) {
+      return state.liveCursors[userId];
     },
   },
 });
 
-export const { setOtherUsers, updateLiveCursors } = usersSlice.actions;
+export const { selectLiveCursor } = usersSlice.selectors;
+export const { setOtherUsers, updateLiveCursor } = usersSlice.actions;
 export default usersSlice.reducer;

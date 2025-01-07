@@ -101,15 +101,15 @@ const FloorDisplay = ({
   useWebSocket(floorCode);
 
   // sync cursor position
-  const cursorPosRef = useRef<CursorInfo[]>([]);
+  const cursorInfoListRef = useRef<CursorInfo[]>([]);
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (cursorPosRef.current.length > 0) {
+      if (cursorInfoListRef.current.length > 0) {
         dispatch({
           type: WEBSOCKET_MESSAGE,
-          payload: { type: CURSOR, cursorPos: cursorPosRef.current },
+          payload: { type: CURSOR, cursorInfoList: cursorInfoListRef.current },
         });
-        cursorPosRef.current = [];
+        cursorInfoListRef.current = [];
       }
     }, 500);
 
@@ -124,7 +124,7 @@ const FloorDisplay = ({
       offset,
       scale
     );
-    cursorPosRef.current.push({ cursorPos });
+    cursorInfoListRef.current.push({ cursorPos });
   }, CURSOR_INTERVAL);
 
   const addNewNode = (newNode: Node) => {
@@ -284,7 +284,7 @@ const FloorDisplay = ({
             <NodesDisplay
               floorCode={floorCode}
               nodes={nodes}
-              cursorPosRef={cursorPosRef}
+              cursorInfoListRef={cursorInfoListRef}
             />
           )}
 

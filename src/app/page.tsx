@@ -9,11 +9,7 @@ import { toast } from "react-toastify";
 
 import MyToastContainer from "../components/shared/MyToastContainer";
 import { buildingCodeToName } from "../components/shared/buildings";
-import {
-  FULL_FLOOR,
-  INVALID_BUILDING_CODE,
-  NO_DEFAULT_FLOOR,
-} from "../components/shared/types";
+import useErrorToast from "../hooks/useErrorToast";
 import useWebSocket from "../hooks/useWebSocket";
 import { getBuildingCodes } from "../lib/apiRoutes";
 
@@ -22,6 +18,9 @@ const App: React.FC = () => {
 
   // join WebSocket
   useWebSocket(null);
+
+  // error toast
+  useErrorToast("/");
 
   // fetch building codes
   useEffect(() => {
@@ -35,32 +34,6 @@ const App: React.FC = () => {
         );
       }
     });
-  }, []);
-
-  // Toast the error message based on session storage
-  useEffect(() => {
-    // make sure on client side
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const error = sessionStorage.getItem("error");
-    switch (error) {
-      case INVALID_BUILDING_CODE:
-        toast.error("The building code is invalid!");
-        break;
-
-      case NO_DEFAULT_FLOOR:
-        toast.error("Please add a default floor for this building!");
-        break;
-
-      case FULL_FLOOR:
-        toast.error("Too many people on the floor!");
-        break;
-    }
-
-    // clear storage so it is not toasted again when refreshed
-    sessionStorage.setItem("error", "");
   }, []);
 
   const renderTopBar = () => (

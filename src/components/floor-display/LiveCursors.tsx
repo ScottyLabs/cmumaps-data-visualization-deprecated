@@ -67,7 +67,7 @@ const LiveCursor = ({ floorCode, userId, user, scale }: LiveCursorProps) => {
     }, CURSOR_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [cursorInfoList, dispatch, userId]);
+  }, [cursorInfoList, dispatch, floorCode, userId]);
 
   if (!cursorInfoList || cursorInfoList.length === 0) {
     return;

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { memo } from "react";
 import { useEffect, useState } from "react";
 import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
 import {
+  moveNodeWithCursor,
   selectCursorInfoList,
   updateCursorInfoList,
   User,
@@ -19,7 +20,7 @@ interface LiveCursorsProps {
 
 export const CURSOR_INTERVAL = 20;
 
-const LiveCursors = ({ floorCode, scale }: LiveCursorsProps) => {
+const LiveCursors = memo(({ floorCode, scale }: LiveCursorsProps) => {
   const otherUsers = useAppSelector((state) => state.users.otherUsers);
   return Object.entries(otherUsers).map(([userId, user]) => (
     <LiveCursor
@@ -30,7 +31,7 @@ const LiveCursors = ({ floorCode, scale }: LiveCursorsProps) => {
       scale={scale}
     />
   ));
-};
+});
 
 interface LiveCursorProps {
   floorCode: string;
@@ -56,11 +57,11 @@ const LiveCursor = ({ floorCode, userId, user, scale }: LiveCursorProps) => {
           })
         );
 
-        // if ("nodeId" in cursorInfoList[0]) {
-        //   dispatch(
-        //     moveNodeWithCursor({ cursorInfo: cursorInfoList[0], floorCode })
-        //   );
-        // }
+        if ("nodeId" in cursorInfoList[0]) {
+          dispatch(
+            moveNodeWithCursor({ cursorInfo: cursorInfoList[0], floorCode })
+          );
+        }
       }
     }, CURSOR_INTERVAL);
 
@@ -140,5 +141,7 @@ const CursorNameRect = ({ user, cursorPos, scale }: CursorNameRectProps) => {
     </Group>
   );
 };
+
+LiveCursors.displayName = "LiveCursors";
 
 export default LiveCursors;

@@ -107,14 +107,13 @@ const FloorDisplay = ({
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (cursorInfoListRef.current.length > 0) {
-        console.log(cursorInfoListRef.current);
         dispatch({
           type: WEBSOCKET_MESSAGE,
           payload: { type: CURSOR, cursorInfoList: cursorInfoListRef.current },
         });
         cursorInfoListRef.current = [];
       }
-    }, 5000);
+    }, 500);
 
     return () => {
       clearInterval(intervalId);

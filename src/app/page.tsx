@@ -16,13 +16,8 @@ import {
 } from "../components/shared/types";
 import useWebSocket from "../hooks/useWebSocket";
 import { getBuildingCodes } from "../lib/apiRoutes";
-import { setError } from "../lib/features/statusSlice";
-import { useAppDispatch, useAppSelector } from "../lib/hooks";
 
 const App: React.FC = () => {
-  const error = useAppSelector((state) => state.status.error);
-  const dispatch = useAppDispatch();
-
   const [buildingCodes, setBuildingCodes] = useState<string[]>([]);
 
   // join WebSocket
@@ -49,9 +44,7 @@ const App: React.FC = () => {
       return;
     }
 
-    console.log(error);
-
-    // const error = sessionStorage.getItem("error");
+    const error = sessionStorage.getItem("error");
     switch (error) {
       case INVALID_BUILDING_CODE:
         toast.error("The building code is invalid!");
@@ -67,8 +60,7 @@ const App: React.FC = () => {
     }
 
     // clear storage so it is not toasted again when refreshed
-    // sessionStorage.setItem("error", "");
-    dispatch(setError(""));
+    sessionStorage.setItem("error", "");
   }, []);
 
   const renderTopBar = () => (

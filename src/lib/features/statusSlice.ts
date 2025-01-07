@@ -9,14 +9,12 @@ interface StatusState {
   loadingStatus: LoadingStatus;
   loadingText: string;
   shortcutsDisabled: boolean;
-  error: string;
 }
 
 const initialState: StatusState = {
   loadingStatus: "Loading",
   loadingText: "",
   shortcutsDisabled: false,
-  error: "",
 };
 
 const statusSlice = createSlice({
@@ -39,10 +37,6 @@ const statusSlice = createSlice({
     setShortcutsDisabled(state, action: PayloadAction<boolean>) {
       state.shortcutsDisabled = action.payload;
     },
-
-    setError(state, action) {
-      state.error = action.payload;
-    },
   },
 });
 
@@ -51,6 +45,5 @@ export const {
   finishLoading,
   failedLoading,
   setShortcutsDisabled,
-  setError,
 } = statusSlice.actions;
 export default statusSlice.reducer;

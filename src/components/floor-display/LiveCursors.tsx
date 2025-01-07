@@ -4,8 +4,8 @@ import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
 import {
-  selectLiveCursor,
-  updateLiveCursor,
+  selectCursorInfoList,
+  updateCursorInfoList,
   User,
 } from "../../lib/features/usersSlice";
 import { useAppSelector } from "../../lib/hooks";
@@ -35,7 +35,7 @@ interface LiveCursorProps {
 const LiveCursor = ({ userId, user, scale }: LiveCursorProps) => {
   const dispatch = useAppDispatch();
   const cursorInfoList = useAppSelector((state) =>
-    selectLiveCursor(state, userId)
+    selectCursorInfoList(state, userId)
   );
 
   // keep popping off the first element of cursor info list
@@ -43,7 +43,7 @@ const LiveCursor = ({ userId, user, scale }: LiveCursorProps) => {
     const intervalId = setInterval(() => {
       if (cursorInfoList && cursorInfoList.length > 1) {
         dispatch(
-          updateLiveCursor({
+          updateCursorInfoList({
             sender: userId,
             cursorInfoList: cursorInfoList.slice(1),
           })

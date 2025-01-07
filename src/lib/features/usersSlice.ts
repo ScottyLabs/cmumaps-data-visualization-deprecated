@@ -41,7 +41,7 @@ const initialState: UsersState = {
   liveCursors: {},
 };
 
-interface UpdateLiveCursorPayload {
+interface UpdatePayload {
   sender: string;
   cursorInfoList: CursorInfo[];
 }
@@ -53,17 +53,17 @@ const usersSlice = createSlice({
     setOtherUsers(state, action: PayloadAction<Record<string, User>>) {
       state.otherUsers = action.payload;
     },
-    updateLiveCursor(state, action: PayloadAction<UpdateLiveCursorPayload>) {
+    updateCursorInfoList(state, action: PayloadAction<UpdatePayload>) {
       state.liveCursors[action.payload.sender] = action.payload.cursorInfoList;
     },
   },
   selectors: {
-    selectLiveCursor(state, userId: string) {
+    selectCursorInfoList(state, userId: string) {
       return state.liveCursors[userId];
     },
   },
 });
 
-export const { selectLiveCursor } = usersSlice.selectors;
-export const { setOtherUsers, updateLiveCursor } = usersSlice.actions;
+export const { selectCursorInfoList } = usersSlice.selectors;
+export const { setOtherUsers, updateCursorInfoList } = usersSlice.actions;
 export default usersSlice.reducer;

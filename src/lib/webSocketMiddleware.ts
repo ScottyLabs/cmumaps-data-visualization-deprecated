@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
-import { setOtherUsers, updateLiveCursor } from "./features/usersSlice";
+import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 
 export const WEBSOCKET_JOIN = "socket/join";
@@ -87,7 +87,7 @@ const handleWebSocketJoin = (
 
       // update cursor
       case CURSOR:
-        dispatch(updateLiveCursor(message));
+        dispatch(updateCursorInfoList(message));
         break;
 
       // for now just set other users

@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 import buildings from "../../../public/cmumaps-data/buildings.json";
 import FloorSwitcher from "../../components/layouts/FloorSwitcher";
+import HelpInfo from "../../components/layouts/HelpInfo";
 import LoadingText from "../../components/layouts/LoadingText";
 import MainDisplay from "../../components/layouts/MainDisplay";
 import ModeDisplay from "../../components/layouts/ModeDisplay";
@@ -20,7 +21,6 @@ import {
   INVALID_FLOOR_LEVEL,
   NO_DEFAULT_FLOOR,
 } from "../../components/shared/types";
-import HelpInfo from "../../components/zoom-pan/HelpInfo";
 import useClerkToken from "../../hooks/useClerkToken";
 import { useGetUserCountQuery } from "../../lib/features/apiSlice";
 import { setFloorLevels } from "../../lib/features/floorSlice";

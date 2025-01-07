@@ -96,9 +96,10 @@ const FloorDisplay = ({
   useWebSocket(floorCode);
 
   // store mouse positions
-  const handleMouseMove = throttle((e) => {
-    const cursorPos = getCursorPos(e, offset, scale);
-    cursorInfoListRef.current.push({ cursorPos });
+  const handleMouseMove = throttle((e: Konva.KonvaEventObject<MouseEvent>) => {
+    getCursorPos(e, offset, scale, (cursorPos) => {
+      cursorInfoListRef.current.push({ cursorPos });
+    });
   }, CURSOR_INTERVAL);
 
   // sync cursor position
@@ -106,6 +107,7 @@ const FloorDisplay = ({
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (cursorInfoListRef.current.length > 0) {
+        console.log(cursorInfoListRef.current);
         dispatch({
           type: WEBSOCKET_MESSAGE,
           payload: { type: CURSOR, cursorInfoList: cursorInfoListRef.current },
@@ -165,56 +167,62 @@ const FloorDisplay = ({
     }
 
     if (mode == ADD_NODE) {
-      const pos = getCursorPos(e, offset, scale);
-      const newNode: Node = {
-        pos: pos,
-        neighbors: {},
-        roomId: findRoomId(rooms, pos),
-      };
-      addNewNode(newNode);
-      dispatch(setMode(GRAPH_SELECT));
+      getCursorPos(e, offset, scale, (pos) => {
+        const newNode: Node = {
+          pos: pos,
+          neighbors: {},
+          roomId: findRoomId(rooms, pos),
+        };
+        addNewNode(newNode);
+        dispatch(setMode(GRAPH_SELECT));
+      });
     } else if (mode == POLYGON_ADD_VERTEX) {
-      const pos = getCursorPos(e, offset, scale);
-      const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
+      getCursorPos(e, offset, scale, (pos) => {
+        const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
 
-      const polygon = rooms[roomIdSelected].polygon;
+        const polygon = rooms[roomIdSelected].polygon;
 
-      const coords = polygon.coordinates[coordsIndex];
+        const coords = polygon.coordinates[coordsIndex];
 
-      const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
+        const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
 
-      if (coords.length == 0) {
-        // first and last coordinate need to be the same
-        newPolygon.coordinates[coordsIndex].push(newVertex);
-        newPolygon.coordinates[coordsIndex].push(newVertex);
-      } else {
-        let minDist = distPointToLine(newVertex, coords[0], coords[1]);
-        let indexToInsert = 0;
-        for (let i = 0; i < coords.length - 1; i++) {
-          const curDist = distPointToLine(newVertex, coords[i], coords[i + 1]);
-          if (curDist < minDist) {
-            indexToInsert = i;
-            minDist = curDist;
+        if (coords.length == 0) {
+          // first and last coordinate need to be the same
+          newPolygon.coordinates[coordsIndex].push(newVertex);
+          newPolygon.coordinates[coordsIndex].push(newVertex);
+        } else {
+          let minDist = distPointToLine(newVertex, coords[0], coords[1]);
+          let indexToInsert = 0;
+          for (let i = 0; i < coords.length - 1; i++) {
+            const curDist = distPointToLine(
+              newVertex,
+              coords[i],
+              coords[i + 1]
+            );
+            if (curDist < minDist) {
+              indexToInsert = i;
+              minDist = curDist;
+            }
           }
+
+          newPolygon.coordinates[coordsIndex].splice(
+            indexToInsert + 1,
+            0,
+            newVertex
+          );
         }
 
-        newPolygon.coordinates[coordsIndex].splice(
-          indexToInsert + 1,
-          0,
-          newVertex
+        saveToPolygonHistory(
+          history,
+          setHistory,
+          historyIndex,
+          setHistoryIndex,
+          newPolygon
         );
-      }
+        saveToRooms(floorCode, roomIdSelected, rooms, setRooms, newPolygon);
 
-      saveToPolygonHistory(
-        history,
-        setHistory,
-        historyIndex,
-        setHistoryIndex,
-        newPolygon
-      );
-      saveToRooms(floorCode, roomIdSelected, rooms, setRooms, newPolygon);
-
-      dispatch(setMode(POLYGON_SELECT));
+        dispatch(setMode(POLYGON_SELECT));
+      });
     }
     // click to unselect a room or exit polygon editing or room label editing
     else if (e.target === e.target.getStage()) {

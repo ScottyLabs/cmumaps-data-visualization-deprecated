@@ -9,7 +9,7 @@
     "start": "next start",
     "server": "node server/index.js",
     "lint": "next lint",
-    "type-check": "npx --package typescript tsc",
+    "tsc": "npx --package typescript tsc",
     "prettier": "prettier --write */**/*.{js,jsx,json,ts,tsx,scss,css,md}",
     "vercel-install": "python3 -m pip install -r requirements.txt && ./init_submodule.sh && npx prisma generate && next build"
   },

@@ -14,8 +14,8 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { ID } from "../shared/types";
+import { setCursor } from "../utils/canvasUtils";
 import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
-import { setCursor } from "../utils/utils";
 
 interface Props {
   floorCode: string;

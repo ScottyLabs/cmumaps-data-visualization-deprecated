@@ -4,19 +4,17 @@ import { GiArrowCursor } from "react-icons/gi";
 import { Group, Path, Rect, Text } from "react-konva";
 
 import {
-  moveNodeWithCursor,
   selectCursorInfoList,
   updateCursorInfoList,
   User,
 } from "../../lib/features/usersSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { useAppDispatch } from "../../lib/hooks";
-import { Graph, PDFCoordinate } from "../shared/types";
+import { PDFCoordinate } from "../shared/types";
 
 interface LiveCursorsProps {
   floorCode: string;
   scale: number;
-  nodes: Graph;
 }
 
 export const CURSOR_INTERVAL = 20;
@@ -58,11 +56,11 @@ const LiveCursor = ({ floorCode, userId, user, scale }: LiveCursorProps) => {
           })
         );
 
-        if ("nodeId" in cursorInfoList[0]) {
-          dispatch(
-            moveNodeWithCursor({ cursorInfo: cursorInfoList[0], floorCode })
-          );
-        }
+        // if ("nodeId" in cursorInfoList[0]) {
+        //   dispatch(
+        //     moveNodeWithCursor({ cursorInfo: cursorInfoList[0], floorCode })
+        //   );
+        // }
       }
     }, CURSOR_INTERVAL);
 

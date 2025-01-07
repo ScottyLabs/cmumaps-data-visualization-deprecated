@@ -24,18 +24,27 @@ import { CursorInfo } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
+import { getCursorPos, setCursor } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
-import { dist, getRoomId, setCursor } from "../utils/utils";
+import { dist, getRoomId } from "../utils/utils";
 import { CURSOR_INTERVAL } from "./LiveCursors";
 
 interface Props {
   floorCode: string;
   nodes: Graph;
   cursorInfoListRef: MutableRefObject<CursorInfo[]>;
+  offset;
+  scale;
 }
 
-const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
+const NodesDisplay = ({
+  floorCode,
+  nodes,
+  cursorInfoListRef,
+  offset,
+  scale,
+}: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -216,15 +225,15 @@ const NodesDisplay = ({ floorCode, nodes, cursorInfoListRef }: Props) => {
 
     cursorInfoListRef.current.push({
       nodeId: nodeIdOnDrag,
-      cursorPos: {
-        x: Number(e.currentTarget.x().toFixed(2)),
-        y: Number(e.currentTarget.y().toFixed(2)),
-      },
+      cursorPos: getCursorPos(e, offset, scale),
       nodePos: {
         x: Number(e.target.x().toFixed(2)),
         y: Number(e.target.y().toFixed(2)),
       },
     });
+
+    console.log(e);
+    console.log(cursorInfoListRef.current);
   }, CURSOR_INTERVAL);
 
   return Object.entries(nodes).map(

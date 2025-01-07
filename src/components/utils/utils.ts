@@ -111,14 +111,6 @@ export const getRoomIdFromRoomInfo = (
 };
 
 // others
-export const setCursor = (e, cursor) => {
-  const curStage = e.target.getStage();
-  if (curStage != null) {
-    const container = curStage.container();
-    container.style.cursor = cursor;
-  }
-};
-
 export const addDoorsToGraph = async (floorCode, doorInfos, type, dispatch) => {
   const response = await fetch("/api/addDoorToGraph", {
     method: "POST",

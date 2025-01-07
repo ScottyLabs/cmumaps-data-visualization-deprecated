@@ -9,7 +9,8 @@ import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { Graph, RoomInfo } from "../shared/types";
-import { getRoomId, setCursor } from "../utils/utils";
+import { setCursor } from "../utils/canvasUtils";
+import { getRoomId } from "../utils/utils";
 
 interface Props {
   floorCode: string;

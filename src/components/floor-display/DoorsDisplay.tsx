@@ -13,7 +13,8 @@ import {
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { DoorInfo, Graph, ID } from "../shared/types";
-import { addDoorsToGraph, setCursor } from "../utils/utils";
+import { setCursor } from "../utils/canvasUtils";
+import { addDoorsToGraph } from "../utils/utils";
 
 interface Props {
   floorCode: string;

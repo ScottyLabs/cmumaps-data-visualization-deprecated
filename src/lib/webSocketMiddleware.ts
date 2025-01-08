@@ -65,11 +65,14 @@ const handleGraphPatch = async (
     const locked = !!getStore().lock.nodeLocks[nodeId];
 
     // update timestamp
-    apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-      if (message.updatedAt > draft[nodeId].updatedAt) {
-        draft[nodeId].updatedAt = message.updatedAt;
-      }
-    });
+    dispatch(
+      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+        console.log(message.updatedAt);
+        if (message.updatedAt > draft[nodeId].updatedAt) {
+          draft[nodeId].updatedAt = message.updatedAt;
+        }
+      })
+    );
 
     // toast a warning about overwriting change if lock
     if (locked) {
@@ -78,10 +81,10 @@ const handleGraphPatch = async (
       return;
     }
 
-    // apply change if patch not outdated
+    // apply change if patch not outdated (meaning I just updated the timestamp)
     // otherwise toast a warning about overwriting change
     const nodes = await getGraph(floorCode, getStore, dispatch);
-    if (nodes[nodeId].updatedAt < message.updatedAt) {
+    if (nodes[nodeId].updatedAt === message.updatedAt) {
       dispatch(
         apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
       );

@@ -106,15 +106,6 @@ export const apiSlice = createApi({
           };
           dispatch(addPatchesToHistory(patch));
 
-          const store = getState() as RootState;
-          // if (store.visibility.showEdges) {
-          //   console.log("Waited for 5 seconds");
-          //   await new Promise((resolve) => setTimeout(resolve, 5000));
-          // } else {
-          //   console.log("Waited for 1 seconds");
-          //   await new Promise((resolve) => setTimeout(resolve, 1000));
-          // }
-
           // different error handling for queryFulfilled
           let updatedAt: string;
           try {
@@ -133,13 +124,19 @@ export const apiSlice = createApi({
             return;
           }
 
+          const store = getState() as RootState;
+          if (store.visibility.showEdges) {
+            console.log("Waited for 5 seconds");
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+          }
+
           // unlock the node after update
           dispatch(unlock(nodeId));
 
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
-          const nodes = getGraph(floorCode, getState, dispatch);
-          if (nodes[nodeId]?.updateAt > updatedAt) {
+          const nodes = await getGraph(floorCode, getState, dispatch);
+          if (nodes[nodeId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Graph"]));
             toast.info("Refetching the graph...");

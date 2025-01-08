@@ -12,7 +12,7 @@ import {
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
-import { lock } from "./lockSlice";
+import { lock, setOverwrite } from "./lockSlice";
 
 interface MoveNodeArgType {
   floorCode: string;
@@ -118,43 +118,60 @@ export const apiSlice = createApi({
           }
 
           const store = getState() as RootState;
-          const overwrites = store.lock.overwritesMap[nodeId].sort((a, b) =>
-            a.updatedAt.localeCompare(b.updatedAt)
-          );
+          let overwrites = store.lock.overwritesMap[nodeId];
 
-          // if there are other changes by myself that needs to be applied,
-          // then apply only patches with lower timestamps, otherwise apply all
-          let overwritesToApply: Overwrite[] = overwrites;
-          let leftoverOverwrites: Overwrite[] = [];
-          if (store.lock.nodeLocks[nodeId].locked !== 1) {
-            overwritesToApply = overwrites.filter(
-              (overwrite) => overwrite.updatedAt < updatedAt
+          const applyOverwrites = () => {
+            const store = getState() as RootState;
+            overwrites = overwrites.sort((a, b) =>
+              a.updatedAt.localeCompare(b.updatedAt)
             );
-            leftoverOverwrites = overwrites.filter(
-              (overwrite) => overwrite.updatedAt > updatedAt
-            );
-          }
 
-          console.log(overwrites);
-          console.log(overwritesToApply);
-
-          // apply all the patchesToApply
-          for (const overwrite of overwritesToApply) {
-            // check if you overwrite the node without knowing someone's change
-            if (overwrite.updatedAt < updatedAt) {
-              const name = getUserName(overwrite.senderId, getState);
-              toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
-                autoClose: false,
-              });
+            // if there are other changes by myself that needs to be applied,
+            // then apply only patches with lower timestamps, otherwise apply all
+            let overwritesToApply: Overwrite[] = overwrites;
+            let leftoverOverwrites: Overwrite[] = [];
+            if (store.lock.nodeLocks[nodeId].locked !== 1) {
+              overwritesToApply = overwrites.filter(
+                (overwrite) => overwrite.updatedAt < updatedAt
+              );
+              leftoverOverwrites = overwrites.filter(
+                (overwrite) => overwrite.updatedAt > updatedAt
+              );
             }
 
+            console.log(overwrites);
+            console.log(overwritesToApply);
+
+            // apply all the patchesToApply
+            for (const overwrite of overwritesToApply) {
+              // check if you overwrite the node without knowing someone's change
+              if (overwrite.updatedAt < updatedAt) {
+                const name = getUserName(overwrite.senderId, getState);
+                toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
+                  autoClose: false,
+                });
+              }
+
+              dispatch(
+                apiSlice.util.patchQueryData(
+                  "getGraph",
+                  floorCode,
+                  overwrite.patch
+                )
+              );
+            }
+
+            // set leftover overwrites
             dispatch(
-              apiSlice.util.patchQueryData(
-                "getGraph",
-                floorCode,
-                overwrite.patch
-              )
+              setOverwrite({
+                nodeId,
+                overwrites: leftoverOverwrites,
+              })
             );
+          };
+
+          if (overwrites) {
+            applyOverwrites();
           }
 
           // create db patches

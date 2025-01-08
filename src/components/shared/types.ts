@@ -64,27 +64,23 @@ export interface Node {
   roomId: ID;
 
   /**
-   * most recent timestamp that the node was updated
-   */
-  updatedAt: Date;
-
-  /**
    * 0 if unlocked, otherwise locked.
    * The user can write to a node whenver they want.
-   * `locked` is used to indicate an overwritten when a WebSocket patch comes
-   * when the node is locked since the user unknowingly edited the node.
+   * `locked` is used to indicate that a WebSocket patch is an overwritten
+   * since the user edited the node without knowing the patch.
    */
   locked: number;
 
   /**
-   * All the messages that are overwritten
+   * All the messages that are overwritten by the user.
    */
   overwrites: Overwrite[];
 }
 
 export interface Overwrite {
   patch: Patch[];
-  updatedAt: Date;
+  // a date as a string value in ISO format.
+  updatedAt: string;
   senderId: string;
 }
 

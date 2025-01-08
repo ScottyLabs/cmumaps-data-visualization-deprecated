@@ -11,7 +11,7 @@ const initialState: UIState = {
   infoDisplayActiveTabIndex: 0,
   showRoomSpecific: false,
   editRoomLabel: false,
-  nodeSize: 2,
+  nodeSize: 5,
 };
 
 const UISlice = createSlice({

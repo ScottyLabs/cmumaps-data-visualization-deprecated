@@ -18,7 +18,9 @@ interface GetFileArgType {
   token: string;
 }
 
-const getGraph = async (floorCode, getState, dispatch) => {
+let slow: boolean | null = null;
+
+export const getGraph = async (floorCode, getState, dispatch) => {
   let nodes = apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
 
   if (!nodes) {
@@ -55,27 +57,39 @@ export const apiSlice = createApi({
       transformResponse: (response: { data: Graph }) => response.data,
       providesTags: ["Graph"],
     }),
-    moveNode: builder.mutation<Date, MoveNodeArgType>({
+    moveNode: builder.mutation<string, MoveNodeArgType>({
       query: ({ nodeId, node }) => ({
         url: "/api/node/update",
         method: "POST",
         body: { nodeId, node },
       }),
-      transformResponse: (response: { updatedAt: Date }) => response.updatedAt,
+      transformResponse: (response: { updatedAt: string }) =>
+        response.updatedAt,
       async onQueryStarted(
         { floorCode, nodeId, node },
         { dispatch, getState, queryFulfilled }
       ) {
         try {
           // optimistic update
-          dispatch(
-            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-              draft[nodeId] = { ...node, locked: node.locked + 1 };
-            })
-          );
+          const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
+            dispatch(
+              apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+                draft[nodeId] = { ...node, locked: node.locked + 1 };
+              })
+            );
+
+          if (slow === null) {
+            slow = Math.random() > 0.5;
+            console.log(slow);
+          }
+
+          if (slow) {
+            console.log("Waited for 5 seconds");
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+          }
 
           // different error handling for queryFulfilled
-          let updatedAt: Date;
+          let updatedAt: string;
           try {
             const res = await queryFulfilled;
             updatedAt = res.data;
@@ -92,17 +106,10 @@ export const apiSlice = createApi({
             return;
           }
 
-          // if (Math.random() > 0.5) {
-          //   console.log("Waited for 2 seconds");
-          //   await new Promise((resolve) => setTimeout(resolve, 2000));
-          //   console.log(nodes[nodeId].updatedAt);
-          //   console.log(updatedAt);
-          // }
-
           // get nodes to create reversedDbPatch
           const nodes: Graph = await getGraph(floorCode, getState, dispatch);
-          const overwrites = nodes[nodeId].overwrites.sort(
-            (a, b) => a.updatedAt.getTime() - b.updatedAt.getTime()
+          const overwrites = nodes[nodeId].overwrites.sort((a, b) =>
+            a.updatedAt.localeCompare(b.updatedAt)
           );
 
           // if there are other changes by myself that needs to be applied,
@@ -117,6 +124,9 @@ export const apiSlice = createApi({
               (overwrite) => overwrite.updatedAt > updatedAt
             );
           }
+
+          console.log(overwrites);
+          console.log(overwritesToApply);
 
           // apply all the patchesToApply
           for (const overwrite of overwritesToApply) {
@@ -138,20 +148,14 @@ export const apiSlice = createApi({
           }
 
           // apply the change again with the updatedAt
-          const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
-            dispatch(
-              apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                const locked = draft[nodeId].locked - 1;
-                const overwrites = leftoverOverwrites;
-                const updatedNode: Node = {
-                  ...node,
-                  updatedAt,
-                  locked,
-                  overwrites,
-                };
-                draft[nodeId] = updatedNode;
-              })
-            );
+          dispatch(
+            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+              const locked = draft[nodeId].locked - 1;
+              const overwrites = leftoverOverwrites;
+              const updatedNode: Node = { ...node, locked, overwrites };
+              draft[nodeId] = updatedNode;
+            })
+          );
 
           // create db patches
           const apiPath = "/api/node/update";
@@ -170,7 +174,7 @@ export const apiSlice = createApi({
           dispatch(addPatchesToHistory(patch));
           dispatch({
             type: WEBSOCKET_MESSAGE,
-            payload: { type: GRAPH_PATCH, patch: jsonPatch },
+            payload: { type: GRAPH_PATCH, patch: jsonPatch, nodeId, updatedAt },
           });
         } catch (e) {
           toast.error("Check the Console for detailed error.");

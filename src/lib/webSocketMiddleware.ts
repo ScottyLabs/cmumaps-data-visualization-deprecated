@@ -3,7 +3,7 @@ import { Action, Middleware } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice } from "./features/apiSlice";
+import { apiSlice, getGraph } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
@@ -32,6 +32,39 @@ interface WebSocketMessageAction {
 }
 
 let socket: WebSocket | null = null;
+
+// patch the graph if not locked, otherwise add to overwrites
+const handleGraphPatch = async (message, floorCode, getStore, dispatch) => {
+  try {
+    const nodes = await getGraph(floorCode, getStore, dispatch);
+    if (!nodes[message.nodeId].locked) {
+      dispatch(
+        apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+      );
+      return;
+    }
+
+    console.log({
+      senderId: message.sender,
+      patch: message.patch,
+      updatedAt: message.updatedAt,
+    });
+    dispatch(
+      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+        {
+          draft[message.nodeId].overwrites.push({
+            senderId: message.sender,
+            patch: message.patch,
+            updatedAt: message.updatedAt,
+          });
+        }
+      })
+    );
+  } catch (e) {
+    toast.error("Error handling graph patch!");
+    console.error(e);
+  }
+};
 
 const handleWebSocketJoin = (
   action: WebSocketConnectAction,
@@ -68,11 +101,8 @@ const handleWebSocketJoin = (
     }
 
     switch (message.type) {
-      // patch the graph
       case GRAPH_PATCH:
-        dispatch(
-          apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
-        );
+        handleGraphPatch(message, floorCode, getStore, dispatch);
         break;
 
       // refresh user count in both floors when leaving a floor

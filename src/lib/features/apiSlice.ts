@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { toast } from "react-toastify";
 
-import { Graph, Node, Overwrite } from "../../components/shared/types";
+import { Graph, Node } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
 import { RootState } from "../store";
 import {
@@ -12,7 +12,7 @@ import {
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
-import { lock, setOverwrite, unlock } from "./lockSlice";
+import { clearOverwrite, lock, unlock } from "./lockSlice";
 
 interface MoveNodeArgType {
   floorCode: string;
@@ -139,68 +139,46 @@ export const apiSlice = createApi({
             toast.info("Refetching the graph...");
             return;
           }
-          console.log("queried!");
 
           // unlock the node after update
           dispatch(unlock(nodeId));
 
-          // apply overwrites
+          // apply overwrites in chronological order
           const store = getState() as RootState;
-          let overwrites = store.lock.overwritesMap[nodeId];
+          const overwrites = store.lock.overwritesMap[nodeId] ?? [];
+          const maxTimestamp = overwrites.length
+            ? overwrites.reduce((max, overwrite) => {
+                return max > overwrite.updatedAt ? max : overwrite.updatedAt;
+              }, overwrites[0]?.updatedAt)
+            : null;
 
-          const applyOverwrites = () => {
-            const store = getState() as RootState;
-            overwrites = overwrites.sort((a, b) =>
-              a.updatedAt.localeCompare(b.updatedAt)
-            );
-
-            // if there are other changes by myself that needs to be applied,
-            // then apply only patches with lower timestamps, otherwise apply all
-            let overwritesToApply: Overwrite[] = overwrites;
-            let leftoverOverwrites: Overwrite[] = [];
-            if (store.lock.nodeLocks[nodeId].locked !== 1) {
-              overwritesToApply = overwrites.filter(
-                (overwrite) => overwrite.updatedAt < updatedAt
-              );
-              leftoverOverwrites = overwrites.filter(
-                (overwrite) => overwrite.updatedAt > updatedAt
-              );
-            }
-
-            console.log(overwrites);
-            console.log(overwritesToApply);
-
-            // apply all the patchesToApply
-            for (const overwrite of overwritesToApply) {
-              // check if you overwrite the node without knowing someone's change
-              if (overwrite.updatedAt < updatedAt) {
-                const name = getUserName(overwrite.senderId, getState);
-                toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
-                  autoClose: false,
-                });
-              }
-
-              dispatch(
-                apiSlice.util.patchQueryData(
-                  "getGraph",
-                  floorCode,
-                  overwrite.patch
-                )
-              );
-            }
-
-            // set leftover overwrites
-            dispatch(
-              setOverwrite({
-                nodeId,
-                overwrites: leftoverOverwrites,
-              })
-            );
-          };
-
-          if (overwrites) {
-            applyOverwrites();
+          // very rare case that an overwrite has a later update timestamp,
+          // but this does mean that I shouldn't overwrite all changes.
+          if (maxTimestamp && maxTimestamp > updatedAt) {
+            toast.error("Very rare concurrency issue!");
+            dispatch(apiSlice.util.invalidateTags(["Graph"]));
+            toast.info("Refetching the graph...");
+            return;
           }
+
+          // toast warnings about overwriting someone's change
+          for (const overwrite of overwrites) {
+            // const name = overwrite.name;
+            const name = getUserName(overwrite.senderId, overwrite);
+            toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
+              autoClose: false,
+            });
+          }
+
+          // clear overwrites
+          dispatch(clearOverwrite(nodeId));
+
+          // reapply your change and update timestamp
+          dispatch(
+            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+              draft[nodeId] = { ...newNode, updatedAt };
+            })
+          );
 
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {

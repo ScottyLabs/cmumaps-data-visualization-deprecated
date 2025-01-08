@@ -17,11 +17,6 @@ interface PushOverwriteAction {
   overwrite: Overwrite;
 }
 
-interface SetOverwriteAction {
-  nodeId: string;
-  overwrites: Overwrite[];
-}
-
 const lockSlice = createSlice({
   name: "lock",
   initialState,
@@ -36,9 +31,8 @@ const lockSlice = createSlice({
       state.nodeLocks[action.payload].locked--;
     },
 
-    setOverwrite(state, action: PayloadAction<SetOverwriteAction>) {
-      const nodeId = action.payload.nodeId;
-      state.overwritesMap[nodeId] = action.payload.overwrites;
+    clearOverwrite(state, action: PayloadAction<ID>) {
+      state.overwritesMap[action.payload] = [];
     },
     pushOverwrite(state, action: PayloadAction<PushOverwriteAction>) {
       const nodeId = action.payload.nodeId;
@@ -48,5 +42,6 @@ const lockSlice = createSlice({
   },
 });
 
-export const { lock, unlock, setOverwrite, pushOverwrite } = lockSlice.actions;
+export const { lock, unlock, clearOverwrite, pushOverwrite } =
+  lockSlice.actions;
 export default lockSlice.reducer;

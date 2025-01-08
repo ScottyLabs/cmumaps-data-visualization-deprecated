@@ -10,6 +10,7 @@ import {
   FULL_FLOOR,
   INVALID_BUILDING_CODE,
   INVALID_FLOOR_LEVEL,
+  INVALID_NODE_ID,
   NO_DEFAULT_FLOOR,
   UNAUTHORIZED,
   UNKNOWN,
@@ -41,6 +42,10 @@ const useErrorToast = (baseUrl: string) => {
 
       case INVALID_FLOOR_LEVEL:
         toast.error("The floor level is invalid!");
+        break;
+
+      case INVALID_NODE_ID:
+        toast.error("The node id is invalid!");
         break;
 
       case UNAUTHORIZED:

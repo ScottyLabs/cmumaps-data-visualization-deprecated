@@ -1,11 +1,12 @@
 import { Polygon } from "geojson";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
+import { INVALID_NODE_ID } from "../../hooks/errorCodes";
 import useKeyboardShortcuts from "../../hooks/useKeyboardShortcuts";
 import { savingHelper } from "../../lib/apiRoutes";
 import { useGetNodesQuery } from "../../lib/features/apiSlice";
@@ -39,6 +40,7 @@ interface Props {
 }
 
 const MainDisplay = ({ floorCode }: Props) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
   const { data: nodes, isFetching } = useGetNodesQuery(floorCode);
@@ -198,7 +200,11 @@ const MainDisplay = ({ floorCode }: Props) => {
     const doorId = searchParams.get("doorId");
 
     if (nodeId) {
-      dispatch(selectNode(nodeId));
+      if (nodes[nodeId]) {
+        dispatch(selectNode(nodeId));
+      } else {
+        router.push(`?error=${INVALID_NODE_ID}`);
+      }
     } else if (doorId) {
       dispatch(selectDoor(doorId));
     } else {

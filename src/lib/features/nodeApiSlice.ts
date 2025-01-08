@@ -21,7 +21,7 @@ export interface MoveNodeArgType {
   addToHistory?: boolean;
 }
 
-const extendedApi = apiSlice.injectEndpoints({
+export const nodeApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     moveNode: builder.mutation<string, MoveNodeArgType>({
       query: ({ nodeId, newNode }) => ({
@@ -140,4 +140,4 @@ const extendedApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useMoveNodeMutation } = extendedApi;
+export const { useMoveNodeMutation } = nodeApiSlice;

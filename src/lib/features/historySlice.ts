@@ -4,8 +4,7 @@ import { toast } from "react-toastify";
 
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
-import { apiSlice } from "./apiSlice";
-import { MoveNodeArgType } from "./nodeApiSlice";
+import { MoveNodeArgType, nodeApiSlice } from "./nodeApiSlice";
 
 const MAX_UNDO_LIMIT = 50;
 
@@ -36,7 +35,7 @@ const initialState: HistoryState = {
 const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
   switch (edit.endpoint) {
     case "moveNode":
-      dispatch(apiSlice.endpoints.moveNode.initiate(edit.arg)).unwrap();
+      dispatch(nodeApiSlice.endpoints.moveNode.initiate(edit.arg)).unwrap();
       break;
   }
 };

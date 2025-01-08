@@ -50,7 +50,15 @@ export const apiSlice = createApi({
       transformResponse: (response: { data: Nodes }) => response.data,
       providesTags: ["Nodes"],
     }),
+    invalidateNodesCache: builder.mutation<void, void>({
+      queryFn: () => ({ data: undefined }),
+      invalidatesTags: ["Nodes"],
+    }),
   }),
 });
 
-export const { useGetFileQuery, useGetNodesQuery } = apiSlice;
+export const {
+  useGetFileQuery,
+  useGetNodesQuery,
+  useInvalidateNodesCacheMutation,
+} = apiSlice;

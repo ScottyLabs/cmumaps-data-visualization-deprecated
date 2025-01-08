@@ -56,6 +56,7 @@ const HelpInfo = () => {
       <div>
         <h1 className="font-bold">General</h1>
         <p>Press 'q' to return to Graph Select mode.</p>
+        <p>Press 'r' to refetch data.</p>
       </div>
     </div>
   );

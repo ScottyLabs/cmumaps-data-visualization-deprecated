@@ -7,7 +7,10 @@ import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
 import { savingHelper } from "../../lib/apiRoutes";
-import { useGetNodesQuery } from "../../lib/features/apiSlice";
+import {
+  useGetNodesQuery,
+  useInvalidateNodesCacheMutation,
+} from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import { redo, undo } from "../../lib/features/historySlice";
 import {
@@ -62,6 +65,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
 
   const { data: nodes, isFetching } = useGetNodesQuery(floorCode);
+  const [invalidateNodesCache] = useInvalidateNodesCacheMutation();
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeIdSelected = useAppSelector((state) =>
@@ -195,6 +199,11 @@ const MainDisplay = ({ floorCode }: Props) => {
       // quit
       else if (event.key === "q") {
         dispatch(setMode(GRAPH_SELECT));
+      }
+
+      // refetch graph
+      else if (event.key === "r") {
+        invalidateNodesCache();
       }
 
       // disable graph shortcuts in edit polygon mode

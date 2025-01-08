@@ -17,7 +17,8 @@ import { lock, setOverwrite } from "./lockSlice";
 interface MoveNodeArgType {
   floorCode: string;
   nodeId: string;
-  node: Node;
+  newNode: Node;
+  oldNode: Node;
 }
 
 interface GetFileArgType {
@@ -65,26 +66,33 @@ export const apiSlice = createApi({
       providesTags: ["Graph"],
     }),
     moveNode: builder.mutation<string, MoveNodeArgType>({
-      query: ({ nodeId, node }) => ({
+      query: ({ nodeId, newNode }) => ({
         url: "/api/node/update",
         method: "POST",
-        body: { nodeId, node },
+        body: { nodeId, node: newNode },
       }),
       transformResponse: (response: { updatedAt: string }) =>
         response.updatedAt,
       async onQueryStarted(
-        { floorCode, nodeId, node },
+        { floorCode, nodeId, oldNode, newNode },
         { dispatch, getState, queryFulfilled }
       ) {
         try {
           // lock the node to update
           dispatch(lock(nodeId));
 
+          // first reset to old pos
+          dispatch(
+            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+              draft[nodeId] = oldNode;
+            })
+          );
+
           // optimistic update
           const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
             dispatch(
               apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                draft[nodeId] = { ...node };
+                draft[nodeId] = newNode;
               })
             );
 
@@ -175,14 +183,13 @@ export const apiSlice = createApi({
           }
 
           // create db patches
-          const nodes: Graph = await getGraph(floorCode, getState, dispatch);
           const apiPath = "/api/node/update";
-          const body = JSON.stringify({ nodeId, node });
-          const reversedBody = JSON.stringify({ nodeId, node: nodes[nodeId] });
+          const body = JSON.stringify({ nodeId, node: newNode });
+          const reversedBody = JSON.stringify({ nodeId, node: oldNode });
           const dbPatch = { apiPath, body };
           const reversedDbPatch = { apiPath, body: reversedBody };
 
-          // create the patch, add to history, and send to other users
+          // create the patch and add to history
           const patch = {
             jsonPatch,
             reversedJsonPatch,
@@ -190,6 +197,8 @@ export const apiSlice = createApi({
             reversedDbPatch,
           };
           dispatch(addPatchesToHistory(patch));
+
+          // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
             payload: { type: GRAPH_PATCH, patch: jsonPatch, nodeId, updatedAt },

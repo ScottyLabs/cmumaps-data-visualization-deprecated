@@ -2,7 +2,7 @@ import Konva from "konva";
 import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 
-import React, { MutableRefObject, useContext } from "react";
+import React, { MutableRefObject, useContext, useState } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -48,6 +48,8 @@ const NodesDisplay = ({
 }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  const [oldNode, setOldNode] = useState<Node | null>(null);
 
   const [moveNode] = useMoveNodeMutation();
 
@@ -115,6 +117,13 @@ const NodesDisplay = ({
     }
 
     return "blue";
+  };
+
+  const getNodePos = (e: Konva.KonvaEventObject<DragEvent>) => {
+    return {
+      x: Number(e.target.x().toFixed(2)),
+      y: Number(e.target.y().toFixed(2)),
+    };
   };
 
   const handleNodeClick = (nodeId: ID) => {
@@ -213,7 +222,12 @@ const NodesDisplay = ({
     };
     newNode.roomId = findRoomId(rooms, newNode.pos);
 
-    moveNode({ floorCode, nodeId, node: newNode });
+    if (oldNode) {
+      moveNode({ floorCode, nodeId, oldNode, newNode });
+    } else {
+      // I actually wonder if it is ever possible to toast this...
+      toast.error("Drag on a node before releasing it!");
+    }
   };
 
   const handleDragMove = (nodeId: string) =>
@@ -222,10 +236,7 @@ const NodesDisplay = ({
         const cursorInfo: CursorInfoOnDragNode = {
           nodeId: nodeId,
           cursorPos,
-          nodePos: {
-            x: Number(e.target.x().toFixed(2)),
-            y: Number(e.target.y().toFixed(2)),
-          },
+          nodePos: getNodePos(e),
         };
 
         cursorInfoListRef.current.push(cursorInfo);
@@ -249,6 +260,7 @@ const NodesDisplay = ({
             onMouseLeave={(e) => setCursor(e, "default")}
             onClick={() => handleNodeClick(nodeId)}
             draggable
+            onDragStart={() => setOldNode(nodes[nodeId])}
             onDragEnd={handleOnDragEnd(nodeId)}
             onDragMove={handleDragMove(nodeId)}
           />

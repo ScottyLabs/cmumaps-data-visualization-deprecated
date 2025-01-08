@@ -67,31 +67,24 @@ const handleGraphPatch = async (
     // update timestamp
     dispatch(
       apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-        console.log(message.updatedAt);
         if (message.updatedAt > draft[nodeId].updatedAt) {
           draft[nodeId].updatedAt = message.updatedAt;
         }
       })
     );
 
-    // toast a warning about overwriting change if lock
-    if (locked) {
-      // const name = getUserName(message.sender, getStore());
-      toastOverwriteOnNode("LOCK Toast", nodeId);
+    // toast warning about overwriting if locked or receiving an outdated patch
+    const nodes = await getGraph(floorCode, getStore, dispatch);
+    if (locked || message.updatedAt < nodes[nodeId].updatedAt) {
+      const name = getUserName(message.sender, getStore());
+      toastOverwriteOnNode(name, nodeId);
       return;
     }
 
-    // apply change if patch not outdated (meaning I just updated the timestamp)
-    // otherwise toast a warning about overwriting change
-    const nodes = await getGraph(floorCode, getStore, dispatch);
-    if (nodes[nodeId].updatedAt === message.updatedAt) {
-      dispatch(
-        apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
-      );
-    } else {
-      const name = getUserName(message.sender, getStore());
-      toastOverwriteOnNode(name, nodeId);
-    }
+    // otherwise apply the patch
+    dispatch(
+      apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+    );
   } catch (e) {
     toast.error("Error handling graph patch!");
     console.error(e);

@@ -124,17 +124,9 @@ export const apiSlice = createApi({
             return;
           }
 
-          const store = getState() as RootState;
-          if (store.visibility.showEdges) {
-            console.log("Waited for 5 seconds");
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          }
-
-          // unlock the node after update
-          dispatch(unlock(nodeId));
-
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
+          const store = getState() as RootState;
           const nodes = await getGraph(floorCode, getState, dispatch);
           if (nodes[nodeId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
@@ -154,6 +146,9 @@ export const apiSlice = createApi({
               }
             })
           );
+
+          // unlock the node after update
+          dispatch(unlock(nodeId));
 
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {

@@ -1,3 +1,4 @@
+import Konva from "konva";
 import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 
@@ -15,11 +16,7 @@ import {
   GRAPH_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
-import {
-  dragNode,
-  getNodeIdSelected,
-  releaseNode,
-} from "../../lib/features/mouseEventSlice";
+import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import {
   CursorInfo,
   CursorInfoOnDragNode,
@@ -66,7 +63,6 @@ const NodesDisplay = ({
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
-  const nodeIdOnDrag = useAppSelector((state) => state.mouseEvent.nodeIdOnDrag);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   if (!nodes) {
@@ -209,8 +205,6 @@ const NodesDisplay = ({
   };
 
   const handleOnDragEnd = (nodeId: ID) => (e) => {
-    dispatch(releaseNode());
-
     // create new node
     const newNode: Node = JSON.parse(JSON.stringify(nodes[nodeId]));
     newNode.pos = {
@@ -222,25 +216,22 @@ const NodesDisplay = ({
     moveNode({ floorCode, nodeId, node: newNode });
   };
 
-  const handleDragMove = throttle((e) => {
-    if (!nodeIdOnDrag) {
-      return;
-    }
+  const handleDragMove = (nodeId: string) =>
+    throttle((e: Konva.KonvaEventObject<DragEvent>) => {
+      getCursorPos(e, offset, scale, (cursorPos) => {
+        const cursorInfo: CursorInfoOnDragNode = {
+          nodeId: nodeId,
+          cursorPos,
+          nodePos: {
+            x: Number(e.target.x().toFixed(2)),
+            y: Number(e.target.y().toFixed(2)),
+          },
+        };
 
-    getCursorPos(e, offset, scale, (cursorPos) => {
-      const cursorInfo: CursorInfoOnDragNode = {
-        nodeId: nodeIdOnDrag,
-        cursorPos,
-        nodePos: {
-          x: Number(e.target.x().toFixed(2)),
-          y: Number(e.target.y().toFixed(2)),
-        },
-      };
-
-      cursorInfoListRef.current.push(cursorInfo);
-      dispatch(moveNodeWithCursor({ floorCode, cursorInfo }));
-    });
-  }, CURSOR_INTERVAL);
+        cursorInfoListRef.current.push(cursorInfo);
+        dispatch(moveNodeWithCursor({ floorCode, cursorInfo }));
+      });
+    }, CURSOR_INTERVAL);
 
   return Object.entries(nodes).map(
     ([nodeId, node]: [ID, Node], index: number) => {
@@ -258,9 +249,8 @@ const NodesDisplay = ({
             onMouseLeave={(e) => setCursor(e, "default")}
             onClick={() => handleNodeClick(nodeId)}
             draggable
-            onDragStart={() => dispatch(dragNode(nodeId))}
             onDragEnd={handleOnDragEnd(nodeId)}
-            onDragMove={handleDragMove}
+            onDragMove={handleDragMove(nodeId)}
           />
         );
       }

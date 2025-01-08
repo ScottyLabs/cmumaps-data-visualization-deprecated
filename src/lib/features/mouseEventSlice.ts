@@ -17,13 +17,11 @@ const DEFAULT: IdSelectedInfo = { id: "", type: NONE };
 interface MouseEventState {
   idSelected: IdSelectedInfo;
   nodeIdOnHover: ID | null;
-  nodeIdOnDrag: ID | null;
 }
 
 const initialState: MouseEventState = {
   idSelected: DEFAULT,
   nodeIdOnHover: null,
-  nodeIdOnDrag: null,
 };
 
 const mouseEventSlice = createSlice({
@@ -46,13 +44,6 @@ const mouseEventSlice = createSlice({
     unHoverNode(state) {
       state.nodeIdOnHover = null;
     },
-
-    dragNode(state, action: PayloadAction<ID>) {
-      state.nodeIdOnDrag = action.payload;
-    },
-    releaseNode(state) {
-      state.nodeIdOnDrag = null;
-    },
   },
 });
 
@@ -66,13 +57,6 @@ export const getDoorIdSelected = (state: MouseEventState) => {
   return idSelected.type == DOOR ? idSelected.id : "";
 };
 
-export const {
-  selectNode,
-  selectDoor,
-  deselect,
-  hoverNode,
-  unHoverNode,
-  dragNode,
-  releaseNode,
-} = mouseEventSlice.actions;
+export const { selectNode, selectDoor, deselect, hoverNode, unHoverNode } =
+  mouseEventSlice.actions;
 export default mouseEventSlice.reducer;

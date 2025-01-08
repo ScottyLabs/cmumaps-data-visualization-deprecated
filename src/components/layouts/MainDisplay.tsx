@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
 import { savingHelper } from "../../lib/apiRoutes";
 import { useGetGraphQuery } from "../../lib/features/apiSlice";
-import { setNodes, undo } from "../../lib/features/dataSlice";
+import { redo, setNodes, undo } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -237,7 +237,7 @@ const MainDisplay = ({ floorCode }: Props) => {
       // eidt history
       else if ((event.metaKey || event.ctrlKey) && event.key === "z") {
         if (event.shiftKey) {
-          // dispatch(redo());
+          dispatch(redo());
         } else {
           dispatch(undo());
         }

@@ -57,7 +57,6 @@ export const undo = createAppAsyncThunk(
       }
       // apply the reversed edit
       const reversedEdit = dataState.reversedEditHistory[editIndex];
-      console.log(reversedEdit);
       applyEdit(reversedEdit, dispatch);
     } catch (error) {
       toast.error("Failed to undo change!");
@@ -67,30 +66,26 @@ export const undo = createAppAsyncThunk(
   }
 );
 
-// export const redo = createAppAsyncThunk(
-//   "data/redo",
-//   async (floorCode: string, { dispatch, getState }) => {
-//     try {
-//       const dataState = getState().data;
-//       const editIndex = dataState.editIndex;
-//       if (editIndex == dataState.editHistory.length) {
-//         toast.error("Can't redo anymore!");
-//         return;
-//       }
-
-//       // redo locally
-//       const patch = dataState.editHistory[editIndex];
-//       dispatch(apiSlice.util.patchQueryData("getGraph", floorCode, patch));
-
-//       // redo in database
-//       const query = dataState.queryHistory[editIndex];
-//       await applyQuery(query);
-//     } catch (error) {
-//       toast.error("Failed to redo change!");
-//       console.error("Error redoing patch:", error);
-//     }
-//   }
-// );
+export const redo = createAppAsyncThunk(
+  "data/redo",
+  (_, { dispatch, getState }) => {
+    try {
+      const dataState = getState().data;
+      const editIndex = dataState.editIndex;
+      if (editIndex === dataState.editHistory.length) {
+        toast.warn("Can't redo anymore!");
+        return Promise.reject();
+      }
+      // apply the edit
+      const edit = dataState.editHistory[editIndex];
+      applyEdit(edit, dispatch);
+    } catch (error) {
+      toast.error("Failed to redo change!");
+      console.error("Error redoing:", error);
+      return Promise.reject();
+    }
+  }
+);
 
 const getUpdatedHistory = <T>(history: T[], patch: T, index: number) => {
   const updatedHistory = [...history.slice(0, index + 1), patch];
@@ -134,11 +129,12 @@ const dataSlice = createSlice({
     builder.addCase(undo.fulfilled, (state) => {
       state.editIndex--;
     });
-    // builder.addCase(redo.pending, (state) => {
-    //   if (state.editIndex !== state.editHistory.length - 1) {
-    //     state.editIndex++;
-    //   }
-    // });
+    builder.addCase(redo.pending, (state) => {
+      state.editIndex++;
+    });
+    builder.addCase(redo.rejected, (state) => {
+      state.editIndex--;
+    });
   },
 });
 

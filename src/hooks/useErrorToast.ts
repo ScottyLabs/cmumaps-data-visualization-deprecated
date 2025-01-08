@@ -22,6 +22,10 @@ const useErrorToast = (baseUrl: string) => {
 
   useEffect(() => {
     const error = searchParam.get("error");
+    if (!error) {
+      return;
+    }
+
     switch (error) {
       case INVALID_BUILDING_CODE:
         toast.error("The building code is invalid!");

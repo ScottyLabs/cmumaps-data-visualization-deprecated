@@ -23,10 +23,14 @@ import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { PolygonContext } from "../../contexts/PolygonProvider";
 import { RoomsContext } from "../../contexts/RoomsProvider";
-import { WalkwayTypeList } from "../../shared/types";
+import { Nodes, WalkwayTypeList } from "../../shared/types";
 import { getRoomId } from "../../utils/utils";
 
-const RoomInfoTable = () => {
+interface Props {
+  nodes: Nodes;
+}
+
+const RoomInfoTable = ({ nodes }: Props) => {
   const router = useRouter();
   const { session } = useSession();
   const dispatch = useAppDispatch();
@@ -39,7 +43,6 @@ const RoomInfoTable = () => {
   );
 
   const { rooms } = useContext(RoomsContext);
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);

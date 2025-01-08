@@ -1,27 +1,15 @@
 import { Polygon } from "geojson";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
+import useKeyboardShortcuts from "../../hooks/useKeyboardShortcuts";
 import { savingHelper } from "../../lib/apiRoutes";
-import {
-  useGetNodesQuery,
-  useInvalidateNodesCacheMutation,
-} from "../../lib/features/apiSlice";
+import { useGetNodesQuery } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
-import { redo, undo } from "../../lib/features/historySlice";
-import {
-  ADD_DOOR_NODE,
-  ADD_EDGE,
-  ADD_NODE,
-  DELETE_EDGE,
-  GRAPH_SELECT,
-  selectEditPolygon,
-  setMode,
-} from "../../lib/features/modeSlice";
 import {
   deselect,
   getNodeIdSelected,
@@ -35,24 +23,14 @@ import {
   LOADED,
   startLoading,
 } from "../../lib/features/statusSlice";
-import {
-  toggleShowEdges,
-  toggleShowFile,
-  toggleShowLabels,
-  toggleShowNodes,
-  toggleShowOutline,
-  toggleShowPolygons,
-} from "../../lib/features/visibilitySlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import Loader from "../common/Loader";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
-import { deleteNode } from "../shared/keyboardShortcuts";
 import { ID, RoomInfo, WalkwayTypeList } from "../shared/types";
 import SidePanel from "../side-panel/SidePanel";
-import { calcMst } from "../utils/graphUtils";
 import { getNodeIdByRoomId, getRoomIdByRoomName } from "../utils/utils";
 import ZoomPanWrapper from "../zoom-pan/ZoomPanWrapper";
 
@@ -61,21 +39,14 @@ interface Props {
 }
 
 const MainDisplay = ({ floorCode }: Props) => {
-  const router = useRouter();
   const dispatch = useAppDispatch();
 
   const { data: nodes, isFetching } = useGetNodesQuery(floorCode);
-  const [invalidateNodesCache] = useInvalidateNodesCacheMutation();
 
-  const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
-  const editPolygon = useAppSelector(selectEditPolygon);
   const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
-  const shortcutsDisabled = useAppSelector(
-    (state) => state.status.shortcutsDisabled
-  );
 
   const [rooms, setRooms] = useState<Record<ID, RoomInfo>>({});
 
@@ -168,108 +139,13 @@ const MainDisplay = ({ floorCode }: Props) => {
     [dispatch, floorCode]
   );
 
+  // useKeyboardShortcuts
+  useKeyboardShortcuts(floorCode, nodes, rooms);
+
   // fetch data
   useEffect(() => {
     parsePDF();
   }, [floorCode, parsePDF]);
-
-  // keyboard shortcuts
-  useEffect(() => {
-    if (shortcutsDisabled) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const toastNodeNotSelectedErr = () => toast.error("Select a node first!");
-
-      // visibility
-      if (event.key === "f") {
-        dispatch(toggleShowFile());
-      } else if (event.key === "o") {
-        dispatch(toggleShowOutline());
-      } else if (event.key === "g") {
-        dispatch(toggleShowNodes());
-        dispatch(toggleShowEdges());
-      } else if (event.key === "l") {
-        dispatch(toggleShowLabels());
-      } else if (event.key === "p") {
-        dispatch(toggleShowPolygons());
-      }
-
-      // quit
-      else if (event.key === "q") {
-        dispatch(setMode(GRAPH_SELECT));
-      }
-
-      // refetch graph
-      else if (event.key === "r") {
-        invalidateNodesCache();
-      }
-
-      // disable graph shortcuts in edit polygon mode
-      if (editPolygon) {
-        return;
-      }
-
-      // graph
-      else if (event.key === "n") {
-        dispatch(setMode(ADD_NODE));
-      } else if (event.key === "e") {
-        if (nodeIdSelected) {
-          dispatch(setMode(ADD_EDGE));
-        } else {
-          toastNodeNotSelectedErr();
-        }
-      } else if (event.key === "d") {
-        if (nodeIdSelected) {
-          dispatch(setMode(DELETE_EDGE));
-        } else {
-          toastNodeNotSelectedErr();
-        }
-      } else if (event.key === "m") {
-        if (nodes) {
-          calcMst(nodes, rooms, router, dispatch);
-        }
-      } else if (
-        event.key === "Backspace" ||
-        event.key === "Delete" ||
-        event.key === "Escape"
-      ) {
-        if (nodeIdSelected && nodes) {
-          deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
-        } else {
-          toastNodeNotSelectedErr();
-        }
-      } else if (event.key === "w") {
-        dispatch(setMode(ADD_DOOR_NODE));
-      }
-
-      // eidt history
-      else if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-        if (event.shiftKey) {
-          dispatch(redo());
-        } else {
-          dispatch(undo());
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [
-    floorCode,
-    idSelected,
-    shortcutsDisabled,
-    editPolygon,
-    router,
-    dispatch,
-    nodeIdSelected,
-    rooms,
-    nodes,
-  ]);
 
   // select node, door, or room based on searchParams
   const searchParams = useSearchParams();

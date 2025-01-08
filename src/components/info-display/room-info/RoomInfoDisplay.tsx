@@ -14,7 +14,7 @@ import { getRoomId, getRoomIdFromRoomInfo } from "../../utils/utils";
 import EditCell from "../EditCell";
 import EditTypeRow from "../SelectTypeCell";
 import AliasesMultiSelect from "./AliasesMultiSelect";
-import RoomInfoButtons from "./RoomInfoButtons";
+import RoomInfoButtons from "./RoomInfoTable";
 
 interface Props {
   floorCode: string;

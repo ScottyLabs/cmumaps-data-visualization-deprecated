@@ -96,6 +96,22 @@ export const apiSlice = createApi({
               })
             );
 
+          // create db patches
+          const apiPath = "/api/node/update";
+          const body = JSON.stringify({ nodeId, node: newNode });
+          const reversedBody = JSON.stringify({ nodeId, node: oldNode });
+          const dbPatch = { apiPath, body };
+          const reversedDbPatch = { apiPath, body: reversedBody };
+
+          // create the patch and add to history
+          const patch = {
+            jsonPatch,
+            reversedJsonPatch,
+            dbPatch,
+            reversedDbPatch,
+          };
+          dispatch(addPatchesToHistory(patch));
+
           if (slow === null) {
             slow = false;
             // Math.random() > 0.5;
@@ -181,22 +197,6 @@ export const apiSlice = createApi({
           if (overwrites) {
             applyOverwrites();
           }
-
-          // create db patches
-          const apiPath = "/api/node/update";
-          const body = JSON.stringify({ nodeId, node: newNode });
-          const reversedBody = JSON.stringify({ nodeId, node: oldNode });
-          const dbPatch = { apiPath, body };
-          const reversedDbPatch = { apiPath, body: reversedBody };
-
-          // create the patch and add to history
-          const patch = {
-            jsonPatch,
-            reversedJsonPatch,
-            dbPatch,
-            reversedDbPatch,
-          };
-          dispatch(addPatchesToHistory(patch));
 
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {

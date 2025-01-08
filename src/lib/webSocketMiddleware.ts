@@ -62,7 +62,7 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const unlocked = getStore().lock.nodeLocks[nodeId] !== 0;
+    const locked = !!getStore().lock.nodeLocks[nodeId];
 
     // update timestamp
     apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
@@ -72,7 +72,7 @@ const handleGraphPatch = async (
     });
 
     // toast a warning about overwriting change if lock
-    if (!unlocked) {
+    if (locked) {
       // const name = getUserName(message.sender, getStore());
       toastOverwriteOnNode("LOCK Toast", nodeId);
       return;

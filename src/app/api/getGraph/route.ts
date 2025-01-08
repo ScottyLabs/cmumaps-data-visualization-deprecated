@@ -81,6 +81,8 @@ export async function GET(request: Request) {
         neighbors,
         roomId,
         updatedAt: node.updatedAt,
+        locked: 0,
+        overwrites: [],
       };
     }
 

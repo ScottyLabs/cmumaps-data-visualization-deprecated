@@ -74,7 +74,14 @@ export interface Node {
    * when the node is locked since the user unknowingly edited the node.
    */
   locked: number;
+
+  /**
+   * All the messages that are overwritten
+   */
+  overwrites: Overwrite[];
 }
+
+type Overwrite = Node & { senderId: string };
 
 /**
  * Door type

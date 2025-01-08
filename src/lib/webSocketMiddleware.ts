@@ -1,8 +1,8 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
-import { Patch } from "immer";
 
 import { toast } from "react-toastify";
 
+import { Node } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice, getGraph } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
@@ -28,20 +28,16 @@ interface WebSocketConnectAction {
 }
 
 interface GraphPatch {
-  patch: Patch[];
+  type: typeof GRAPH_PATCH;
   nodeId: string;
+  newNode: Node;
   updatedAt: string;
   sender: string;
 }
 
 export interface GraphPatchMessageAction {
   type: typeof WEBSOCKET_MESSAGE;
-  payload: {
-    type: typeof GRAPH_PATCH;
-    patch: Patch[];
-    nodeId: string;
-    updatedAt: string;
-  };
+  payload: Omit<GraphPatch, "sender">;
 }
 
 interface WebSocketMessageAction {
@@ -81,9 +77,11 @@ const handleGraphPatch = async (
       return;
     }
 
-    // otherwise apply the patch
+    // otherwise apply the change
     dispatch(
-      apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+        draft[nodeId] = { ...message.newNode, updatedAt: message.updatedAt };
+      })
     );
   } catch (e) {
     toast.error("Error handling graph patch!");

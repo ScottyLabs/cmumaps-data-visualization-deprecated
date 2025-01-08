@@ -11,7 +11,6 @@ import {
   GraphPatchMessageAction,
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
-import { addPatchesToHistory } from "./dataSlice";
 import { lock, unlock } from "./lockSlice";
 
 interface MoveNodeArgType {
@@ -83,28 +82,25 @@ export const apiSlice = createApi({
           );
 
           // optimistic update
-          const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
-            dispatch(
-              apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                draft[nodeId] = newNode;
-              })
-            );
+          dispatch(
+            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+              draft[nodeId] = newNode;
+            })
+          );
 
           // create db patches
-          const apiPath = "/api/node/update";
-          const body = JSON.stringify({ nodeId, node: newNode });
-          const reversedBody = JSON.stringify({ nodeId, node: oldNode });
-          const dbPatch = { apiPath, body };
-          const reversedDbPatch = { apiPath, body: reversedBody };
+          // const apiPath = "/api/node/update";
+          // const body = JSON.stringify({ nodeId, node: newNode });
+          // const reversedBody = JSON.stringify({ nodeId, node: oldNode });
+          // const dbPatch = { apiPath, body };
+          // const reversedDbPatch = { apiPath, body: reversedBody };
 
-          // create the patch and add to history
-          const patch = {
-            jsonPatch,
-            reversedJsonPatch,
-            dbPatch,
-            reversedDbPatch,
-          };
-          dispatch(addPatchesToHistory(patch));
+          // // create the patch and add to history
+          // const patch = {
+          //   dbPatch,
+          //   reversedDbPatch,
+          // };
+          // dispatch(addPatchesToHistory(patch));
 
           // different error handling for queryFulfilled
           let updatedAt: string;
@@ -153,7 +149,7 @@ export const apiSlice = createApi({
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
-            payload: { type: GRAPH_PATCH, patch: jsonPatch, nodeId, updatedAt },
+            payload: { type: GRAPH_PATCH, nodeId, newNode, updatedAt },
           };
           dispatch(graphPatchAction as unknown as UnknownAction);
         } catch (e) {

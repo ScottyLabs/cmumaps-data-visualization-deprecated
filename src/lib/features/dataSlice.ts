@@ -51,10 +51,9 @@ export const undo = createAppAsyncThunk(
     try {
       const dataState = getState().data;
       const editIndex = dataState.editIndex;
-      console.log(editIndex);
       if (editIndex == -1) {
-        toast.error("Can't undo anymore!");
-        return;
+        toast.warn("Can't undo anymore!");
+        return Promise.reject();
       }
       // apply the reversed edit
       const reversedEdit = dataState.reversedEditHistory[editIndex];
@@ -63,6 +62,7 @@ export const undo = createAppAsyncThunk(
     } catch (error) {
       toast.error("Failed to undo change!");
       console.error("Error undoing:", error);
+      return Promise.reject();
     }
   }
 );

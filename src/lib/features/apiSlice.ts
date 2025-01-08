@@ -19,6 +19,7 @@ export interface MoveNodeArgType {
   nodeId: string;
   newNode: Node;
   oldNode: Node;
+  addToHistory: boolean;
 }
 
 interface GetFileArgType {
@@ -68,7 +69,7 @@ export const apiSlice = createApi({
       transformResponse: (response: { updatedAt: string }) =>
         response.updatedAt,
       async onQueryStarted(
-        { floorCode, nodeId, oldNode, newNode },
+        { floorCode, nodeId, oldNode, newNode, addToHistory = true },
         { dispatch, getState, queryFulfilled }
       ) {
         try {
@@ -90,18 +91,32 @@ export const apiSlice = createApi({
           );
 
           // create edit and add to history
-          const endpoint = "moveNode";
-          const edit: EditArg = {
-            edit: {
-              endpoint,
-              arg: { floorCode, nodeId, oldNode, newNode },
-            },
-            reverseEdit: {
-              endpoint,
-              arg: { floorCode, nodeId, oldNode: newNode, newNode: oldNode },
-            },
-          };
-          dispatch(addEditToHistory(edit));
+          if (addToHistory) {
+            const endpoint = "moveNode";
+            const edit: EditArg = {
+              edit: {
+                endpoint,
+                arg: {
+                  floorCode,
+                  nodeId,
+                  oldNode,
+                  newNode,
+                  addToHistory: false,
+                },
+              },
+              reverseEdit: {
+                endpoint,
+                arg: {
+                  floorCode,
+                  nodeId,
+                  oldNode: newNode,
+                  newNode: oldNode,
+                  addToHistory: false,
+                },
+              },
+            };
+            dispatch(addEditToHistory(edit));
+          }
 
           // different error handling for queryFulfilled
           let updatedAt: string;

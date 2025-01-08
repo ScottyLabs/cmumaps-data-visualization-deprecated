@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { apiSlice } from "./features/apiSlice";
 import dataSlice from "./features/dataSlice";
 import floorSlice from "./features/floorSlice";
+import lockSlice from "./features/lockSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
 import outlineSlice from "./features/outlineSlice";
@@ -25,6 +26,7 @@ export const makeStore = () => {
       outline: outlineSlice,
       floor: floorSlice,
       users: usersSlice,
+      lock: lockSlice,
       [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>

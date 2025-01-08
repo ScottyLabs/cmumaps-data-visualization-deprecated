@@ -62,7 +62,9 @@ export interface Node {
    * ${buildingCode}-${roomName}
    */
   roomId: ID;
+}
 
+export interface NodeLock {
   /**
    * 0 if unlocked, otherwise locked.
    * The user can write to a node whenver they want.

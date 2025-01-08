@@ -80,8 +80,6 @@ export async function GET(request: Request) {
         pos: { x: node.posX, y: node.posY },
         neighbors,
         roomId,
-        locked: 0,
-        overwrites: [],
       };
     }
 

@@ -66,6 +66,14 @@ export interface Node {
    * most recent timestamp that the node was updated
    */
   updatedAt: Date;
+
+  /**
+   * 0 if unlocked, otherwise locked.
+   * The user can write to a node whenver they want.
+   * `locked` is used to indicate an overwritten when a WebSocket patch comes
+   * when the node is locked since the user unknowingly edited the node.
+   */
+  locked: number;
 }
 
 /**

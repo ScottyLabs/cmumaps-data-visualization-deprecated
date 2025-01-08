@@ -18,6 +18,18 @@ interface GetFileArgType {
   token: string;
 }
 
+const getGraph = async (floorCode, getState, dispatch) => {
+  let nodes = apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
+
+  if (!nodes) {
+    nodes = (await dispatch(
+      apiSlice.endpoints.getGraph.initiate(floorCode)
+    ).unwrap()) as Graph;
+  }
+
+  return nodes;
+};
+
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
@@ -51,10 +63,18 @@ export const apiSlice = createApi({
         { dispatch, getState, queryFulfilled }
       ) {
         try {
+          // optimistic update
+          dispatch(
+            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+              draft[nodeId] = node;
+            })
+          );
+
           // different error handling for queryFulfilled
+          let updatedAt: Date;
           try {
             const res = await queryFulfilled;
-            node.updatedAt = res.data;
+            updatedAt = res.data;
           } catch (e) {
             toast.error(
               "Failed to save! Check the Console for detailed error."
@@ -68,19 +88,30 @@ export const apiSlice = createApi({
             return;
           }
 
-          let nodes =
-            apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
+          // get nodes to create reversedDbPatch
+          const nodes: Graph = await getGraph(floorCode, getState, dispatch);
 
-          if (!nodes) {
-            nodes = await dispatch(
-              apiSlice.endpoints.getGraph.initiate(floorCode)
-            ).unwrap();
+          // if (Math.random() > 0.5) {
+          //   console.log("Waited for 2 seconds");
+          //   await new Promise((resolve) => setTimeout(resolve, 2000));
+          //   console.log(nodes[nodeId].updatedAt);
+          //   console.log(updatedAt);
+          // }
+
+          // check if someone overwrite the node without knowing your change
+          if (nodes[nodeId].updatedAt > updatedAt) {
+            toast.warn(`Someone overwrote your change to node ${nodeId}`, {
+              autoClose: false,
+            });
+            return;
           }
 
+          // apply the change again with the updatedAt
           const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
             dispatch(
               apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                draft[nodeId] = node;
+                const updatedNode = { ...node, updatedAt };
+                draft[nodeId] = updatedNode;
               })
             );
 
@@ -91,13 +122,13 @@ export const apiSlice = createApi({
           const dbPatch = { apiPath, body };
           const reversedDbPatch = { apiPath, body: reversedBody };
 
+          // create the patch, add to history, and send to other users
           const patch = {
             jsonPatch,
             reversedJsonPatch,
             dbPatch,
             reversedDbPatch,
           };
-
           dispatch(addPatchesToHistory(patch));
           dispatch({
             type: WEBSOCKET_MESSAGE,

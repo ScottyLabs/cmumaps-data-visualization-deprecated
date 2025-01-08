@@ -4,7 +4,7 @@ import {
   RootState,
 } from "@reduxjs/toolkit/query/react";
 
-import { Graph } from "../../components/shared/types";
+import { Nodes } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
 import { AppDispatch } from "../store";
 
@@ -13,17 +13,17 @@ interface GetFileArgType {
   token: string;
 }
 
-export const getGraph = async (
+export const getNodes = async (
   floorCode: string,
   getState: () => RootState<any, any, "api">,
   dispatch: AppDispatch
 ) => {
-  let nodes = apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
+  let nodes = apiSlice.endpoints.getNodes.select(floorCode)(getState()).data;
 
   if (!nodes) {
     nodes = (await dispatch(
-      apiSlice.endpoints.getGraph.initiate(floorCode)
-    ).unwrap()) as Graph;
+      apiSlice.endpoints.getNodes.initiate(floorCode)
+    ).unwrap()) as Nodes;
   }
 
   return nodes;
@@ -34,7 +34,7 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "/",
   }),
-  tagTypes: ["Graph"],
+  tagTypes: ["Nodes"],
   endpoints: (builder) => ({
     getFile: builder.query<string, GetFileArgType>({
       query: ({ filePath, token }) => ({
@@ -45,12 +45,12 @@ export const apiSlice = createApi({
       }),
       transformResponse: (response: { data: string }) => response.data,
     }),
-    getGraph: builder.query<Graph, string>({
+    getNodes: builder.query<Nodes, string>({
       query: (floorCode) => `/api/getGraph?floorCode=${floorCode}`,
-      transformResponse: (response: { data: Graph }) => response.data,
-      providesTags: ["Graph"],
+      transformResponse: (response: { data: Nodes }) => response.data,
+      providesTags: ["Nodes"],
     }),
   }),
 });
 
-export const { useGetFileQuery, useGetGraphQuery } = apiSlice;
+export const { useGetFileQuery, useGetNodesQuery } = apiSlice;

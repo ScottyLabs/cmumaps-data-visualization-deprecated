@@ -9,7 +9,7 @@ import {
   GraphPatchMessageAction,
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
-import { apiSlice, getGraph } from "./apiSlice";
+import { apiSlice, getNodes } from "./apiSlice";
 import { addEditToHistory, EditPair } from "./historySlice";
 import { lock, unlock } from "./lockSlice";
 
@@ -41,14 +41,14 @@ const extendedApi = apiSlice.injectEndpoints({
 
           // first reset to old pos
           dispatch(
-            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
               draft[nodeId] = oldNode;
             })
           );
 
           // optimistic update
           dispatch(
-            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
               draft[nodeId] = newNode;
             })
           );
@@ -94,7 +94,7 @@ const extendedApi = apiSlice.injectEndpoints({
             console.error(error.error.data.error);
 
             // invalidate the cache
-            dispatch(apiSlice.util.invalidateTags(["Graph"]));
+            dispatch(apiSlice.util.invalidateTags(["Nodes"]));
             toast.info("Refetching the graph...");
             return;
           }
@@ -102,10 +102,10 @@ const extendedApi = apiSlice.injectEndpoints({
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
           const store = getState() as RootState;
-          const nodes = await getGraph(floorCode, getState, dispatch);
+          const nodes = await getNodes(floorCode, getState, dispatch);
           if (nodes[nodeId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
-            dispatch(apiSlice.util.invalidateTags(["Graph"]));
+            dispatch(apiSlice.util.invalidateTags(["Nodes"]));
             toast.info("Refetching the graph...");
             return;
           }
@@ -113,7 +113,7 @@ const extendedApi = apiSlice.injectEndpoints({
           // update timestamp
           // reapply change if no more change by myself
           dispatch(
-            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
               if (store.lock[nodeId] === 1) {
                 draft[nodeId] = { ...newNode, updatedAt };
               } else {

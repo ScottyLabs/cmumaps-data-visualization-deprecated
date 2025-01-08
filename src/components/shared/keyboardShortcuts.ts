@@ -2,10 +2,10 @@ import { savingHelper } from "../../lib/apiRoutes";
 import { setNodes } from "../../lib/features/dataSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { deselect } from "../../lib/features/mouseEventSlice";
-import { Edge, Graph } from "./types";
+import { Edge, Nodes } from "./types";
 
 export const deleteNode = async (
-  nodes: Graph,
+  nodes: Nodes,
   nodeId,
   floorCode,
   router,

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import React, { useContext } from "react";
 
 import { savingHelper } from "../../../lib/apiRoutes";
+import { useGetNodesQuery } from "../../../lib/features/apiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
@@ -21,9 +22,9 @@ interface Props {
 
 const RoomInfoDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
+  const { data: nodes } = useGetNodesQuery(floorCode);
 
   const { rooms, setRooms } = useContext(RoomsContext);
-  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];

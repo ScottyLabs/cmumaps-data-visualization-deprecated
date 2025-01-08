@@ -3,11 +3,11 @@ import { Line } from "react-konva";
 
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
-import { Graph, ID } from "../shared/types";
+import { Nodes, ID } from "../shared/types";
 import { getRoomId } from "../utils/utils";
 
 interface Props {
-  nodes: Graph;
+  nodes: Nodes;
 }
 
 const EdgesDisplay = ({ nodes }: Props) => {

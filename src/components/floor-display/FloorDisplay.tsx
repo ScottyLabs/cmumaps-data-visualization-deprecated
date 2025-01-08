@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 import useWebSocket from "../../hooks/useWebSocket";
 import { savingHelper } from "../../lib/apiRoutes";
-import { useGetGraphQuery } from "../../lib/features/apiSlice";
+import { useGetNodesQuery } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -71,7 +71,7 @@ const FloorDisplay = ({
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { data: nodes } = useGetGraphQuery(floorCode);
+  const { data: nodes } = useGetNodesQuery(floorCode);
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeIdSelected = useAppSelector((state) =>

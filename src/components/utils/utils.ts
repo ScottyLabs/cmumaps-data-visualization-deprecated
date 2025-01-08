@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
 import { setNodes } from "../../lib/features/dataSlice";
-import { Graph, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
+import { Nodes, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
 
 /**
  * @param roomName
@@ -25,7 +25,7 @@ export const getRoomIdByRoomName = (roomName: string, rooms: Rooms) => {
  * @returns the id of the first node in `graph` that belong to the room
  * identified by `roomId`, `null` if roomId is null or no such node exist
  */
-export const getNodeIdByRoomId = (roomId: ID | null, graph: Graph) => {
+export const getNodeIdByRoomId = (roomId: ID | null, graph: Nodes) => {
   if (roomId == null) {
     return null;
   }

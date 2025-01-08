@@ -160,6 +160,6 @@ export interface RoomInfo {
 }
 
 export type Rooms = Record<ID, RoomInfo>;
-export type Graph = Record<ID, Node>;
+export type Nodes = Record<ID, Node>;
 
 export type Mst = Record<ID, Record<ID, boolean>>;

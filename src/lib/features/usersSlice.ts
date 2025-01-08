@@ -76,7 +76,7 @@ export const moveNodeWithCursor = createAppAsyncThunk(
   "users/moveNodeWithCursor",
   ({ cursorInfo, floorCode }: MoveNodeWithCursorArgType, { dispatch }) => {
     dispatch(
-      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+      apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
         draft[cursorInfo.nodeId].pos = cursorInfo.nodePos;
       })
     );

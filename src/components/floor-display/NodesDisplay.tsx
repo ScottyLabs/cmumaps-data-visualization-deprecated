@@ -24,7 +24,7 @@ import {
 } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
+import { EdgeTypeList, Node, ID, Nodes } from "../shared/types";
 import { getCursorPos, setCursor } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -33,7 +33,7 @@ import { CURSOR_INTERVAL } from "./LiveCursors";
 
 interface Props {
   floorCode: string;
-  nodes: Graph;
+  nodes: Nodes;
   cursorInfoListRef: MutableRefObject<CursorInfo[]>;
   offset;
   scale;

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 import { Node } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice, getGraph } from "./features/apiSlice";
+import { apiSlice, getNodes } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
@@ -62,7 +62,7 @@ const handleGraphPatch = async (
 
     // update timestamp
     dispatch(
-      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+      apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
         if (message.updatedAt > draft[nodeId].updatedAt) {
           draft[nodeId].updatedAt = message.updatedAt;
         }
@@ -70,7 +70,7 @@ const handleGraphPatch = async (
     );
 
     // toast warning about overwriting if locked or receiving an outdated patch
-    const nodes = await getGraph(floorCode, getStore, dispatch);
+    const nodes = await getNodes(floorCode, getStore, dispatch);
     if (locked || message.updatedAt < nodes[nodeId].updatedAt) {
       const name = getUserName(message.sender, getStore());
       toastOverwriteOnNode(name, nodeId);
@@ -79,7 +79,7 @@ const handleGraphPatch = async (
 
     // otherwise apply the change
     dispatch(
-      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+      apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
         draft[nodeId] = { ...message.newNode, updatedAt: message.updatedAt };
       })
     );

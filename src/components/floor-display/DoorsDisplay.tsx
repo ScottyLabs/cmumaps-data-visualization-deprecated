@@ -12,13 +12,13 @@ import {
 } from "../../lib/features/modeSlice";
 import { DOOR, NODE } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { DoorInfo, Graph, ID } from "../shared/types";
+import { DoorInfo, Nodes, ID } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 import { addDoorsToGraph } from "../utils/utils";
 
 interface Props {
   floorCode: string;
-  nodes: Graph;
+  nodes: Nodes;
 }
 
 const DoorsDisplay = ({ floorCode, nodes }: Props) => {

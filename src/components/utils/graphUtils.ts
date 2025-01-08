@@ -5,10 +5,10 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { toast } from "react-toastify";
 
 import { setMst } from "../../lib/features/dataSlice";
-import { Graph, ID, Mst, Rooms } from "../shared/types";
+import { Nodes, ID, Mst, Rooms } from "../shared/types";
 import { dist } from "./utils";
 
-export const removeOverlappingsNodes = (nodes: Graph, nodeSize: number) => {
+export const removeOverlappingsNodes = (nodes: Nodes, nodeSize: number) => {
   const nodeIds = Object.keys(nodes);
 
   const newNodes = { ...nodes };
@@ -51,7 +51,7 @@ export const removeOverlappingsNodes = (nodes: Graph, nodeSize: number) => {
 
 // calculate mst for each connected components of the graph
 export const calcMst = (
-  nodes: Graph,
+  nodes: Nodes,
   rooms: Rooms,
   router: AppRouterInstance,
   dispatch: Dispatch

@@ -4,7 +4,8 @@ import { toast } from "react-toastify";
 
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
-import { apiSlice, MoveNodeArgType } from "./apiSlice";
+import { apiSlice } from "./apiSlice";
+import { MoveNodeArgType } from "./nodeApiSlice";
 
 const MAX_UNDO_LIMIT = 50;
 

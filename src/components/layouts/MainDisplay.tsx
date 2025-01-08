@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
 import { savingHelper } from "../../lib/apiRoutes";
-import { useGetGraphQuery } from "../../lib/features/apiSlice";
+import { useGetNodesQuery } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import { redo, undo } from "../../lib/features/historySlice";
 import {
@@ -61,7 +61,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { data: nodes, isFetching } = useGetGraphQuery(floorCode);
+  const { data: nodes, isFetching } = useGetNodesQuery(floorCode);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeIdSelected = useAppSelector((state) =>

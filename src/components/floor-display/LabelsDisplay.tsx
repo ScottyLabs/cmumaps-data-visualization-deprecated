@@ -8,13 +8,13 @@ import { savingHelper } from "../../lib/apiRoutes";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
-import { Graph, RoomInfo } from "../shared/types";
+import { Nodes, RoomInfo } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 import { getRoomId } from "../utils/utils";
 
 interface Props {
   floorCode: string;
-  nodes: Graph;
+  nodes: Nodes;
   addNewNode;
 }
 

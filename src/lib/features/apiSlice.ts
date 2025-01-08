@@ -23,6 +23,7 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "/",
   }),
+  tagTypes: ["Graph"],
   endpoints: (builder) => ({
     getFile: builder.query<string, GetFileArgType>({
       query: ({ filePath, token }) => ({
@@ -36,6 +37,7 @@ export const apiSlice = createApi({
     getGraph: builder.query<Graph, string>({
       query: (floorCode) => `/api/getGraph?floorCode=${floorCode}`,
       transformResponse: (response: { data: Graph }) => response.data,
+      providesTags: ["Graph"],
     }),
     moveNode: builder.mutation<Date, MoveNodeArgType>({
       query: ({ nodeId, node }) => ({
@@ -43,21 +45,29 @@ export const apiSlice = createApi({
         method: "POST",
         body: { nodeId, node },
       }),
+      transformResponse: (response: { updatedAt: Date }) => response.updatedAt,
       async onQueryStarted(
         { floorCode, nodeId, node },
         { dispatch, getState, queryFulfilled }
       ) {
         try {
-          const res = await queryFulfilled;
-          node.updatedAt = res.data;
-        } catch (e) {
-          toast.error("Failed to save! Check the Console for detailed error.");
-          const error = e as { error: { data: { error: string } } };
-          console.error(error.error.data.error);
-          return;
-        }
+          // different error handling for queryFulfilled
+          try {
+            const res = await queryFulfilled;
+            node.updatedAt = res.data;
+          } catch (e) {
+            toast.error(
+              "Failed to save! Check the Console for detailed error."
+            );
+            const error = e as { error: { data: { error: string } } };
+            console.error(error.error.data.error);
 
-        try {
+            // invalidate the cache
+            dispatch(apiSlice.util.invalidateTags(["Graph"]));
+            toast.info("Refetching the graph...");
+            return;
+          }
+
           let nodes =
             apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
 
@@ -73,9 +83,6 @@ export const apiSlice = createApi({
                 draft[nodeId] = node;
               })
             );
-
-          console.log(node);
-          console.log(jsonPatch);
 
           // create db patches
           const apiPath = "/api/node/update";
@@ -101,7 +108,6 @@ export const apiSlice = createApi({
           console.error(e);
         }
       },
-      transformResponse: (response: { updatedAt: Date }) => response.updatedAt,
     }),
   }),
 });

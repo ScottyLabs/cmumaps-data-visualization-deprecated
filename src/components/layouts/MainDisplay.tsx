@@ -41,6 +41,7 @@ import {
 } from "../../lib/features/visibilitySlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
+import Loader from "../common/Loader";
 import PolygonProvider from "../contexts/PolygonProvider";
 import RoomsProvider from "../contexts/RoomsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
@@ -321,12 +322,12 @@ const MainDisplay = ({ floorCode }: Props) => {
     setStateUpdated(true);
   }, [dispatch, floorCode, nodes, rooms, searchParams]);
 
-  if (!statesUpdated) {
+  if (!statesUpdated || loadingStatus !== LOADED) {
     return;
   }
 
-  if (isFetching || loadingStatus !== LOADED) {
-    return;
+  if (isFetching) {
+    return <Loader loadingText="Fetching Graph" />;
   }
 
   return (

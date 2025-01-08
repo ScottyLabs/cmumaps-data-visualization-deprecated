@@ -2,6 +2,7 @@ import { Action, Middleware } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
+import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
@@ -123,6 +124,10 @@ interface ParamsType {
 export const socketMiddleware: Middleware = (params) => (next) => (action) => {
   const { getState, dispatch } = params as ParamsType;
   const { type } = action as Action;
+
+  if (!WEBSOCKET_ENABLED) {
+    return next(action);
+  }
 
   switch (type) {
     case WEBSOCKET_JOIN:

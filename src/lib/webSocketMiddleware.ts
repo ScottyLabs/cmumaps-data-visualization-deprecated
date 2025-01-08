@@ -1,10 +1,12 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
+import { Patch } from "immer";
 
 import { toast } from "react-toastify";
 
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice, getGraph } from "./features/apiSlice";
+import { apiSlice } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
+import { pushOverwrite } from "./features/lockSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 
@@ -12,17 +14,33 @@ export const WEBSOCKET_JOIN = "socket/join";
 export const WEBSOCKET_MESSAGE = "socket/message";
 
 // Message types
-export type MessageType = "patch" | "cursor" | "leaveFloor" | "users";
-export const GRAPH_PATCH: MessageType = "patch";
-export const CURSOR: MessageType = "cursor";
-const LEAVE_FLOOR: MessageType = "leaveFloor";
-const USERS: MessageType = "users";
+export const GRAPH_PATCH = "patch";
+export const CURSOR = "cursor";
+const LEAVE_FLOOR = "leaveFloor";
+const USERS = "users";
 
 interface WebSocketConnectAction {
   type: string;
   payload: {
     floorCode: string;
     url: string;
+  };
+}
+
+interface GraphPatch {
+  patch: Patch[];
+  nodeId: string;
+  updatedAt: string;
+  sender: string;
+}
+
+export interface GraphPatchMessageAction {
+  type: typeof WEBSOCKET_MESSAGE;
+  payload: {
+    type: typeof GRAPH_PATCH;
+    patch: Patch[];
+    nodeId: string;
+    updatedAt: string;
   };
 }
 
@@ -34,30 +52,29 @@ interface WebSocketMessageAction {
 let socket: WebSocket | null = null;
 
 // patch the graph if not locked, otherwise add to overwrites
-const handleGraphPatch = async (message, floorCode, getStore, dispatch) => {
+const handleGraphPatch = async (
+  message: GraphPatch,
+  floorCode: string,
+  getStore: () => RootState,
+  dispatch: AppDispatch
+) => {
   try {
-    const nodes = await getGraph(floorCode, getStore, dispatch);
-    if (!nodes[message.nodeId].locked) {
+    const nodeId = message.nodeId;
+    const locked = getStore().lock.nodeLocks[nodeId].locked === 0;
+    if (locked) {
       dispatch(
         apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
       );
       return;
     }
-
-    console.log({
-      senderId: message.sender,
-      patch: message.patch,
-      updatedAt: message.updatedAt,
-    });
     dispatch(
-      apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-        {
-          draft[message.nodeId].overwrites.push({
-            senderId: message.sender,
-            patch: message.patch,
-            updatedAt: message.updatedAt,
-          });
-        }
+      pushOverwrite({
+        nodeId,
+        overwrite: {
+          senderId: message.sender,
+          patch: message.patch,
+          updatedAt: message.updatedAt,
+        },
       })
     );
   } catch (e) {

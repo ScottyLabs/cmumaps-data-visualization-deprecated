@@ -1,11 +1,18 @@
+import { UnknownAction } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { toast } from "react-toastify";
 
 import { Graph, Node, Overwrite } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
-import { GRAPH_PATCH, WEBSOCKET_MESSAGE } from "../webSocketMiddleware";
+import { RootState } from "../store";
+import {
+  GRAPH_PATCH,
+  GraphPatchMessageAction,
+  WEBSOCKET_MESSAGE,
+} from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
+import { lock } from "./lockSlice";
 
 interface MoveNodeArgType {
   floorCode: string;
@@ -70,16 +77,20 @@ export const apiSlice = createApi({
         { dispatch, getState, queryFulfilled }
       ) {
         try {
+          // lock the node to update
+          dispatch(lock(nodeId));
+
           // optimistic update
           const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
             dispatch(
               apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                draft[nodeId] = { ...node, locked: node.locked + 1 };
+                draft[nodeId] = { ...node };
               })
             );
 
           if (slow === null) {
-            slow = Math.random() > 0.5;
+            slow = false;
+            // Math.random() > 0.5;
             console.log(slow);
           }
 
@@ -106,9 +117,8 @@ export const apiSlice = createApi({
             return;
           }
 
-          // get nodes to create reversedDbPatch
-          const nodes: Graph = await getGraph(floorCode, getState, dispatch);
-          const overwrites = nodes[nodeId].overwrites.sort((a, b) =>
+          const store = getState() as RootState;
+          const overwrites = store.lock.overwritesMap[nodeId].sort((a, b) =>
             a.updatedAt.localeCompare(b.updatedAt)
           );
 
@@ -116,7 +126,7 @@ export const apiSlice = createApi({
           // then apply only patches with lower timestamps, otherwise apply all
           let overwritesToApply: Overwrite[] = overwrites;
           let leftoverOverwrites: Overwrite[] = [];
-          if (nodes[nodeId].locked !== 1) {
+          if (store.lock.nodeLocks[nodeId].locked !== 1) {
             overwritesToApply = overwrites.filter(
               (overwrite) => overwrite.updatedAt < updatedAt
             );
@@ -147,17 +157,8 @@ export const apiSlice = createApi({
             );
           }
 
-          // apply the change again with the updatedAt
-          dispatch(
-            apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-              const locked = draft[nodeId].locked - 1;
-              const overwrites = leftoverOverwrites;
-              const updatedNode: Node = { ...node, locked, overwrites };
-              draft[nodeId] = updatedNode;
-            })
-          );
-
           // create db patches
+          const nodes: Graph = await getGraph(floorCode, getState, dispatch);
           const apiPath = "/api/node/update";
           const body = JSON.stringify({ nodeId, node });
           const reversedBody = JSON.stringify({ nodeId, node: nodes[nodeId] });
@@ -172,10 +173,11 @@ export const apiSlice = createApi({
             reversedDbPatch,
           };
           dispatch(addPatchesToHistory(patch));
-          dispatch({
+          const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
             payload: { type: GRAPH_PATCH, patch: jsonPatch, nodeId, updatedAt },
-          });
+          };
+          dispatch(graphPatchAction as unknown as UnknownAction);
         } catch (e) {
           toast.error("Check the Console for detailed error.");
           console.error(e);

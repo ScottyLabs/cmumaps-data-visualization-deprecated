@@ -4,11 +4,12 @@ import { Patch } from "immer";
 import { toast } from "react-toastify";
 
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice } from "./features/apiSlice";
+import { apiSlice, getGraph } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { pushOverwrite } from "./features/lockSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
+import { getUserName, toastOverwriteOnNode } from "./utils/overwriteUtils";
 
 export const WEBSOCKET_JOIN = "socket/join";
 export const WEBSOCKET_MESSAGE = "socket/message";
@@ -51,7 +52,15 @@ interface WebSocketMessageAction {
 
 let socket: WebSocket | null = null;
 
-// patch the graph if not locked, otherwise add to overwrites
+/**
+ * Handles a graph patch in the following way:
+ *
+ * - First check if the node is locked:
+ *   - If it is locked, then add to overwrites.
+ *   - Otherwise check if the timestamp is later
+ *     - If later then apply the patch
+ *     - Otherwise it is outdated (unrecoverable) and toast a warning
+ */
 const handleGraphPatch = async (
   message: GraphPatch,
   floorCode: string,
@@ -60,23 +69,29 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const locked = getStore().lock.nodeLocks[nodeId]?.locked === 0;
+    const locked = getStore().lock.nodeLocks[nodeId]?.locked !== 0;
     if (locked) {
       dispatch(
-        apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+        pushOverwrite({
+          nodeId,
+          overwrite: {
+            senderId: message.sender,
+            updatedAt: message.updatedAt,
+          },
+        })
       );
       return;
     }
-    dispatch(
-      pushOverwrite({
-        nodeId,
-        overwrite: {
-          senderId: message.sender,
-          patch: message.patch,
-          updatedAt: message.updatedAt,
-        },
-      })
-    );
+
+    const nodes = await getGraph(floorCode, getStore, dispatch);
+    if (nodes[nodeId].updatedAt < message.updatedAt) {
+      dispatch(
+        apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)
+      );
+    } else {
+      const name = getUserName(message.sender, getStore());
+      toastOverwriteOnNode(name, nodeId);
+    }
   } catch (e) {
     toast.error("Error handling graph patch!");
     console.error(e);

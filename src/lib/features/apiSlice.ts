@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { Graph, Node } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
 import { RootState } from "../store";
+import { getUserName, toastOverwriteOnNode } from "../utils/overwriteUtils";
 import {
   GRAPH_PATCH,
   GraphPatchMessageAction,
@@ -38,10 +39,6 @@ export const getGraph = async (floorCode, getState, dispatch) => {
   }
 
   return nodes;
-};
-
-const getUserName = (userId: string, getState) => {
-  return getState().users.otherUsers[userId].userName;
 };
 
 export const apiSlice = createApi({
@@ -163,11 +160,8 @@ export const apiSlice = createApi({
 
           // toast warnings about overwriting someone's change
           for (const overwrite of overwrites) {
-            // const name = overwrite.name;
-            const name = getUserName(overwrite.senderId, overwrite);
-            toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
-              autoClose: false,
-            });
+            const name = getUserName(overwrite.senderId, store);
+            toastOverwriteOnNode(name, nodeId);
           }
 
           // clear overwrites

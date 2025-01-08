@@ -1,5 +1,4 @@
 import { Polygon } from "geojson";
-import { Patch } from "immer";
 
 export interface PDFCoordinate {
   x: number;
@@ -85,7 +84,6 @@ export interface NodeLock {
 }
 
 export interface Overwrite {
-  patch: Patch[];
   // a date as a string value in ISO format.
   updatedAt: string;
   senderId: string;

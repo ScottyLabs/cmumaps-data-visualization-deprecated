@@ -60,7 +60,7 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const locked = getStore().lock.nodeLocks[nodeId].locked === 0;
+    const locked = getStore().lock.nodeLocks[nodeId]?.locked === 0;
     if (locked) {
       dispatch(
         apiSlice.util.patchQueryData("getGraph", floorCode, message.patch)

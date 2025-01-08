@@ -62,6 +62,11 @@ export interface Node {
    * ${buildingCode}-${roomName}
    */
   roomId: ID;
+
+  /**
+   * Most recent update timestamp as a string value in ISO format.
+   */
+  updatedAt: string;
 }
 
 export interface NodeLock {

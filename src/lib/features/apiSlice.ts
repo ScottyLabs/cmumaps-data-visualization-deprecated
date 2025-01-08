@@ -12,7 +12,7 @@ import {
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
-import { lock, setOverwrite } from "./lockSlice";
+import { lock, setOverwrite, unlock } from "./lockSlice";
 
 interface MoveNodeArgType {
   floorCode: string;
@@ -113,8 +113,7 @@ export const apiSlice = createApi({
           dispatch(addPatchesToHistory(patch));
 
           if (slow === null) {
-            slow = false;
-            // Math.random() > 0.5;
+            slow = Math.random() > 0.5;
             console.log(slow);
           }
 
@@ -140,7 +139,12 @@ export const apiSlice = createApi({
             toast.info("Refetching the graph...");
             return;
           }
+          console.log("queried!");
 
+          // unlock the node after update
+          dispatch(unlock(nodeId));
+
+          // apply overwrites
           const store = getState() as RootState;
           let overwrites = store.lock.overwritesMap[nodeId];
 

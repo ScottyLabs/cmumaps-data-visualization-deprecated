@@ -18,7 +18,6 @@ const EdgesDisplay = ({ nodes }: Props) => {
     getNodeIdSelected(state.mouseEvent)
   );
 
-  const nodeIdOnDrag = useAppSelector((state) => state.mouseEvent.nodeIdOnDrag);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const includedNodes = new Set();
@@ -27,11 +26,6 @@ const EdgesDisplay = ({ nodes }: Props) => {
   const shouldRender = (curId: ID, neighborId: ID) => {
     // don't display an edge twice
     if (includedNodes.has(neighborId)) {
-      return false;
-    }
-
-    // don't display edge of a node on drag
-    if (nodeIdOnDrag === curId || nodeIdOnDrag === neighborId) {
       return false;
     }
 

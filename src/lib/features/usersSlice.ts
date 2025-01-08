@@ -13,7 +13,7 @@ interface BaseCursorInfo {
   cursorPos: PDFCoordinate;
 }
 
-interface CursorInfoOnDragNode extends BaseCursorInfo {
+export interface CursorInfoOnDragNode extends BaseCursorInfo {
   nodeId: ID;
   nodePos: PDFCoordinate;
 }

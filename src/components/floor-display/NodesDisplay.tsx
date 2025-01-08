@@ -20,7 +20,11 @@ import {
   getNodeIdSelected,
   releaseNode,
 } from "../../lib/features/mouseEventSlice";
-import { CursorInfo } from "../../lib/features/usersSlice";
+import {
+  CursorInfo,
+  CursorInfoOnDragNode,
+  moveNodeWithCursor,
+} from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { RoomsContext } from "../contexts/RoomsProvider";
 import { EdgeTypeList, Node, ID, Graph } from "../shared/types";
@@ -216,7 +220,6 @@ const NodesDisplay = ({
     newNode.roomId = findRoomId(rooms, newNode.pos);
 
     moveNode({ floorCode, nodeId, node: newNode });
-    // setTimeout(() => moveNode({ floorCode, nodeId, node: newNode }), 2000);
   };
 
   const handleDragMove = throttle((e) => {
@@ -225,14 +228,17 @@ const NodesDisplay = ({
     }
 
     getCursorPos(e, offset, scale, (cursorPos) => {
-      cursorInfoListRef.current.push({
+      const cursorInfo: CursorInfoOnDragNode = {
         nodeId: nodeIdOnDrag,
         cursorPos,
         nodePos: {
           x: Number(e.target.x().toFixed(2)),
           y: Number(e.target.y().toFixed(2)),
         },
-      });
+      };
+
+      cursorInfoListRef.current.push(cursorInfo);
+      dispatch(moveNodeWithCursor({ floorCode, cursorInfo }));
     });
   }, CURSOR_INTERVAL);
 

@@ -52,16 +52,7 @@ interface WebSocketMessageAction {
 let socket: WebSocket | null = null;
 
 /**
- * Handles a graph patch in the following way:
- *
- * - First check if the node is locked:
- *   - If it is locked then update the `updatedAt` time
- *     and toast a warning about overwriting their change
- *
- *   - Otherwise check if the timestamp is later
- *     - If later then apply the patch
- *     - Otherwise it is outdated
- *       and toast a warning about overwriting their change
+ * Handles a graph patch
  */
 const handleGraphPatch = async (
   message: GraphPatch,
@@ -71,18 +62,24 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const locked = getStore().lock.nodeLocks[nodeId] !== 0;
-    if (locked) {
-      const name = getUserName(message.sender, getStore());
-      toastOverwriteOnNode(name, nodeId);
-      dispatch(
-        apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-          draft[nodeId].updatedAt = message.updatedAt;
-        })
-      );
+    const unlocked = getStore().lock.nodeLocks[nodeId] !== 0;
+
+    // update timestamp
+    apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+      if (message.updatedAt > draft[nodeId].updatedAt) {
+        draft[nodeId].updatedAt = message.updatedAt;
+      }
+    });
+
+    // toast a warning about overwriting change if lock
+    if (!unlocked) {
+      // const name = getUserName(message.sender, getStore());
+      toastOverwriteOnNode("LOCK Toast", nodeId);
       return;
     }
 
+    // apply change if patch not outdated
+    // otherwise toast a warning about overwriting change
     const nodes = await getGraph(floorCode, getStore, dispatch);
     if (nodes[nodeId].updatedAt < message.updatedAt) {
       dispatch(

@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 import { Graph, Node } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
+import { RootState } from "../store";
 import {
   GRAPH_PATCH,
   GraphPatchMessageAction,
@@ -24,8 +25,6 @@ interface GetFileArgType {
   filePath: string;
   token: string;
 }
-
-let slow: boolean | null = null;
 
 export const getGraph = async (floorCode, getState, dispatch) => {
   let nodes = apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
@@ -107,15 +106,14 @@ export const apiSlice = createApi({
           };
           dispatch(addPatchesToHistory(patch));
 
-          if (slow === null) {
-            slow = Math.random() > 0.5;
-            console.log(slow);
-          }
-
-          if (slow) {
-            console.log("Waited for 5 seconds");
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          }
+          const store = getState() as RootState;
+          // if (store.visibility.showEdges) {
+          //   console.log("Waited for 5 seconds");
+          //   await new Promise((resolve) => setTimeout(resolve, 5000));
+          // } else {
+          //   console.log("Waited for 1 seconds");
+          //   await new Promise((resolve) => setTimeout(resolve, 1000));
+          // }
 
           // different error handling for queryFulfilled
           let updatedAt: string;
@@ -141,17 +139,22 @@ export const apiSlice = createApi({
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
           const nodes = getGraph(floorCode, getState, dispatch);
-          if (nodes[nodeId].update > updatedAt) {
+          if (nodes[nodeId]?.updateAt > updatedAt) {
             toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Graph"]));
             toast.info("Refetching the graph...");
             return;
           }
 
-          // reapply your change and update timestamp
+          // update timestamp
+          // reapply change if no more change by myself
           dispatch(
             apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-              draft[nodeId] = { ...newNode, updatedAt };
+              if (store.lock[nodeId] === 1) {
+                draft[nodeId] = { ...newNode, updatedAt };
+              } else {
+                draft[nodeId].updatedAt = updatedAt;
+              }
             })
           );
 

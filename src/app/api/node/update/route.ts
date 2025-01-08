@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const nodeId = requestData.nodeId;
     const node: Node = requestData.node;
 
-    await prisma.node.update({
+    const newNode = await prisma.node.update({
       where: {
         id: nodeId,
       },
@@ -23,12 +23,18 @@ export async function POST(request: Request) {
         buildingCode: getBuildingCodeFromRoomId(node.roomId),
         roomName: getRoomNameFromRoomId(node.roomId),
       },
+      select: {
+        updatedAt: true,
+      },
     });
+
+    const updatedAt = newNode.updatedAt;
 
     // good response
     return new NextResponse(
       JSON.stringify({
         status: 200,
+        updatedAt,
       })
     );
   } catch (e) {

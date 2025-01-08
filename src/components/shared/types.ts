@@ -61,6 +61,11 @@ export interface Node {
    * ${buildingCode}-${roomName}
    */
   roomId: ID;
+
+  /**
+   * most recent timestamp that the node was updated
+   */
+  updatedAt: Date;
 }
 
 /**

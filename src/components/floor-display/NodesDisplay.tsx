@@ -216,6 +216,7 @@ const NodesDisplay = ({
     newNode.roomId = findRoomId(rooms, newNode.pos);
 
     moveNode({ floorCode, nodeId, node: newNode });
+    // setTimeout(() => moveNode({ floorCode, nodeId, node: newNode }), 2000);
   };
 
   const handleDragMove = throttle((e) => {

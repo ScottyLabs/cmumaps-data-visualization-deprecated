@@ -37,7 +37,7 @@ export const apiSlice = createApi({
       query: (floorCode) => `/api/getGraph?floorCode=${floorCode}`,
       transformResponse: (response: { data: Graph }) => response.data,
     }),
-    moveNode: builder.mutation<Graph, MoveNodeArgType>({
+    moveNode: builder.mutation<Date, MoveNodeArgType>({
       query: ({ nodeId, node }) => ({
         url: "/api/node/update",
         method: "POST",
@@ -47,6 +47,16 @@ export const apiSlice = createApi({
         { floorCode, nodeId, node },
         { dispatch, getState, queryFulfilled }
       ) {
+        try {
+          const res = await queryFulfilled;
+          node.updatedAt = res.data;
+        } catch (e) {
+          toast.error("Failed to save! Check the Console for detailed error.");
+          const error = e as { error: { data: { error: string } } };
+          console.error(error.error.data.error);
+          return;
+        }
+
         try {
           let nodes =
             apiSlice.endpoints.getGraph.select(floorCode)(getState()).data;
@@ -63,6 +73,9 @@ export const apiSlice = createApi({
                 draft[nodeId] = node;
               })
             );
+
+          console.log(node);
+          console.log(jsonPatch);
 
           // create db patches
           const apiPath = "/api/node/update";
@@ -87,15 +100,8 @@ export const apiSlice = createApi({
           toast.error("Check the Console for detailed error.");
           console.error(e);
         }
-
-        try {
-          await queryFulfilled;
-        } catch (e) {
-          toast.error("Failed to save! Check the Console for detailed error.");
-          const error = e as { error: { data: { error: string } } };
-          console.error(error.error.data.error);
-        }
       },
+      transformResponse: (response: { updatedAt: Date }) => response.updatedAt,
     }),
   }),
 });

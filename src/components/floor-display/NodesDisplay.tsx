@@ -7,7 +7,6 @@ import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
 import { savingHelper } from "../../lib/apiRoutes";
-import { useMoveNodeMutation } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -17,6 +16,7 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import { useMoveNodeMutation } from "../../lib/features/nodeApiSlice";
 import {
   CursorInfo,
   CursorInfoOnDragNode,

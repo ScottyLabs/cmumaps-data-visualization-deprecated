@@ -11,7 +11,7 @@ import {
   GraphPatchMessageAction,
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
-import { addEditToHistory, EditArg } from "./dataSlice";
+import { addEditToHistory, EditPair } from "./historySlice";
 import { lock, unlock } from "./lockSlice";
 
 export interface MoveNodeArgType {
@@ -19,7 +19,7 @@ export interface MoveNodeArgType {
   nodeId: string;
   newNode: Node;
   oldNode: Node;
-  addToHistory: boolean;
+  addToHistory?: boolean;
 }
 
 interface GetFileArgType {
@@ -93,7 +93,7 @@ export const apiSlice = createApi({
           // create edit and add to history
           if (addToHistory) {
             const endpoint = "moveNode";
-            const edit: EditArg = {
+            const edit: EditPair = {
               edit: {
                 endpoint,
                 arg: {

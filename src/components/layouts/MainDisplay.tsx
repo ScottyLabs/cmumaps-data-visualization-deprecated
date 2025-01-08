@@ -8,7 +8,8 @@ import { toast } from "react-toastify";
 import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
 import { savingHelper } from "../../lib/apiRoutes";
 import { useGetGraphQuery } from "../../lib/features/apiSlice";
-import { redo, setNodes, undo } from "../../lib/features/dataSlice";
+import { setNodes } from "../../lib/features/dataSlice";
+import { redo, undo } from "../../lib/features/historySlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,

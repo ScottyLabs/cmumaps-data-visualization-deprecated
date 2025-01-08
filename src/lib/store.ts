@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { apiSlice } from "./features/apiSlice";
 import dataSlice from "./features/dataSlice";
 import floorSlice from "./features/floorSlice";
+import historySlice from "./features/historySlice";
 import lockSlice from "./features/lockSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
@@ -27,6 +28,7 @@ export const makeStore = () => {
       floor: floorSlice,
       users: usersSlice,
       lock: lockSlice,
+      history: historySlice,
       [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>

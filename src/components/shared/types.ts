@@ -1,4 +1,5 @@
 import { Polygon } from "geojson";
+import { Patch } from "immer";
 
 export interface PDFCoordinate {
   x: number;
@@ -81,7 +82,11 @@ export interface Node {
   overwrites: Overwrite[];
 }
 
-type Overwrite = Node & { senderId: string };
+export interface Overwrite {
+  patch: Patch[];
+  updatedAt: Date;
+  senderId: string;
+}
 
 /**
  * Door type

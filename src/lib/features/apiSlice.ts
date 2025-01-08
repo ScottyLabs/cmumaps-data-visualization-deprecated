@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { toast } from "react-toastify";
 
-import { Graph, Node } from "../../components/shared/types";
+import { Graph, Node, Overwrite } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
 import { GRAPH_PATCH, WEBSOCKET_MESSAGE } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
@@ -92,20 +92,6 @@ export const apiSlice = createApi({
             return;
           }
 
-          // get nodes to create reversedDbPatch
-          const nodes: Graph = await getGraph(floorCode, getState, dispatch);
-
-          // if there are other changes by myself that needs to be applied,
-          // just decrease locked by 1 and exit;
-          if (nodes[nodeId].locked !== 1) {
-            dispatch(
-              apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                draft[nodeId].locked--;
-              })
-            );
-            return;
-          }
-
           // if (Math.random() > 0.5) {
           //   console.log("Waited for 2 seconds");
           //   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -113,41 +99,56 @@ export const apiSlice = createApi({
           //   console.log(updatedAt);
           // }
 
-          // keep node in sync with the node with the highest updatedAt timestamp
-          let maxUpdatedAt = updatedAt;
-          let finalNode: Node = { ...node, updatedAt };
-          for (const overwrite of nodes[nodeId].overwrites) {
+          // get nodes to create reversedDbPatch
+          const nodes: Graph = await getGraph(floorCode, getState, dispatch);
+          const overwrites = nodes[nodeId].overwrites.sort(
+            (a, b) => a.updatedAt.getTime() - b.updatedAt.getTime()
+          );
+
+          // if there are other changes by myself that needs to be applied,
+          // then apply only patches with lower timestamps, otherwise apply all
+          let overwritesToApply: Overwrite[] = overwrites;
+          let leftoverOverwrites: Overwrite[] = [];
+          if (nodes[nodeId].locked !== 1) {
+            overwritesToApply = overwrites.filter(
+              (overwrite) => overwrite.updatedAt < updatedAt
+            );
+            leftoverOverwrites = overwrites.filter(
+              (overwrite) => overwrite.updatedAt > updatedAt
+            );
+          }
+
+          // apply all the patchesToApply
+          for (const overwrite of overwritesToApply) {
             // check if you overwrite the node without knowing someone's change
             if (overwrite.updatedAt < updatedAt) {
               const name = getUserName(overwrite.senderId, getState);
               toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
                 autoClose: false,
               });
-            } else {
-              maxUpdatedAt = overwrite.updatedAt;
-              finalNode = overwrite;
             }
-          }
 
-          // if updatedAt changed, then need to apply someone else's change
-          if (maxUpdatedAt !== updatedAt) {
             dispatch(
-              apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                draft[nodeId] = finalNode;
-              })
+              apiSlice.util.patchQueryData(
+                "getGraph",
+                floorCode,
+                overwrite.patch
+              )
             );
-            return;
           }
-
-          // Otherwise need to broadcast your change
 
           // apply the change again with the updatedAt
           const { patches: jsonPatch, inversePatches: reversedJsonPatch } =
             dispatch(
               apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
-                const locked = 0;
-                const overwrite = [];
-                const updatedNode = { ...node, updatedAt, locked, overwrite };
+                const locked = draft[nodeId].locked - 1;
+                const overwrites = leftoverOverwrites;
+                const updatedNode: Node = {
+                  ...node,
+                  updatedAt,
+                  locked,
+                  overwrites,
+                };
                 draft[nodeId] = updatedNode;
               })
             );

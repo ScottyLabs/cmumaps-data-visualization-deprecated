@@ -11,9 +11,10 @@ import {
   GraphPatchMessageAction,
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
+import { addEditToHistory, EditArg } from "./dataSlice";
 import { lock, unlock } from "./lockSlice";
 
-interface MoveNodeArgType {
+export interface MoveNodeArgType {
   floorCode: string;
   nodeId: string;
   newNode: Node;
@@ -88,19 +89,19 @@ export const apiSlice = createApi({
             })
           );
 
-          // create db patches
-          // const apiPath = "/api/node/update";
-          // const body = JSON.stringify({ nodeId, node: newNode });
-          // const reversedBody = JSON.stringify({ nodeId, node: oldNode });
-          // const dbPatch = { apiPath, body };
-          // const reversedDbPatch = { apiPath, body: reversedBody };
-
-          // // create the patch and add to history
-          // const patch = {
-          //   dbPatch,
-          //   reversedDbPatch,
-          // };
-          // dispatch(addPatchesToHistory(patch));
+          // create edit and add to history
+          const endpoint = "moveNode";
+          const edit: EditArg = {
+            edit: {
+              endpoint,
+              arg: { floorCode, nodeId, oldNode, newNode },
+            },
+            reverseEdit: {
+              endpoint,
+              arg: { floorCode, nodeId, oldNode: newNode, newNode: oldNode },
+            },
+          };
+          dispatch(addEditToHistory(edit));
 
           // different error handling for queryFulfilled
           let updatedAt: string;

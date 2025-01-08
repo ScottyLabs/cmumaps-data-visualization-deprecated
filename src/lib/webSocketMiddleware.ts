@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice, getGraph } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
-import { pushOverwrite } from "./features/lockSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 import { getUserName, toastOverwriteOnNode } from "./utils/overwriteUtils";
@@ -56,10 +55,13 @@ let socket: WebSocket | null = null;
  * Handles a graph patch in the following way:
  *
  * - First check if the node is locked:
- *   - If it is locked, then add to overwrites.
+ *   - If it is locked then update the `updatedAt` time
+ *     and toast a warning about overwriting their change
+ *
  *   - Otherwise check if the timestamp is later
  *     - If later then apply the patch
- *     - Otherwise it is outdated (unrecoverable) and toast a warning
+ *     - Otherwise it is outdated
+ *       and toast a warning about overwriting their change
  */
 const handleGraphPatch = async (
   message: GraphPatch,
@@ -69,15 +71,13 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const locked = getStore().lock.nodeLocks[nodeId]?.locked !== 0;
+    const locked = getStore().lock.nodeLocks[nodeId] !== 0;
     if (locked) {
+      const name = getUserName(message.sender, getStore());
+      toastOverwriteOnNode(name, nodeId);
       dispatch(
-        pushOverwrite({
-          nodeId,
-          overwrite: {
-            senderId: message.sender,
-            updatedAt: message.updatedAt,
-          },
+        apiSlice.util.updateQueryData("getGraph", floorCode, (draft) => {
+          draft[nodeId].updatedAt = message.updatedAt;
         })
       );
       return;

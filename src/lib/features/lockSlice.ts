@@ -1,47 +1,34 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { ID, NodeLock, Overwrite } from "../../components/shared/types";
+import { ID } from "../../components/shared/types";
 
 interface LockState {
-  nodeLocks: Record<ID, NodeLock>;
-  overwritesMap: Record<ID, Overwrite[]>;
+  /**
+   * 0 if unlocked, otherwise locked.
+   * The user can write to a node whenver they want.
+   * `locked` is used to indicate that a WebSocket patch is being overwritten
+   * since the user edited the node without knowing the patch.
+   */
+  nodeLocks: Record<ID, number>;
 }
 
 const initialState: LockState = {
   nodeLocks: {},
-  overwritesMap: {},
 };
-
-interface PushOverwriteAction {
-  nodeId: string;
-  overwrite: Overwrite;
-}
 
 const lockSlice = createSlice({
   name: "lock",
   initialState,
   reducers: {
     lock(state, action: PayloadAction<string>) {
-      state.nodeLocks[action.payload] = state.nodeLocks[action.payload] || {
-        locked: 0,
-      };
-      state.nodeLocks[action.payload].locked++;
+      state.nodeLocks[action.payload] = state.nodeLocks[action.payload] || 0;
+      state.nodeLocks[action.payload]++;
     },
     unlock(state, action: PayloadAction<string>) {
-      state.nodeLocks[action.payload].locked--;
-    },
-
-    clearOverwrite(state, action: PayloadAction<ID>) {
-      state.overwritesMap[action.payload] = [];
-    },
-    pushOverwrite(state, action: PayloadAction<PushOverwriteAction>) {
-      const nodeId = action.payload.nodeId;
-      state.overwritesMap[nodeId] = state.overwritesMap[nodeId] || [];
-      state.overwritesMap[nodeId].push(action.payload.overwrite);
+      state.nodeLocks[action.payload]--;
     },
   },
 });
 
-export const { lock, unlock, clearOverwrite, pushOverwrite } =
-  lockSlice.actions;
+export const { lock, unlock } = lockSlice.actions;
 export default lockSlice.reducer;

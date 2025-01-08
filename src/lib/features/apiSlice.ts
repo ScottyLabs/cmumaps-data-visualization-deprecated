@@ -5,15 +5,13 @@ import { toast } from "react-toastify";
 
 import { Graph, Node } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
-import { RootState } from "../store";
-import { getUserName, toastOverwriteOnNode } from "../utils/overwriteUtils";
 import {
   GRAPH_PATCH,
   GraphPatchMessageAction,
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
 import { addPatchesToHistory } from "./dataSlice";
-import { clearOverwrite, lock, unlock } from "./lockSlice";
+import { lock, unlock } from "./lockSlice";
 
 interface MoveNodeArgType {
   floorCode: string;
@@ -140,32 +138,15 @@ export const apiSlice = createApi({
           // unlock the node after update
           dispatch(unlock(nodeId));
 
-          // apply overwrites in chronological order
-          const store = getState() as RootState;
-          const overwrites = store.lock.overwritesMap[nodeId] ?? [];
-          const maxTimestamp = overwrites.length
-            ? overwrites.reduce((max, overwrite) => {
-                return max > overwrite.updatedAt ? max : overwrite.updatedAt;
-              }, overwrites[0]?.updatedAt)
-            : null;
-
-          // very rare case that an overwrite has a later update timestamp,
+          // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
-          if (maxTimestamp && maxTimestamp > updatedAt) {
-            toast.error("Very rare concurrency issue!");
+          const nodes = getGraph(floorCode, getState, dispatch);
+          if (nodes[nodeId].update > updatedAt) {
+            toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Graph"]));
             toast.info("Refetching the graph...");
             return;
           }
-
-          // toast warnings about overwriting someone's change
-          for (const overwrite of overwrites) {
-            const name = getUserName(overwrite.senderId, store);
-            toastOverwriteOnNode(name, nodeId);
-          }
-
-          // clear overwrites
-          dispatch(clearOverwrite(nodeId));
 
           // reapply your change and update timestamp
           dispatch(

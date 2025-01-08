@@ -68,27 +68,6 @@ export interface Node {
   updatedAt: string;
 }
 
-export interface NodeLock {
-  /**
-   * 0 if unlocked, otherwise locked.
-   * The user can write to a node whenver they want.
-   * `locked` is used to indicate that a WebSocket patch is an overwritten
-   * since the user edited the node without knowing the patch.
-   */
-  locked: number;
-
-  /**
-   * All the messages that are overwritten by the user.
-   */
-  overwrites: Overwrite[];
-}
-
-export interface Overwrite {
-  // a date as a string value in ISO format.
-  updatedAt: string;
-  senderId: string;
-}
-
 /**
  * Door type
  */

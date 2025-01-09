@@ -8,6 +8,7 @@ import lockSlice from "./features/lockSlice";
 import modeSlice from "./features/modeSlice";
 import mouseEventSlice from "./features/mouseEventSlice";
 import outlineSlice from "./features/outlineSlice";
+import polygonSlice from "./features/polygonSlice";
 import statusSlice from "./features/statusSlice";
 import uiSlice from "./features/uiSlice";
 import usersSlice from "./features/usersSlice";
@@ -29,6 +30,7 @@ export const makeStore = () => {
       users: usersSlice,
       lock: lockSlice,
       history: historySlice,
+      polygon: polygonSlice,
       [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>

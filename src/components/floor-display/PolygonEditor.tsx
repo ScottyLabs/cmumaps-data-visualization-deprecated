@@ -1,6 +1,6 @@
 import { Polygon } from "geojson";
 
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Circle, Line } from "react-konva";
 
 import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
@@ -9,6 +9,7 @@ import {
   POLYGON_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
+import { dragVertex, releaseVertex } from "../../lib/features/polygonSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
 import { ID } from "../shared/types";
@@ -25,8 +26,10 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector((state) => state.mode.mode);
   const { coordsIndex } = useContext(PolygonContext);
-  const [vertexOnDrag, setVertexOnDrag] = useState<number>(-1);
   const savePolygonEdit = useSavePolygonEdit(floorCode, roomId);
+  const vertexOnDrag = useAppSelector(
+    (state) => state.polygon.vertexIndexOnDrag
+  );
 
   const handleOnDragEnd = (e, index: number) => {
     const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
@@ -77,9 +80,9 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
     coords.map((points, index) => {
       if (
         !(
-          index == 0 ||
-          index == vertexOnDrag ||
-          (index + coords.length - 1) % coords.length == vertexOnDrag ||
+          index === 0 ||
+          index === vertexOnDrag ||
+          (index + coords.length - 1) % coords.length === vertexOnDrag ||
           // special case of dragging the last coord
           (vertexOnDrag == 0 && index == coords.length - 1)
         )
@@ -117,10 +120,10 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
               draggable
               onMouseEnter={(e) => setCursor(e, "pointer")}
               onMouseLeave={(e) => setCursor(e, "default")}
-              onDragStart={() => setVertexOnDrag(index)}
+              onDragStart={() => dispatch(dragVertex(index))}
               onDragEnd={(e) => {
                 handleOnDragEnd(e, index);
-                setVertexOnDrag(-1);
+                dispatch(releaseVertex());
               }}
               onClick={() => handleClick(index)}
             />

@@ -45,10 +45,16 @@ const MainDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { data: nodes, isFetching: isFetchingNodes } =
-    useGetNodesQuery(floorCode);
-  const { data: rooms, isFetching: isFetchingRooms } =
-    useGetRoomsQuery(floorCode);
+  const {
+    data: nodes,
+    isFetching: isFetchingNodes,
+    isError: isErrorNodes,
+  } = useGetNodesQuery(floorCode);
+  const {
+    data: rooms,
+    isFetching: isFetchingRooms,
+    isError: isErrorRooms,
+  } = useGetRoomsQuery(floorCode);
 
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
@@ -214,6 +220,16 @@ const MainDisplay = ({ floorCode }: Props) => {
 
     setStateUpdated(true);
   }, [dispatch, floorCode, nodes, rooms, router, searchParams]);
+
+  if (isErrorNodes || isErrorRooms) {
+    return (
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2">
+        <p className="text-nowrap text-3xl text-red-500">
+          Failed to fetch data!
+        </p>
+      </div>
+    );
+  }
 
   if (!statesUpdated || loadingStatus !== LOADED) {
     return;

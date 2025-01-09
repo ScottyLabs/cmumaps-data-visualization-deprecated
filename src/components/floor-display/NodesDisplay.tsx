@@ -16,7 +16,7 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
-import { useMoveNodeMutation } from "../../lib/features/nodeApiSlice";
+import { useUpdateNodeMutation } from "../../lib/features/nodeApiSlice";
 import {
   CursorInfo,
   CursorInfoOnDragNode,
@@ -59,7 +59,7 @@ const NodesDisplay = ({
 
   const [oldNode, setOldNode] = useState<NodeInfo | null>(null);
 
-  const [moveNode] = useMoveNodeMutation();
+  const [moveNode] = useUpdateNodeMutation();
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);

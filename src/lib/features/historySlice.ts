@@ -41,7 +41,7 @@ const initialState: HistoryState = {
 const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
   switch (edit.endpoint) {
     case "moveNode":
-      dispatch(nodeApiSlice.endpoints.moveNode.initiate(edit.arg)).unwrap();
+      dispatch(nodeApiSlice.endpoints.updateNode.initiate(edit.arg)).unwrap();
       break;
     case "upsertRoom":
       dispatch(RoomApiSlice.endpoints.upsertRoom.initiate(edit.arg)).unwrap();

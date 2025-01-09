@@ -24,7 +24,7 @@ export interface MoveNodeArgType {
 export const nodeApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    moveNode: builder.mutation<string, MoveNodeArgType>({
+    updateNode: builder.mutation<string, MoveNodeArgType>({
       query: ({ nodeId, newNode }) => ({
         url: "/api/node/update",
         method: "POST",
@@ -141,4 +141,4 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useMoveNodeMutation } = nodeApiSlice;
+export const { useUpdateNodeMutation } = nodeApiSlice;

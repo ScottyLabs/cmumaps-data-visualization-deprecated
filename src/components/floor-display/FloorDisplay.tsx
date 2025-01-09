@@ -270,7 +270,7 @@ const FloorDisplay = ({
           {showPolygons && <PolygonsDisplay rooms={rooms} />}
 
           {showEdges && !editPolygon && !editRoomLabel && (
-            <EdgesDisplay nodes={nodes} />
+            <EdgesDisplay nodes={nodes} cursorInfoListRef={cursorInfoListRef} />
           )}
           {showNodes && !editPolygon && !editRoomLabel && (
             <NodesDisplay

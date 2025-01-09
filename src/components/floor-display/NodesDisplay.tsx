@@ -15,7 +15,11 @@ import {
   GRAPH_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
-import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import {
+  dragNode,
+  getNodeIdSelected,
+  releaseNode,
+} from "../../lib/features/mouseEventSlice";
 import { useUpdateNodeMutation } from "../../lib/features/nodeApiSlice";
 import {
   CursorInfo,
@@ -219,6 +223,8 @@ const NodesDisplay = ({
 
   const handleOnDragEnd =
     (nodeId: ID) => (e: Konva.KonvaEventObject<DragEvent>) => {
+      dispatch(releaseNode());
+
       // create new node
       const newNode: NodeInfo = JSON.parse(JSON.stringify(nodes[nodeId]));
       newNode.pos = getNodePos(e);
@@ -256,6 +262,7 @@ const NodesDisplay = ({
             onMouseLeave={(e) => setCursor(e, "default")}
             onClick={() => handleNodeClick(nodeId)}
             draggable
+            onDragStart={() => dispatch(dragNode(nodeId))}
             onDragEnd={handleOnDragEnd(nodeId)}
             onDragMove={handleDragMove(nodeId)}
           />

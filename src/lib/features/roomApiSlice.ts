@@ -81,10 +81,18 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
             const res = await queryFulfilled;
             updatedAt = res.data;
           } catch (e) {
-            toast.error(
-              "Failed to save! Check the Console for detailed error."
-            );
-            const error = e as { error: { data: { error: string } } };
+            const error = e as {
+              error: { data: { error: string; errorMessage?: string } };
+            };
+            // known error
+            if (error.error.data.errorMessage) {
+              toast.error(error.error.data.errorMessage);
+              return;
+            } else {
+              toast.error(
+                "Failed to save! Check the Console for detailed error."
+              );
+            }
             console.error(error.error.data.error);
 
             // invalidate the cache

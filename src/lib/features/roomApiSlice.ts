@@ -22,6 +22,7 @@ export interface UpdateRoomArgType {
 }
 
 export const RoomApiSlice = apiSlice.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     updateRoom: builder.mutation<string, UpdateRoomArgType>({
       query: ({ roomId, newRoom }) => ({
@@ -95,7 +96,7 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
 
             // invalidate the cache
             dispatch(apiSlice.util.invalidateTags(["Rooms"]));
-            toast.info("Refetching the graph...");
+            toast.info("Refetching rooms...");
             return;
           }
 
@@ -106,8 +107,16 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           if (rooms[roomId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Rooms"]));
-            toast.info("Refetching the graph...");
+            toast.info("Refetching rooms...");
             return;
+          }
+
+          if (store.visibility.showEdges) {
+            console.log("Waited for 5 seconds");
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+          } else {
+            console.log("Waited for 1 seconds");
+            await new Promise((resolve) => setTimeout(resolve, 1000));
           }
 
           // update timestamp

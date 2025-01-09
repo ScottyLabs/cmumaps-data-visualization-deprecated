@@ -4,11 +4,11 @@ import { toast } from "react-toastify";
 
 import { NodeInfo, RoomInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice, getNodes } from "./features/apiSlice";
+import { apiSlice, getNodes, getRooms } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
-import { getUserName, toastOverwriteOnNode } from "./utils/overwriteUtils";
+import { getUserName } from "./utils/overwriteUtils";
 
 export const WEBSOCKET_JOIN = "socket/join";
 export const WEBSOCKET_MESSAGE = "socket/message";
@@ -84,17 +84,19 @@ const handleRoomEdit = async (
     );
 
     // toast warning about overwriting if locked or receiving an outdated edit
-    const nodes = await getNodes(floorCode, getStore, dispatch);
-    if (locked || message.updatedAt < nodes[roomId].updatedAt) {
+    const rooms = await getRooms(floorCode, getStore, dispatch);
+    if (locked || message.updatedAt < rooms[roomId].updatedAt) {
       const name = getUserName(message.sender, getStore());
-      toastOverwriteOnNode(name, roomId);
+      toast.warn(`You overwrote ${name}'s change on room ${roomId}`, {
+        autoClose: false,
+      });
       return;
     }
 
     // otherwise apply the change
     dispatch(
       apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-        draft[roomId] = { ...message.newRoom, updatedAt: message.updatedAt };
+        draft[roomId] = message.newRoom;
       })
     );
   } catch (e) {
@@ -129,7 +131,9 @@ const handleGraphPatch = async (
     const nodes = await getNodes(floorCode, getStore, dispatch);
     if (locked || message.updatedAt < nodes[nodeId].updatedAt) {
       const name = getUserName(message.sender, getStore());
-      toastOverwriteOnNode(name, nodeId);
+      toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
+        autoClose: false,
+      });
       return;
     }
 

@@ -38,10 +38,11 @@ const PolygonTab = ({ floorCode, rooms, nodes }: Props) => {
   const polygon = rooms[roomId].polygon;
 
   const renderInteriorButton = () => {
-    const addHole = () => {
+    const addHole = async () => {
       const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
       newPolygon.coordinates.push([]);
-      savePolygonEdit(newPolygon);
+      await savePolygonEdit(newPolygon);
+      dispatch(setRingIndex(newPolygon.coordinates.length - 1));
     };
 
     const deleteHole = () => {

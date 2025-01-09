@@ -8,11 +8,11 @@ const useSavePolygonEdit = (floorCode: string, roomId: string) => {
   const { data: rooms } = useGetRoomsQuery(floorCode);
   const [upsertRoom] = useUpsertRoomMutation();
 
-  const savePolygonEdit = (polygon: Polygon) => {
+  const savePolygonEdit = async (polygon: Polygon) => {
     if (rooms) {
       const oldRoom = rooms[roomId];
       const newRoom: RoomInfo = { ...oldRoom, polygon };
-      upsertRoom({ floorCode, roomId, newRoom, oldRoom });
+      await upsertRoom({ floorCode, roomId, newRoom, oldRoom });
     }
   };
 

@@ -5,15 +5,21 @@ import { toast } from "react-toastify";
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
 import { MoveNodeArgType, nodeApiSlice } from "./nodeApiSlice";
+import { UpdateRoomArgType } from "./roomApiSlice";
 
 const MAX_UNDO_LIMIT = 50;
+
+interface UpdateRoomEdit {
+  endpoint: "updateRoom";
+  arg: UpdateRoomArgType;
+}
 
 interface MoveNodeEdit {
   endpoint: "moveNode";
   arg: MoveNodeArgType;
 }
 
-type Edit = MoveNodeEdit;
+type Edit = MoveNodeEdit | UpdateRoomEdit;
 
 export interface EditPair {
   edit: Edit;

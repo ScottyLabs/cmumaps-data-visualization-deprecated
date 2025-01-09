@@ -8,6 +8,18 @@ interface GetFileArgType {
   token: string;
 }
 
+export const getRooms = async (floorCode: string, getState, dispatch) => {
+  let rooms = apiSlice.endpoints.getRooms.select(floorCode)(getState()).data;
+
+  if (!rooms) {
+    rooms = (await dispatch(
+      apiSlice.endpoints.getRooms.initiate(floorCode)
+    ).unwrap()) as Rooms;
+  }
+
+  return rooms;
+};
+
 export const getNodes = async (floorCode: string, getState, dispatch) => {
   let nodes = apiSlice.endpoints.getNodes.select(floorCode)(getState()).data;
 

@@ -44,6 +44,7 @@ export async function GET(request: Request) {
         displayAlias: room.displayAlias ?? undefined,
         aliases: room.aliases.map((aliasEntry) => aliasEntry.alias),
         polygon: room.polygon as unknown as Polygon,
+        updatedAt: room.updatedAt.toISOString(),
       };
     }
 

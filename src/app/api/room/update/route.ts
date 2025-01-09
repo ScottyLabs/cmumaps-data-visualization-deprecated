@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const roomId = requestData.roomId;
     const roomData: RoomInfo = requestData.roomData;
 
-    await prisma.room.update({
+    const newRoom = await prisma.room.update({
       where: {
         buildingCode_name: {
           buildingCode: getBuildingCodeFromRoomId(roomId),
@@ -24,14 +24,15 @@ export async function POST(request: Request) {
       data: {
         name: roomData.name,
       },
+      select: {
+        updatedAt: true,
+      },
     });
 
+    const updatedAt = newRoom.updatedAt;
+
     // good response
-    return new NextResponse(
-      JSON.stringify({
-        status: 200,
-      })
-    );
+    return new NextResponse(JSON.stringify({ status: 200, updatedAt }));
   } catch (e) {
     // console.log(e);
     let errorMessage = "";

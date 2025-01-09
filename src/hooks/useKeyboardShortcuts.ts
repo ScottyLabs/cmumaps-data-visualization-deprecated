@@ -156,6 +156,7 @@ const useKeyboardShortcuts = (
     nodeIdSelected,
     rooms,
     nodes,
+    invalidateNodesCache,
   ]);
 };
 

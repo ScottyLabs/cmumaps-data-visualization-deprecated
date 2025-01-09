@@ -1,23 +1,14 @@
-import {
-  createApi,
-  fetchBaseQuery,
-  RootState,
-} from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { Nodes } from "../../components/shared/types";
 import { AWS_API_INVOKE_URL } from "../apiRoutes";
-import { AppDispatch } from "../store";
 
 interface GetFileArgType {
   filePath: string;
   token: string;
 }
 
-export const getNodes = async (
-  floorCode: string,
-  getState: () => RootState<any, any, "api">,
-  dispatch: AppDispatch
-) => {
+export const getNodes = async (floorCode: string, getState, dispatch) => {
   let nodes = apiSlice.endpoints.getNodes.select(floorCode)(getState()).data;
 
   if (!nodes) {
@@ -50,8 +41,8 @@ export const apiSlice = createApi({
       transformResponse: (response: { data: Nodes }) => response.data,
       providesTags: ["Nodes"],
     }),
-    invalidateNodesCache: builder.mutation<void, void>({
-      queryFn: () => ({ data: undefined }),
+    invalidateNodesCache: builder.mutation<unknown, void>({
+      queryFn: () => ({ data: null }),
       invalidatesTags: ["Nodes"],
     }),
   }),

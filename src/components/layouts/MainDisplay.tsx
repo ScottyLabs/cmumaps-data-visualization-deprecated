@@ -212,7 +212,7 @@ const MainDisplay = ({ floorCode }: Props) => {
     }
 
     setStateUpdated(true);
-  }, [dispatch, floorCode, nodes, rooms, searchParams]);
+  }, [dispatch, floorCode, nodes, rooms, router, searchParams]);
 
   if (!statesUpdated || loadingStatus !== LOADED) {
     return;

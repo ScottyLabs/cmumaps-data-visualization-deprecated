@@ -1,21 +1,20 @@
 import { Polygon } from "geojson";
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Circle, Line } from "react-konva";
-import { toast } from "react-toastify";
 
+import { useGetRoomsQuery } from "../../lib/features/apiSlice";
 import {
   POLYGON_ADD_VERTEX,
   POLYGON_DELETE_VERTEX,
   POLYGON_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
+import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { RoomsContext } from "../contexts/RoomsProvider";
-import { ID } from "../shared/types";
+import { ID, RoomInfo } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
-import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 
 interface Props {
   floorCode: string;
@@ -26,69 +25,34 @@ interface Props {
 
 const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const dispatch = useAppDispatch();
+  const { data: rooms } = useGetRoomsQuery(floorCode);
+  const [upsertRoom] = useUpsertRoomMutation();
 
   const mode = useAppSelector((state) => state.mode.mode);
   const shortcutsDisabled = useAppSelector(
     (state) => state.status.shortcutsDisabled
   );
 
-  const { rooms, setRooms } = useContext(RoomsContext);
-  const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
-    useContext(PolygonContext);
+  const { coordsIndex } = useContext(PolygonContext);
 
   const [vertexOnDrag, setVertexOnDrag] = useState<number>(-1);
 
-  const saveNewPolygonEdit = (newPolygon: Polygon) => {
-    saveToPolygonHistory(
-      history,
-      setHistory,
-      historyIndex,
-      setHistoryIndex,
-      newPolygon
-    );
-    saveToRoomsHelper(newPolygon);
+  const savePolygonEdit = (newPolygon: Polygon) => {
+    if (rooms) {
+      const oldRoom = rooms[roomId];
+      const newRoom: RoomInfo = JSON.parse(JSON.stringify(oldRoom));
+      newRoom.polygon = newPolygon;
+      upsertRoom({ floorCode, roomId, newRoom, oldRoom });
+    }
   };
-
-  const saveToRoomsHelper = useCallback(
-    (newPolygon: Polygon) => {
-      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
-    },
-    [floorCode, roomId, rooms, setRooms]
-  );
 
   useEffect(() => {
     if (shortcutsDisabled) {
       return;
     }
 
-    const undo = () => {
-      if (historyIndex == 0) {
-        toast.error("Can't undo anymore!");
-        return;
-      }
-
-      saveToRoomsHelper(history[historyIndex - 1]);
-      setHistoryIndex(historyIndex - 1);
-    };
-
-    const redo = () => {
-      if (historyIndex == history.length - 1) {
-        toast.error("Can't redo anymore!");
-        return;
-      }
-
-      saveToRoomsHelper(history[historyIndex + 1]);
-      setHistoryIndex(historyIndex + 1);
-    };
-
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-        if (event.shiftKey) {
-          redo();
-        } else {
-          undo();
-        }
-      } else if (event.key === "d") {
+      if (event.key === "d") {
         dispatch(setMode(POLYGON_DELETE_VERTEX));
       } else if (event.key === "v") {
         dispatch(setMode(POLYGON_ADD_VERTEX));
@@ -100,14 +64,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    dispatch,
-    history,
-    historyIndex,
-    saveToRoomsHelper,
-    setHistoryIndex,
-    shortcutsDisabled,
-  ]);
+  }, [dispatch, shortcutsDisabled]);
 
   const handleOnDragEnd = (e, index: number) => {
     const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
@@ -122,7 +79,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
       coords[coords.length - 1] = newPos;
     }
 
-    saveNewPolygonEdit(newPolygon);
+    savePolygonEdit(newPolygon);
   };
 
   const handleClick = (index: number) => {
@@ -143,7 +100,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
         }
       }
 
-      saveNewPolygonEdit(newPolygon);
+      savePolygonEdit(newPolygon);
       dispatch(setMode(POLYGON_SELECT));
     }
   };

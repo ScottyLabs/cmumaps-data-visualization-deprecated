@@ -13,7 +13,6 @@ import {
   NodeInfo,
   Nodes,
   RoomInfo,
-  RoomInfoWithoutTimestamp,
   Rooms,
   RoomTypeList,
 } from "../../shared/types";
@@ -45,7 +44,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
     const createRoom = async () => {
       const floorLevel = extractFloorLevel(floorCode);
       const name = floorLevel + ":" + uuidv4().replace(/-/g, "");
-      const newRoom: RoomInfoWithoutTimestamp = {
+      const newRoom: RoomInfo = {
         name,
         labelPosition: nodes[nodeId].pos,
         type: "",
@@ -55,9 +54,10 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
           type: "Polygon",
           coordinates: [[]],
         },
+        updatedAt: new Date().toISOString(),
       };
       const roomId = getRoomIdFromRoomInfo(floorCode, newRoom);
-      const oldRoom = rooms[roomId];
+      const oldRoom = null;
       await upsertRoom({ floorCode, roomId, newRoom, oldRoom });
 
       const newNode = JSON.parse(JSON.stringify(nodes[nodeId]));

@@ -2,7 +2,7 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { RoomInfoWithoutTimestamp } from "../../components/shared/types";
+import { RoomInfo } from "../../components/shared/types";
 import {
   ROOM_EDIT,
   RoomEditMessageAction,
@@ -15,8 +15,8 @@ import { lockRoom, unlockRoom } from "./lockSlice";
 export interface UpdateRoomArgType {
   floorCode: string;
   roomId: string;
-  newRoom: RoomInfoWithoutTimestamp;
-  oldRoom: RoomInfoWithoutTimestamp;
+  newRoom: RoomInfo;
+  oldRoom: RoomInfo | null;
   addToHistory?: boolean;
 }
 
@@ -42,38 +42,45 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // optimistic update
           dispatch(
             apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-              // used the old updatedAt time
-              const updatedAt = draft[roomId].updatedAt;
-              draft[roomId] = { ...newRoom, updatedAt };
+              draft[roomId] = newRoom;
             })
           );
 
           // create edit and add to history
           if (addToHistory) {
-            const endpoint = "upsertRoom";
-            const edit: EditPair = {
-              edit: {
-                endpoint,
-                arg: {
-                  floorCode,
-                  roomId,
-                  oldRoom,
-                  newRoom,
-                  addToHistory: false,
+            // can't undo create room
+            if (!oldRoom) {
+              const edit: EditPair = {
+                edit: { endpoint: "createRoom" },
+                reverseEdit: { endpoint: "deleteRoom" },
+              };
+              dispatch(addEditToHistory(edit));
+            } else {
+              const endpoint = "upsertRoom";
+              const edit: EditPair = {
+                edit: {
+                  endpoint,
+                  arg: {
+                    floorCode,
+                    roomId,
+                    oldRoom,
+                    newRoom,
+                    addToHistory: false,
+                  },
                 },
-              },
-              reverseEdit: {
-                endpoint,
-                arg: {
-                  floorCode,
-                  roomId,
-                  oldRoom: newRoom,
-                  newRoom: oldRoom,
-                  addToHistory: false,
+                reverseEdit: {
+                  endpoint,
+                  arg: {
+                    floorCode,
+                    roomId,
+                    oldRoom: newRoom,
+                    newRoom: oldRoom,
+                    addToHistory: false,
+                  },
                 },
-              },
-            };
-            dispatch(addEditToHistory(edit));
+              };
+              dispatch(addEditToHistory(edit));
+            }
           }
 
           // different error handling for queryFulfilled
@@ -105,6 +112,8 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
           const rooms = await getRooms(floorCode, getState, dispatch);
+          console.log(rooms[roomId].updatedAt);
+          console.log(updatedAt);
           if (rooms[roomId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Rooms"]));

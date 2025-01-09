@@ -2,14 +2,7 @@ import { toast } from "react-toastify";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
 import { setNodes } from "../../lib/features/dataSlice";
-import {
-  Nodes,
-  ID,
-  PDFCoordinate,
-  RoomInfo,
-  Rooms,
-  RoomInfoWithoutTimestamp,
-} from "../shared/types";
+import { Nodes, ID, PDFCoordinate, RoomInfo, Rooms } from "../shared/types";
 
 /**
  * @param roomName
@@ -119,7 +112,7 @@ export const extractFloorLevelFromRoomName = (roomName: string) => {
 
 export const getRoomIdFromRoomInfo = (
   floorCode: string,
-  roomInfo: RoomInfo | RoomInfoWithoutTimestamp
+  roomInfo: RoomInfo
 ) => {
   const buildingCode = extractBuildingCode(floorCode);
   return `${buildingCode}-${roomInfo.name}`;

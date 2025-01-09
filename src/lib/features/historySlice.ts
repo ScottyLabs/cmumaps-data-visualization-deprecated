@@ -19,7 +19,15 @@ interface MoveNodeEdit {
   arg: MoveNodeArgType;
 }
 
-type Edit = MoveNodeEdit | UpdateRoomEdit;
+interface DeleteRoomEdit {
+  endpoint: "deleteRoom";
+}
+interface CreateRoomEdit {
+  // for redoing create room
+  endpoint: "createRoom";
+}
+
+type Edit = MoveNodeEdit | UpdateRoomEdit | DeleteRoomEdit | CreateRoomEdit;
 
 export interface EditPair {
   edit: Edit;
@@ -45,6 +53,12 @@ const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
       break;
     case "upsertRoom":
       dispatch(RoomApiSlice.endpoints.upsertRoom.initiate(edit.arg)).unwrap();
+      break;
+    case "deleteRoom":
+      toast.warn("Can't undo create room!");
+      break;
+    case "createRoom":
+      toast.warn("Can't redo create room!");
       break;
   }
 };

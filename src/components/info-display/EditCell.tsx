@@ -26,10 +26,10 @@ const EditCell = ({ property, value, handleSave }: Props) => {
   const renderValueCell = () => {
     if (isEditing) {
       return (
-        <div className="flex">
+        <div className="my-1 flex justify-between">
           <input
             id={property}
-            className="box-border h-7 w-20 rounded border border-gray-300 px-2 py-0.5"
+            className="flex h-7 w-full rounded border border-gray-300 px-1 py-0.5"
             type="text"
             value={editedValue}
             onChange={(e) => setEditedValue(e.target.value)}
@@ -47,7 +47,7 @@ const EditCell = ({ property, value, handleSave }: Props) => {
             autoFocus
           />
           <FaCheck
-            className="ml-2 cursor-pointer text-2xl text-white hover:text-gray-400"
+            className="ml-2 flex cursor-pointer text-2xl text-white hover:text-gray-400"
             onMouseDown={() => {
               handleSave(editedValue, setEditedValue, setIsEditing);
               dispatch(setShortcutsDisabled(false));
@@ -58,9 +58,9 @@ const EditCell = ({ property, value, handleSave }: Props) => {
     } else {
       return (
         <div className="flex justify-between">
-          <div className="h-7 text-lg text-white">{value}</div>
+          <div className="h-7 truncate text-lg text-white">{value}</div>
           <FaPencilAlt
-            className="ml-2 mt-1 cursor-pointer text-right text-white hover:text-gray-400"
+            className="ml-2 mt-1 flex-none cursor-pointer text-right text-white hover:text-gray-400"
             onClick={() => {
               setIsEditing(true);
               dispatch(setShortcutsDisabled(true));

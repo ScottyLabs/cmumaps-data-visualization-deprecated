@@ -82,7 +82,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
     return (
       <tr>
         {renderCell("Room ID")}
-        {renderCell(roomId)}
+        {renderCell(roomId, "truncate")}
       </tr>
     );
   };
@@ -191,7 +191,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
     return (
       <tr>
         <td className="border pl-4 pr-4">Aliases</td>
-        <td className="flex w-48 border p-2 text-black">
+        <td className="border p-2 text-black">
           <AliasesMultiSelect
             key={roomId}
             room={room}
@@ -204,12 +204,14 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
 
   return (
     <>
-      <table className="table-auto">
-        <tbody>
+      <table className="w-72 table-fixed">
+        <thead>
           <tr>
-            {renderCell("Property", "font-bold")}
+            {renderCell("Property", "font-bold w-28")}
             {renderCell("Value", "font-bold")}
           </tr>
+        </thead>
+        <tbody>
           {renderRoomIdRow()}
           {renderEditNameRow()}
           {renderEditTypeRow()}

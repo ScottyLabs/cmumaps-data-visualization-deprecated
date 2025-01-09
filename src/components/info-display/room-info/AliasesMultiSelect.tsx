@@ -51,7 +51,7 @@ const AliasesMultiSelect = ({ room, handleSaveHelper }: Props) => {
     <div className="w-full space-y-2">
       <div className="flex w-full gap-1">
         <input
-          className="w-full flex-1 rounded p-1"
+          className="w-full flex-1 rounded p-1 text-sm"
           placeholder="Enter new alias..."
           value={inputValue}
           onChange={(newValue) => setInputValue(newValue.target.value)}

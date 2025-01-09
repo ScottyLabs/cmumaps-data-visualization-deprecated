@@ -111,14 +111,6 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
             return;
           }
 
-          if (store.visibility.showEdges) {
-            console.log("Waited for 5 seconds");
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          } else {
-            console.log("Waited for 1 seconds");
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-
           // update timestamp
           // reapply change if no more change by myself
           dispatch(

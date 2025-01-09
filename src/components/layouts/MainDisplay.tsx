@@ -219,7 +219,17 @@ const MainDisplay = ({ floorCode }: Props) => {
     }
 
     setStateUpdated(true);
-  }, [dispatch, floorCode, nodes, rooms, router, searchParams]);
+    // putting nodes and rooms in the dependency array causes too many rerenders
+    // when dragging. Having isFetching variables is enough.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dispatch,
+    floorCode,
+    isFetchingNodes,
+    isFetchingRooms,
+    router,
+    searchParams,
+  ]);
 
   if (isErrorNodes || isErrorRooms) {
     return (

@@ -207,8 +207,8 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
       <table className="table-auto">
         <tbody>
           <tr>
-            {renderCell("Property", { bold: true })}
-            {renderCell("Value", { bold: true })}
+            {renderCell("Property", "font-bold")}
+            {renderCell("Value", "font-bold")}
           </tr>
           {renderRoomIdRow()}
           {renderEditNameRow()}

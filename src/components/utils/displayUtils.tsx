@@ -1,9 +1,9 @@
+import { twMerge } from "tailwind-merge";
+
 // info-display
-export const renderCell = (property, style?) => {
+export const renderCell = (property: string, style?: string) => {
   return (
-    <td className={`border pl-4 pr-4 ${style?.bold ? "font-bold" : ""}`}>
-      {property}
-    </td>
+    <td className={twMerge("pr-4, style border pl-4", style)}>{property}</td>
   );
 };
 

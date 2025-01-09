@@ -40,13 +40,6 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // lock the Room to update
           dispatch(lock(roomId));
 
-          // first reset to old pos
-          dispatch(
-            apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-              draft[roomId] = oldRoom;
-            })
-          );
-
           // optimistic update
           dispatch(
             apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
@@ -104,7 +97,7 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // but this does mean that I shouldn't overwrite all changes.
           const store = getState() as RootState;
           const rooms = await getRooms(floorCode, getState, dispatch);
-          if (rooms[roomId].updatedAt > updatedAt) {
+          if (rooms[roomId].updatedAt && rooms[roomId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Rooms"]));
             toast.info("Refetching rooms...");

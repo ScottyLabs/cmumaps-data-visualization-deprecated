@@ -45,7 +45,7 @@ export interface Edge {
 /**
  * Graph types
  */
-export interface Node {
+export interface NodeInfo {
   /**
    * the position (x and y coordinates) of the node
    */
@@ -160,6 +160,6 @@ export interface RoomInfo {
 }
 
 export type Rooms = Record<ID, RoomInfo>;
-export type Nodes = Record<ID, Node>;
+export type Nodes = Record<ID, NodeInfo>;
 
 export type Mst = Record<ID, Record<ID, boolean>>;

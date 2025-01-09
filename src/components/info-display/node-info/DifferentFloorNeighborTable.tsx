@@ -6,7 +6,7 @@ import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { Node, Edge, EdgeTypeList } from "../../shared/types";
+import { NodeInfo, Edge, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import EditTypeRow from "../SelectTypeCell";
 
@@ -44,7 +44,7 @@ const DifferentFloorNeighborTable = ({
       (neighborId) => (setSelectedOption) => async (newValue) => {
         setSelectedOption(newValue);
 
-        const newNodes: Record<string, Node> = JSON.parse(
+        const newNodes: Record<string, NodeInfo> = JSON.parse(
           JSON.stringify(nodes)
         );
 
@@ -86,7 +86,9 @@ const DifferentFloorNeighborTable = ({
       };
 
     const deleteEdgeAcrossFloors = (neighborId) => {
-      const newNodes: Record<string, Node> = JSON.parse(JSON.stringify(nodes));
+      const newNodes: Record<string, NodeInfo> = JSON.parse(
+        JSON.stringify(nodes)
+      );
 
       delete newNodes[nodeId].neighbors[neighborId];
 

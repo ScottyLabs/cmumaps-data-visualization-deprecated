@@ -36,7 +36,7 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { Node, PDFCoordinate } from "../shared/types";
+import { NodeInfo, PDFCoordinate } from "../shared/types";
 import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { saveToPolygonHistory } from "../utils/polygonUtils";
@@ -126,7 +126,7 @@ const FloorDisplay = ({
     return;
   }
 
-  const addNewNode = (newNode: Node) => {
+  const addNewNode = (newNode: NodeInfo) => {
     const newNodes = { ...nodes };
 
     const newNodeId = uuidv4();
@@ -173,7 +173,7 @@ const FloorDisplay = ({
 
     if (mode == ADD_NODE) {
       getCursorPos(e, offset, scale, (pos) => {
-        const newNode: Node = {
+        const newNode: NodeInfo = {
           pos: pos,
           neighbors: {},
           roomId: findRoomId(rooms, pos),

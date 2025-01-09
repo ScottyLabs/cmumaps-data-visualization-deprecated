@@ -2,7 +2,7 @@ import { Action, Middleware } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { Node } from "../components/shared/types";
+import { NodeInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice, getNodes } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
@@ -30,7 +30,7 @@ interface WebSocketConnectAction {
 interface GraphPatch {
   type: typeof GRAPH_PATCH;
   nodeId: string;
-  newNode: Node;
+  newNode: NodeInfo;
   updatedAt: string;
   sender: string;
 }

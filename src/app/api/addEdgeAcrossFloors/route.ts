@@ -2,7 +2,7 @@ import fs from "fs";
 import { readFile } from "fs/promises";
 import { NextResponse } from "next/server";
 
-import { Node } from "../../../components/shared/types";
+import { NodeInfo } from "../../../components/shared/types";
 import {
   getNodeIdByRoomId,
   getRoomIdByRoomName,
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     const rooms1 = outline1["rooms"];
     const rooms2 = outline2["rooms"];
 
-    const node1: Node = graph1[nodeId1];
+    const node1: NodeInfo = graph1[nodeId1];
 
     // try autodetect with the name of the room
     if (!nodeId2) {
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const node2: Node = graph2[nodeId2];
+    const node2: NodeInfo = graph2[nodeId2];
 
     if (node1.neighbors[nodeId2] || node2.neighbors[nodeId1]) {
       return new NextResponse(

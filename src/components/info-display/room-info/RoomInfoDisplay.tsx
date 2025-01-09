@@ -8,7 +8,7 @@ import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { RoomsContext } from "../../contexts/RoomsProvider";
-import { Node, RoomInfo, RoomTypeList } from "../../shared/types";
+import { NodeInfo, RoomInfo, RoomTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { getRoomId, getRoomIdFromRoomInfo } from "../../utils/utils";
 import EditCell from "../EditCell";
@@ -105,7 +105,9 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
       const newNodes = { ...nodes };
       for (const nodeId in newNodes) {
         if (nodes[nodeId].roomId == roomId) {
-          const newNode: Node = JSON.parse(JSON.stringify(newNodes[nodeId]));
+          const newNode: NodeInfo = JSON.parse(
+            JSON.stringify(newNodes[nodeId])
+          );
           newNode.roomId = newRoomId;
           newNodes[nodeId] = newNode;
         }

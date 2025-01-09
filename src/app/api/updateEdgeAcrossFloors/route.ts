@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
 import fs from "fs";
 import { readFile } from "fs/promises";
+import { NextResponse } from "next/server";
+
+import { NodeInfo, ToFloorInfo } from "../../../components/shared/types";
 import { getGraphJsonFilePath } from "../apiUtils";
-import { Node, ToFloorInfo } from "../../../components/shared/types";
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
 
     const graphFilePath = getGraphJsonFilePath(floorCode);
     const graph = JSON.parse(await readFile(graphFilePath, "utf8"));
-    const node: Node = graph[nodeId];
+    const node: NodeInfo = graph[nodeId];
 
     if (newToFloorInfo) {
       node.neighbors[neighborId].toFloorInfo = newToFloorInfo;

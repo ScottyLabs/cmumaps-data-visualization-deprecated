@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
-import { Node, DoorInfo } from "../../../components/shared/types";
+import { NodeInfo, DoorInfo } from "../../../components/shared/types";
 import { dist } from "../../../components/utils/utils";
 import { getGraphJsonFilePath, getOutlineJsonFilePath } from "../apiUtils";
 import { AS_EDGE, AS_NODE } from "./addDoorToGraphTypes";
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     const graphJSON = JSON.parse(graph);
 
     for (const doorInfo of doors) {
-      const newNode: Node = {
+      const newNode: NodeInfo = {
         pos: doorInfo.center,
         neighbors: {},
         roomId: doorInfo.roomIds[0],
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
       // find the two closest nodes
       for (const nodeId in graphJSON) {
-        const node: Node = graphJSON[nodeId];
+        const node: NodeInfo = graphJSON[nodeId];
         if (node.roomId == roomId1) {
           const curDist = dist(node.pos, doorInfo.center);
           if (minDistance1 == -1 || curDist < minDistance1) {

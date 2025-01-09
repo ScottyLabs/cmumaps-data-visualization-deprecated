@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 // switch back to spawn if needed
 import { promisify } from "util";
 
-import { ID, Node } from "../../../components/shared/types";
+import { ID, NodeInfo } from "../../../components/shared/types";
 import {
   extractBuildingCode,
   getGraphJsonFilePath,
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
     // delete walkways nodes
     for (const nodeId in oldGraphJSON) {
-      const curNode: Node = oldGraphJSON[nodeId];
+      const curNode: NodeInfo = oldGraphJSON[nodeId];
 
       if (walkways.includes(curNode.roomId)) {
         delete oldGraphJSON[nodeId];
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
     // delete their neighbors
     for (const nodeId in oldGraphJSON) {
-      const curNode: Node = oldGraphJSON[nodeId];
+      const curNode: NodeInfo = oldGraphJSON[nodeId];
 
       for (const neighbor in curNode.neighbors) {
         if (deletedNodeIds.includes(neighbor)) {

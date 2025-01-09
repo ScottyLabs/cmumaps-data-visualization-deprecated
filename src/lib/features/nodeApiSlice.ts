@@ -2,7 +2,7 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { Node } from "../../components/shared/types";
+import { NodeInfo } from "../../components/shared/types";
 import { RootState } from "../store";
 import {
   GRAPH_PATCH,
@@ -16,8 +16,8 @@ import { lock, unlock } from "./lockSlice";
 export interface MoveNodeArgType {
   floorCode: string;
   nodeId: string;
-  newNode: Node;
-  oldNode: Node;
+  newNode: NodeInfo;
+  oldNode: NodeInfo;
   addToHistory?: boolean;
 }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { Node } from "../../../../components/shared/types";
+import { NodeInfo } from "../../../../components/shared/types";
 import {
   getBuildingCodeFromRoomId,
   getRoomNameFromRoomId,
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   try {
     const requestData = await request.json();
     const nodeId = requestData.nodeId;
-    const node: Node = requestData.node;
+    const node: NodeInfo = requestData.node;
 
     const newNode = await prisma.node.update({
       where: {

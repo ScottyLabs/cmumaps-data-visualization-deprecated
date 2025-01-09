@@ -25,7 +25,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import {
   EdgeTypeList,
-  Node,
+  NodeInfo,
   ID,
   Nodes,
   Rooms,
@@ -57,7 +57,7 @@ const NodesDisplay = ({
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const [oldNode, setOldNode] = useState<Node | null>(null);
+  const [oldNode, setOldNode] = useState<NodeInfo | null>(null);
 
   const [moveNode] = useMoveNodeMutation();
 
@@ -221,7 +221,7 @@ const NodesDisplay = ({
 
   const handleOnDragEnd = (nodeId: ID) => (e) => {
     // create new node
-    const newNode: Node = JSON.parse(JSON.stringify(nodes[nodeId]));
+    const newNode: NodeInfo = JSON.parse(JSON.stringify(nodes[nodeId]));
     newNode.pos = {
       x: Number(e.target.x().toFixed(2)),
       y: Number(e.target.y().toFixed(2)),
@@ -251,7 +251,7 @@ const NodesDisplay = ({
     }, CURSOR_INTERVAL);
 
   return Object.entries(nodes).map(
-    ([nodeId, node]: [ID, Node], index: number) => {
+    ([nodeId, node]: [ID, NodeInfo], index: number) => {
       if (!(showRoomSpecific && node.roomId !== roomIdSelected)) {
         return (
           <Circle

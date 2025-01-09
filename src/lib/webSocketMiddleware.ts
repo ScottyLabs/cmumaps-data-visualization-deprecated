@@ -2,7 +2,7 @@ import { Action, Middleware } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { NodeInfo } from "../components/shared/types";
+import { NodeInfo, RoomInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice, getNodes } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
@@ -14,6 +14,7 @@ export const WEBSOCKET_JOIN = "socket/join";
 export const WEBSOCKET_MESSAGE = "socket/message";
 
 // Message types
+export const ROOM_EDIT = "room edit";
 export const GRAPH_PATCH = "patch";
 export const CURSOR = "cursor";
 const LEAVE_FLOOR = "leaveFloor";
@@ -40,12 +41,67 @@ export interface GraphPatchMessageAction {
   payload: Omit<GraphPatch, "sender">;
 }
 
+interface RoomEdit {
+  type: typeof ROOM_EDIT;
+  roomId: string;
+  newRoom: RoomInfo;
+  updatedAt: string;
+  sender: string;
+}
+
+export interface RoomEditMessageAction {
+  type: typeof WEBSOCKET_MESSAGE;
+  payload: Omit<RoomEdit, "sender">;
+}
+
 interface WebSocketMessageAction {
   type: string;
   payload;
 }
 
 let socket: WebSocket | null = null;
+
+/**
+ * Handles a room edit
+ */
+const handleRoomEdit = async (
+  message: RoomEdit,
+  floorCode: string,
+  getStore: () => RootState,
+  dispatch: AppDispatch
+) => {
+  try {
+    const roomId = message.roomId;
+    const locked = !!getStore().lock.nodeLocks[roomId];
+
+    // update timestamp
+    dispatch(
+      apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
+        if (message.updatedAt > draft[roomId].updatedAt) {
+          draft[roomId].updatedAt = message.updatedAt;
+        }
+      })
+    );
+
+    // toast warning about overwriting if locked or receiving an outdated edit
+    const nodes = await getNodes(floorCode, getStore, dispatch);
+    if (locked || message.updatedAt < nodes[roomId].updatedAt) {
+      const name = getUserName(message.sender, getStore());
+      toastOverwriteOnNode(name, roomId);
+      return;
+    }
+
+    // otherwise apply the change
+    dispatch(
+      apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
+        draft[roomId] = { ...message.newRoom, updatedAt: message.updatedAt };
+      })
+    );
+  } catch (e) {
+    toast.error("Error handling room edit!");
+    console.error(e);
+  }
+};
 
 /**
  * Handles a graph patch
@@ -126,6 +182,10 @@ const handleWebSocketJoin = (
     switch (message.type) {
       case GRAPH_PATCH:
         handleGraphPatch(message, floorCode, getStore, dispatch);
+        break;
+
+      case ROOM_EDIT:
+        handleRoomEdit(message, floorCode, getStore, dispatch);
         break;
 
       // refresh user count in both floors when leaving a floor

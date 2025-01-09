@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 import { RoomInfo } from "../../components/shared/types";
 import { RootState } from "../store";
 import {
-  GRAPH_PATCH,
-  GraphPatchMessageAction,
+  ROOM_EDIT,
+  RoomEditMessageAction,
   WEBSOCKET_MESSAGE,
 } from "../webSocketMiddleware";
 import { apiSlice, getRooms } from "./apiSlice";
@@ -126,7 +126,7 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           dispatch(unlock(roomId));
 
           // send patch to others
-          const graphPatchAction: GraphPatchMessageAction = {
+          const graphPatchAction: RoomEditMessageAction = {
             type: WEBSOCKET_MESSAGE,
             payload: { type: ROOM_EDIT, roomId, newRoom, updatedAt },
           };

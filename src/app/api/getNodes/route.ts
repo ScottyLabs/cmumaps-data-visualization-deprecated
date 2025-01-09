@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { Edge, Nodes, ID } from "../../../components/shared/types";
 import prisma from "../../../lib/prisma";
-import { extractBuildingCode, extractFloorLevel } from "../apiUtils";
+import { extractBuildingCode, extractFloorLevel, getRoomId } from "../apiUtils";
 
 export async function GET(request: Request) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
           error: "Need Floor Code!",
         }),
         {
-          status: 500,
+          status: 400,
         }
       );
     }
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const floorLevel = extractFloorLevel(floorCode);
 
     // fetch all nodes from the database for this floor
-    const nodes = await prisma.node.findMany({
+    const dbNodes = await prisma.node.findMany({
       where: {
         room: {
           buildingCode: buildingCode,
@@ -45,9 +45,9 @@ export async function GET(request: Request) {
       },
     });
 
-    const graph: Nodes = {};
+    const nodes: Nodes = {};
 
-    for (const node of nodes) {
+    for (const node of dbNodes) {
       const neighbors: Record<ID, Edge> = {};
 
       // Process outNeighbors
@@ -73,10 +73,10 @@ export async function GET(request: Request) {
 
       let roomId = "";
       if (node.room) {
-        roomId = `${buildingCode}-${node.room.name}`;
+        roomId = getRoomId(node.room);
       }
 
-      graph[node.id] = {
+      nodes[node.id] = {
         pos: { x: node.posX, y: node.posY },
         neighbors,
         roomId,
@@ -84,14 +84,9 @@ export async function GET(request: Request) {
       };
     }
 
-    return new NextResponse(
-      JSON.stringify({
-        data: graph,
-      }),
-      {
-        status: 200,
-      }
-    );
+    return new NextResponse(JSON.stringify({ data: nodes }), {
+      status: 200,
+    });
   } catch (e) {
     // Javascript Error Message
     // console.log(e);

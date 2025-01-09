@@ -1,4 +1,15 @@
+import { Room } from "@prisma/client";
 import path from "path";
+
+/**
+ * Get room id as a string from a Prisma Room DB object
+ *
+ * @param room
+ * @returns
+ */
+export const getRoomId = (room: Room) => {
+  return `${room.buildingCode}-${room.name}`;
+};
 
 /**
  * Extract the building code associated with the floor code.

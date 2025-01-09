@@ -145,7 +145,7 @@ export interface RoomInfo {
    * The name under which the room is known (e.g. 'McConomy Auditorium')
    * The one that will be displayed.
    */
-  displayAlias: string;
+  displayAlias?: string;
 
   /**
    * List of names under which the room is known (e.g. 'McConomy Auditorium')

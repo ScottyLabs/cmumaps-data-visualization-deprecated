@@ -43,9 +43,8 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
 
   if (!roomId) {
     const createRoom = async () => {
-      const newRoomId = uuidv4();
-
-      const newRoomInfo: RoomInfo = {
+      const roomId = floorCode + uuidv4();
+      const newRoom: RoomInfo = {
         name: "",
         labelPosition: nodes[nodeId].pos,
         type: "",
@@ -56,31 +55,12 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
           coordinates: [[]],
         },
       };
+      const oldRoom = rooms[roomId];
+      upsertRoom({ floorCode, roomId, newRoom, oldRoom });
 
-      const newRooms = { ...rooms };
-      newRooms[newRoomId] = newRoomInfo;
-      setRooms(newRooms);
-
-      const newNodes = { ...nodes };
-      newNodes[nodeId].roomId = newRoomId;
-      dispatch(setNodes(newNodes));
-
-      savingHelper(
-        "/api/updateRoomInfo",
-        JSON.stringify({
-          floorCode: floorCode,
-          roomId: newRoomId,
-          newRoomInfo: newRoomInfo,
-        })
-      );
-
-      savingHelper(
-        "/api/updateGraph",
-        JSON.stringify({
-          floorCode: floorCode,
-          newGraph: JSON.stringify(newNodes),
-        })
-      );
+      // const newNodes = { ...nodes };
+      // newNodes[nodeId].roomId = newRoomId;
+      // dispatch(setNodes(newNodes));
     };
 
     return (

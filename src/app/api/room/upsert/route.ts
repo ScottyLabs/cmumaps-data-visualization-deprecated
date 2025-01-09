@@ -48,24 +48,33 @@ export async function POST(request: Request) {
       type: room.type,
       displayAlias: room.displayAlias,
       polygon: room.polygon as unknown as InputJsonValue,
-      aliases: {
-        deleteMany: {
-          alias: {
-            in: aliasesToDelete,
-          },
-        },
-        createMany: {
-          data: aliasesToCreate.map((alias) => ({ alias })),
-        },
-      },
     };
 
     const newRoom = await prisma.room.upsert({
       where: {
         buildingCode_name: { buildingCode, name: roomName },
       },
-      create: upsertData,
-      update: upsertData,
+      create: {
+        ...upsertData,
+        aliases: {
+          createMany: {
+            data: aliasesToCreate.map((alias) => ({ alias })),
+          },
+        },
+      },
+      update: {
+        ...upsertData,
+        aliases: {
+          deleteMany: {
+            alias: {
+              in: aliasesToDelete,
+            },
+          },
+          createMany: {
+            data: aliasesToCreate.map((alias) => ({ alias })),
+          },
+        },
+      },
       select: {
         updatedAt: true,
       },

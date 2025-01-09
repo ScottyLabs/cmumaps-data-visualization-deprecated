@@ -161,7 +161,7 @@ export interface RoomInfo {
   /**
    * Most recent update timestamp as a string value in ISO format.
    */
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export type Rooms = Record<ID, RoomInfo>;

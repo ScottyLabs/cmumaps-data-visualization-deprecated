@@ -13,7 +13,8 @@ export async function POST(request: Request) {
   try {
     const requestData = await request.json();
     const roomId = requestData.roomId;
-    const room: RoomInfo = requestData.room;
+    const oldRoom: RoomInfo | undefined = requestData.oldRoom;
+    const newRoom: RoomInfo = requestData.newRoom;
 
     const { buildingCode, roomName } = getInfoFromRoomId(roomId);
     const floorLevel = extractFloorLevelFromRoomName(roomName);
@@ -31,10 +32,10 @@ export async function POST(request: Request) {
 
     const existingAliasList = existingAliases.map((a) => a.alias);
     const aliasesToDelete = existingAliasList.filter(
-      (alias) => !room.aliases.includes(alias)
+      (alias) => !newRoom.aliases.includes(alias)
     );
 
-    const aliasesToCreate = room.aliases.filter(
+    const aliasesToCreate = newRoom.aliases.filter(
       (alias) => !existingAliasList.includes(alias)
     );
     //#endregion
@@ -42,17 +43,19 @@ export async function POST(request: Request) {
     const upsertData = {
       buildingCode,
       floorLevel,
-      name: room.name,
-      labelPosX: room.labelPosition.x,
-      labelPosY: room.labelPosition.y,
-      type: room.type,
-      displayAlias: room.displayAlias,
-      polygon: room.polygon as unknown as InputJsonValue,
+      name: newRoom.name,
+      labelPosX: newRoom.labelPosition.x,
+      labelPosY: newRoom.labelPosition.y,
+      type: newRoom.type,
+      displayAlias: newRoom.displayAlias,
+      polygon: newRoom.polygon as unknown as InputJsonValue,
     };
 
-    const newRoom = await prisma.room.upsert({
+    console.log(oldRoom);
+
+    const dbRoom = await prisma.room.upsert({
       where: {
-        buildingCode_name: { buildingCode, name: roomName },
+        buildingCode_name: { buildingCode, name: oldRoom?.name || "" },
       },
       create: {
         ...upsertData,
@@ -80,10 +83,10 @@ export async function POST(request: Request) {
       },
     });
 
-    const updatedAt = newRoom.updatedAt;
-
     // good response
-    return new NextResponse(JSON.stringify({ status: 200, updatedAt }));
+    return new NextResponse(
+      JSON.stringify({ status: 200, updatedAt: dbRoom.updatedAt })
+    );
   } catch (e) {
     // console.log(e);
     let errorMessage = "";

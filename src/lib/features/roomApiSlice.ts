@@ -25,10 +25,10 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     upsertRoom: builder.mutation<string, UpdateRoomArgType>({
-      query: ({ roomId, newRoom }) => ({
+      query: ({ roomId, newRoom, oldRoom }) => ({
         url: "/api/room/upsert",
         method: "POST",
-        body: { roomId, room: newRoom },
+        body: { roomId, newRoom, oldRoom },
       }),
       transformResponse: (response: { updatedAt: string }) =>
         response.updatedAt,

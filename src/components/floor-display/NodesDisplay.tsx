@@ -2,7 +2,7 @@ import Konva from "konva";
 import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 
-import React, { MutableRefObject, useState } from "react";
+import React, { MutableRefObject } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -56,8 +56,6 @@ const NodesDisplay = ({
 }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  const [oldNode, setOldNode] = useState<NodeInfo | null>(null);
 
   const [moveNode] = useUpdateNodeMutation();
 
@@ -225,13 +223,7 @@ const NodesDisplay = ({
       const newNode: NodeInfo = JSON.parse(JSON.stringify(nodes[nodeId]));
       newNode.pos = getNodePos(e);
       newNode.roomId = findRoomId(rooms, newNode.pos);
-
-      if (oldNode) {
-        moveNode({ floorCode, nodeId, oldNode, newNode });
-      } else {
-        // Probably never going to be toasted...
-        toast.error("Drag on a node before releasing it!");
-      }
+      moveNode({ floorCode, nodeId, newNode });
     };
 
   const handleDragMove = (nodeId: string) =>
@@ -264,7 +256,6 @@ const NodesDisplay = ({
             onMouseLeave={(e) => setCursor(e, "default")}
             onClick={() => handleNodeClick(nodeId)}
             draggable
-            onDragStart={() => setOldNode(nodes[nodeId])}
             onDragEnd={handleOnDragEnd(nodeId)}
             onDragMove={handleDragMove(nodeId)}
           />

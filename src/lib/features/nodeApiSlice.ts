@@ -17,7 +17,6 @@ export interface MoveNodeArgType {
   floorCode: string;
   nodeId: string;
   newNode: NodeInfo;
-  oldNode: NodeInfo;
   addToHistory?: boolean;
 }
 
@@ -33,19 +32,16 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response: { updatedAt: string }) =>
         response.updatedAt,
       async onQueryStarted(
-        { floorCode, nodeId, oldNode, newNode, addToHistory = true },
+        { floorCode, nodeId, newNode, addToHistory = true },
         { dispatch, getState, queryFulfilled }
       ) {
         try {
           // lock the node to update
           dispatch(lock(nodeId));
 
-          // first reset to old pos
-          dispatch(
-            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-              draft[nodeId] = oldNode;
-            })
-          );
+          // retrive old node
+          let nodes = await getNodes(floorCode, getState, dispatch);
+          const oldNode = nodes[nodeId];
 
           // optimistic update
           dispatch(
@@ -63,7 +59,6 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
                 arg: {
                   floorCode,
                   nodeId,
-                  oldNode,
                   newNode,
                   addToHistory: false,
                 },
@@ -73,7 +68,6 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
                 arg: {
                   floorCode,
                   nodeId,
-                  oldNode: newNode,
                   newNode: oldNode,
                   addToHistory: false,
                 },
@@ -102,8 +96,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
 
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
-          const store = getState() as RootState;
-          const nodes = await getNodes(floorCode, getState, dispatch);
+          nodes = await getNodes(floorCode, getState, dispatch);
           if (nodes[nodeId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
             dispatch(apiSlice.util.invalidateTags(["Nodes"]));
@@ -113,6 +106,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
 
           // update timestamp
           // reapply change if no more change by myself
+          const store = getState() as RootState;
           dispatch(
             apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
               if (store.lock[nodeId] === 1) {

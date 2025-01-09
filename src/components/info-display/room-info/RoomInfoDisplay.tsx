@@ -62,8 +62,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
 
       const newNode = JSON.parse(JSON.stringify(nodes[nodeId]));
       newNode.roomId = roomId;
-      const oldNode = nodes[nodeId];
-      updateNode({ floorCode, nodeId, newNode, oldNode });
+      updateNode({ floorCode, nodeId, newNode });
     };
 
     return (

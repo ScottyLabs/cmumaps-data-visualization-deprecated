@@ -13,16 +13,23 @@ export async function POST(request: Request) {
     const nodeId = requestData.nodeId;
     const node: NodeInfo = requestData.node;
 
+    const updateData: Record<string, unknown> = {
+      posX: node.pos.x,
+      posY: node.pos.y,
+      buildingCode: getBuildingCodeFromRoomId(node.roomId),
+      roomName: getRoomNameFromRoomId(node.roomId),
+    };
+
+    if (!node.roomId) {
+      delete updateData.buildingCode;
+      delete updateData.roomName;
+    }
+
     const newNode = await prisma.node.update({
       where: {
         id: nodeId,
       },
-      data: {
-        posX: node.pos.x,
-        posY: node.pos.y,
-        buildingCode: getBuildingCodeFromRoomId(node.roomId),
-        roomName: getRoomNameFromRoomId(node.roomId),
-      },
+      data: updateData,
       select: {
         updatedAt: true,
       },

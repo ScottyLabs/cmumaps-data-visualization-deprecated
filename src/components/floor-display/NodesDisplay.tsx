@@ -219,22 +219,20 @@ const NodesDisplay = ({
     }
   };
 
-  const handleOnDragEnd = (nodeId: ID) => (e) => {
-    // create new node
-    const newNode: NodeInfo = JSON.parse(JSON.stringify(nodes[nodeId]));
-    newNode.pos = {
-      x: Number(e.target.x().toFixed(2)),
-      y: Number(e.target.y().toFixed(2)),
-    };
-    newNode.roomId = findRoomId(rooms, newNode.pos);
+  const handleOnDragEnd =
+    (nodeId: ID) => (e: Konva.KonvaEventObject<DragEvent>) => {
+      // create new node
+      const newNode: NodeInfo = JSON.parse(JSON.stringify(nodes[nodeId]));
+      newNode.pos = getNodePos(e);
+      newNode.roomId = findRoomId(rooms, newNode.pos);
 
-    if (oldNode) {
-      moveNode({ floorCode, nodeId, oldNode, newNode });
-    } else {
-      // I actually wonder if it is ever possible to toast this...
-      toast.error("Drag on a node before releasing it!");
-    }
-  };
+      if (oldNode) {
+        moveNode({ floorCode, nodeId, oldNode, newNode });
+      } else {
+        // Probably never going to be toasted...
+        toast.error("Drag on a node before releasing it!");
+      }
+    };
 
   const handleDragMove = (nodeId: string) =>
     throttle((e: Konva.KonvaEventObject<DragEvent>) => {

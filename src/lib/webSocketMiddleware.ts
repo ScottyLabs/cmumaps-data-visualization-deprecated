@@ -4,8 +4,9 @@ import { toast } from "react-toastify";
 
 import { NodeInfo, RoomInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice, getNodes, getRooms } from "./features/apiSlice";
+import { apiSlice, getRooms } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
+import { updateGraphUpdatedAt } from "./features/lockSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 import { getUserName } from "./utils/overwriteUtils";
@@ -114,22 +115,20 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const locked = !!getStore().lock.roomLocks[nodeId];
+    const locked = !!getStore().lock.graphLock;
+    const graphUpdatedAt = getStore().lock.graphUpdatedAt;
+    const outdated =
+      graphUpdatedAt && message.newNode.updatedAt < graphUpdatedAt;
 
     // update timestamp
-    dispatch(
-      apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-        if (message.newNode.updatedAt > draft[nodeId].updatedAt) {
-          draft[nodeId].updatedAt = message.newNode.updatedAt;
-        }
-      })
-    );
+    if (!outdated) {
+      dispatch(updateGraphUpdatedAt(message.newNode.updatedAt));
+    }
 
     // toast warning about overwriting if locked or receiving an outdated patch
-    const nodes = await getNodes(floorCode, getStore, dispatch);
-    if (locked || message.newNode.updatedAt < nodes[nodeId].updatedAt) {
+    if (locked || outdated) {
       const name = getUserName(message.sender, getStore());
-      toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
+      toast.warn(`You might have overwrote ${name}'s change on the graph`, {
         autoClose: false,
       });
       return;

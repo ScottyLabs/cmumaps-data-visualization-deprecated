@@ -15,11 +15,17 @@ interface LockState {
    * global lock for graph. 0 if unlocked, otherwise locked.
    */
   graphLock: number;
+
+  /**
+   * Most recent update timestamp as a string value in ISO format.
+   */
+  graphUpdatedAt: string | null;
 }
 
 const initialState: LockState = {
   roomLocks: {},
   graphLock: 0,
+  graphUpdatedAt: null,
 };
 
 const lockSlice = createSlice({
@@ -33,8 +39,25 @@ const lockSlice = createSlice({
     unlockRoom(state, action: PayloadAction<string>) {
       state.roomLocks[action.payload]--;
     },
+
+    lockGraph(state) {
+      state.graphLock++;
+    },
+    unlockGraph(state) {
+      state.graphLock--;
+    },
+
+    updateGraphUpdatedAt(state, action: PayloadAction<string>) {
+      state.graphUpdatedAt = action.payload;
+    },
   },
 });
 
-export const { lockRoom, unlockRoom } = lockSlice.actions;
+export const {
+  lockRoom,
+  unlockRoom,
+  lockGraph,
+  unlockGraph,
+  updateGraphUpdatedAt,
+} = lockSlice.actions;
 export default lockSlice.reducer;

@@ -11,7 +11,7 @@ import {
 } from "../webSocketMiddleware";
 import { apiSlice, getNodes } from "./apiSlice";
 import { addEditToHistory, EditPair } from "./historySlice";
-import { lockRoom, unlockRoom } from "./lockSlice";
+import { lockGraph, unlockGraph } from "./lockSlice";
 
 export interface MoveNodeArgType {
   floorCode: string;
@@ -36,11 +36,11 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         { dispatch, getState, queryFulfilled }
       ) {
         try {
-          // lock the node to update
-          dispatch(lockRoom(nodeId));
+          // lock the graph to update
+          dispatch(lockGraph());
 
           // retrive old node
-          let nodes = await getNodes(floorCode, getState, dispatch);
+          const nodes = await getNodes(floorCode, getState, dispatch);
           const oldNode = nodes[nodeId];
 
           // optimistic update
@@ -94,16 +94,6 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             return;
           }
 
-          // very rare case of receiving a patch with a later update timestamp,
-          // but this does mean that I shouldn't overwrite all changes.
-          nodes = await getNodes(floorCode, getState, dispatch);
-          if (nodes[nodeId].updatedAt > updatedAt) {
-            toast.error("Very rare concurrency case!");
-            dispatch(apiSlice.util.invalidateTags(["Nodes"]));
-            toast.info("Refetching the graph...");
-            return;
-          }
-
           // update timestamp
           // reapply change if no more change by myself
           const store = getState() as RootState;
@@ -117,8 +107,8 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             })
           );
 
-          // unlock the node after update
-          dispatch(unlockRoom(nodeId));
+          // unlock the graph after update
+          dispatch(unlockGraph());
 
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {

@@ -1,31 +1,32 @@
 import { useRouter } from "next/navigation";
 
-import React, { useContext } from "react";
+import React from "react";
 import { TfiLocationPin } from "react-icons/tfi";
 import { Group, Path, Rect } from "react-konva";
 
-import { savingHelper } from "../../lib/apiRoutes";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppSelector } from "../../lib/hooks";
-import { RoomsContext } from "../contexts/RoomsProvider";
-import { Nodes, RoomInfo } from "../shared/types";
+import { Nodes, RoomInfo, Rooms } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 import { getRoomId } from "../utils/utils";
 
 interface Props {
   floorCode: string;
   nodes: Nodes;
+  rooms: Rooms;
   addNewNode;
 }
 
-const LabelsDisplay = ({ floorCode, nodes, addNewNode }: Props) => {
+const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {
   const router = useRouter();
 
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
   const showLabels = useAppSelector((state) => state.visibility.showLabels);
 
+  const [upsertRoom] = useUpsertRoomMutation();
+
   const doors = useAppSelector((state) => state.outline.doors);
-  const { rooms, setRooms } = useContext(RoomsContext);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -53,24 +54,15 @@ const LabelsDisplay = ({ floorCode, nodes, addNewNode }: Props) => {
       const draggable = editRoomLabel && roomIdSelected == roomId;
 
       const handleOnDragEnd = (e) => {
-        const newRoomInfo: RoomInfo = {
-          ...rooms[roomId],
+        const oldRoom = rooms[roomId];
+        const newRoom: RoomInfo = {
+          ...oldRoom,
           labelPosition: {
             x: Number((e.target.x() + width / 2).toFixed(2)),
             y: Number((e.target.y() + height).toFixed(2)),
           },
         };
-        const newRooms = Object.assign(rooms, {});
-        newRooms[roomId] = newRoomInfo;
-        setRooms(newRooms);
-        savingHelper(
-          "/api/updateRoomInfo",
-          JSON.stringify({
-            floorCode: floorCode,
-            roomId: roomId,
-            newRoomInfo: newRoomInfo,
-          })
-        );
+        upsertRoom({ floorCode, roomId, newRoom, oldRoom });
       };
 
       const handleClick = () => {

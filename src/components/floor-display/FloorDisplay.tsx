@@ -295,6 +295,7 @@ const FloorDisplay = ({
             <LabelsDisplay
               floorCode={floorCode}
               nodes={nodes}
+              rooms={rooms}
               addNewNode={addNewNode}
             />
           }

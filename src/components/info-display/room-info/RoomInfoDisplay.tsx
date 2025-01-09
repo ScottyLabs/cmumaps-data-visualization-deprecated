@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import React, { useContext } from "react";
+import React from "react";
 
 import { extractFloorLevel } from "../../../app/api/apiUtils";
 import { savingHelper } from "../../../lib/apiRoutes";
@@ -9,7 +9,6 @@ import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useUpdateNodeMutation } from "../../../lib/features/nodeApiSlice";
 import { useUpsertRoomMutation } from "../../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { RoomsContext } from "../../contexts/RoomsProvider";
 import {
   NodeInfo,
   Nodes,
@@ -36,7 +35,6 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
   const [upsertRoom] = useUpsertRoomMutation();
   const [updateNode] = useUpdateNodeMutation();
 
-  const { setRooms } = useContext(RoomsContext);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const roomId = getRoomId(nodes, nodeId);
@@ -122,7 +120,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
 
     // if room id didn't change, then only need to reassign
     newRooms[newRoomId] = roomInfo;
-    setRooms(newRooms);
+    // setRooms(newRooms);
 
     // backend update
     const succeeded = savingHelper(

@@ -14,6 +14,8 @@ import {
   ADD_NODE,
   DELETE_EDGE,
   GRAPH_SELECT,
+  POLYGON_ADD_VERTEX,
+  POLYGON_DELETE_VERTEX,
   selectEditPolygon,
   setMode,
 } from "../lib/features/modeSlice";
@@ -54,10 +56,7 @@ const useKeyboardShortcuts = (
     const handleKeyDown = (event: KeyboardEvent) => {
       const toastNodeNotSelectedErr = () => toast.error("Select a node first!");
 
-      if (editPolygon) {
-        return;
-      }
-
+      // general keyboard shortcuts
       switch (event.key) {
         // visibility
         case "f":
@@ -82,48 +81,9 @@ const useKeyboardShortcuts = (
           dispatch(setMode(GRAPH_SELECT));
           break;
 
-        // refetch graph
+        // refetch data
         case "r":
           invalidateNodesCache();
-          break;
-
-        // graph
-        case "n":
-          dispatch(setMode(ADD_NODE));
-          break;
-        case "e":
-          if (nodeIdSelected) {
-            dispatch(setMode(ADD_EDGE));
-          } else {
-            toastNodeNotSelectedErr();
-          }
-          break;
-        case "d":
-          if (nodeIdSelected) {
-            dispatch(setMode(DELETE_EDGE));
-          } else {
-            toastNodeNotSelectedErr();
-          }
-          break;
-        case "m":
-          if (nodes && rooms) {
-            calcMst(nodes, rooms, router, dispatch);
-          }
-          break;
-
-        // delete or backspace or escape
-        case "Backspace":
-        case "Delete":
-        case "Escape":
-          if (nodeIdSelected && nodes) {
-            deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
-          } else {
-            toastNodeNotSelectedErr();
-          }
-          break;
-
-        case "w":
-          dispatch(setMode(ADD_DOOR_NODE));
           break;
 
         // edit history
@@ -136,9 +96,60 @@ const useKeyboardShortcuts = (
             }
           }
           break;
+      }
 
-        default:
-          break;
+      if (editPolygon) {
+        // polygon keyboard shortcuts
+        switch (event.key) {
+          case "d":
+            dispatch(setMode(POLYGON_DELETE_VERTEX));
+            break;
+          case "v":
+            dispatch(setMode(POLYGON_ADD_VERTEX));
+            break;
+        }
+      } else {
+        // graph keyboard shortcuts
+        switch (event.key) {
+          // graph
+          case "n":
+            dispatch(setMode(ADD_NODE));
+            break;
+          case "e":
+            if (nodeIdSelected) {
+              dispatch(setMode(ADD_EDGE));
+            } else {
+              toastNodeNotSelectedErr();
+            }
+            break;
+          case "d":
+            if (nodeIdSelected) {
+              dispatch(setMode(DELETE_EDGE));
+            } else {
+              toastNodeNotSelectedErr();
+            }
+            break;
+          case "m":
+            if (nodes && rooms) {
+              calcMst(nodes, rooms, router, dispatch);
+            }
+            break;
+
+          // delete or backspace or escape
+          case "Backspace":
+          case "Delete":
+          case "Escape":
+            if (nodeIdSelected && nodes) {
+              deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
+            } else {
+              toastNodeNotSelectedErr();
+            }
+            break;
+
+          case "w":
+            dispatch(setMode(ADD_DOOR_NODE));
+            break;
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);

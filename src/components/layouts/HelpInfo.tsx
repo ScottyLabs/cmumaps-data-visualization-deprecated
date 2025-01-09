@@ -50,13 +50,13 @@ const HelpInfo = () => {
         <h1 className="font-bold">Polygon</h1>
         <p>Press 'v' to enter polygon editing mode and add a vertex.</p>
         <p>Press 'd' to delete a vertex.</p>
-        <p>'ctrl + z' or 'cmd + z' to undo.</p>
-        <p>'ctrl + shift + z' or 'cmd + shift + z' to redo.</p>
       </div>
       <div>
         <h1 className="font-bold">General</h1>
         <p>Press 'q' to return to Graph Select mode.</p>
         <p>Press 'r' to refetch data.</p>
+        <p>'ctrl + z' or 'cmd + z' to undo.</p>
+        <p>'ctrl + shift + z' or 'cmd + shift + z' to redo.</p>
       </div>
     </div>
   );

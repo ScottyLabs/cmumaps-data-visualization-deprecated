@@ -1,11 +1,10 @@
 import { Polygon } from "geojson";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Circle, Line } from "react-konva";
 
 import { useGetRoomsQuery } from "../../lib/features/apiSlice";
 import {
-  POLYGON_ADD_VERTEX,
   POLYGON_DELETE_VERTEX,
   POLYGON_SELECT,
   setMode,
@@ -27,11 +26,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const dispatch = useAppDispatch();
   const { data: rooms } = useGetRoomsQuery(floorCode);
   const [upsertRoom] = useUpsertRoomMutation();
-
   const mode = useAppSelector((state) => state.mode.mode);
-  const shortcutsDisabled = useAppSelector(
-    (state) => state.status.shortcutsDisabled
-  );
 
   const { coordsIndex } = useContext(PolygonContext);
 
@@ -45,26 +40,6 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
       upsertRoom({ floorCode, roomId, newRoom, oldRoom });
     }
   };
-
-  useEffect(() => {
-    if (shortcutsDisabled) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "d") {
-        dispatch(setMode(POLYGON_DELETE_VERTEX));
-      } else if (event.key === "v") {
-        dispatch(setMode(POLYGON_ADD_VERTEX));
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [dispatch, shortcutsDisabled]);
 
   const handleOnDragEnd = (e, index: number) => {
     const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));

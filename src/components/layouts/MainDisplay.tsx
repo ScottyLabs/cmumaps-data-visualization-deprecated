@@ -9,7 +9,10 @@ import { DEFAULT_DENSITY } from "../../app/api/detectWalkway/detectWalkway";
 import { INVALID_NODE_ID } from "../../hooks/errorCodes";
 import useKeyboardShortcuts from "../../hooks/useKeyboardShortcuts";
 import { savingHelper } from "../../lib/apiRoutes";
-import { useGetNodesQuery } from "../../lib/features/apiSlice";
+import {
+  useGetNodesQuery,
+  useGetRoomsQuery,
+} from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   deselect,
@@ -28,9 +31,8 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import Loader from "../common/Loader";
 import PolygonProvider from "../contexts/PolygonProvider";
-import RoomsProvider from "../contexts/RoomsProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
-import { ID, RoomInfo, WalkwayTypeList } from "../shared/types";
+import { WalkwayTypeList } from "../shared/types";
 import SidePanel from "../side-panel/SidePanel";
 import { getNodeIdByRoomId, getRoomIdByRoomName } from "../utils/utils";
 import ZoomPanWrapper from "../zoom-pan/ZoomPanWrapper";
@@ -43,14 +45,15 @@ const MainDisplay = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { data: nodes, isFetching } = useGetNodesQuery(floorCode);
+  const { data: nodes, isFetching: isFetchingNodes } =
+    useGetNodesQuery(floorCode);
+  const { data: rooms, isFetching: isFetchingRooms } =
+    useGetRoomsQuery(floorCode);
 
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
   const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
-
-  const [rooms, setRooms] = useState<Record<ID, RoomInfo>>({});
 
   // polygon editing history
   const [history, setHistory] = useState<Polygon[]>([]);
@@ -107,8 +110,6 @@ const MainDisplay = ({ floorCode }: Props) => {
         })
       );
 
-      setRooms(parsedRes["rooms"]);
-
       dispatch(startLoading("Detecting Walkways"));
 
       if (!parsedRes["calculated"] || TEST_WALKWAYS) {
@@ -153,7 +154,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   const searchParams = useSearchParams();
   const [statesUpdated, setStateUpdated] = useState<boolean>(false);
   useEffect(() => {
-    if (Object.keys(rooms).length == 0 || !nodes) {
+    if (!rooms || !nodes) {
       return;
     }
 
@@ -218,23 +219,21 @@ const MainDisplay = ({ floorCode }: Props) => {
     return;
   }
 
-  if (isFetching) {
+  if (isFetchingNodes || isFetchingRooms) {
     return <Loader loadingText="Fetching Graph" />;
   }
 
   return (
     <PolygonProvider polygonData={polygonData}>
-      <RoomsProvider roomsData={{ rooms, setRooms }}>
-        <div className="fixed top-1/2 z-50 -translate-y-1/2">
-          <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+      <div className="fixed top-1/2 z-50 -translate-y-1/2">
+        <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
+      </div>
+      <ZoomPanWrapper floorCode={floorCode} />
+      {nodeIdSelected && (
+        <div className="absolute right-4 top-28 z-50">
+          <InfoDisplay floorCode={floorCode} />
         </div>
-        <ZoomPanWrapper floorCode={floorCode} />
-        {nodeIdSelected && (
-          <div className="absolute right-4 top-28 z-50">
-            <InfoDisplay floorCode={floorCode} />
-          </div>
-        )}
-      </RoomsProvider>
+      )}
     </PolygonProvider>
   );
 };

@@ -10,7 +10,10 @@ import { toast } from "react-toastify";
 
 import useWebSocket from "../../hooks/useWebSocket";
 import { savingHelper } from "../../lib/apiRoutes";
-import { useGetNodesQuery } from "../../lib/features/apiSlice";
+import {
+  useGetNodesQuery,
+  useGetRoomsQuery,
+} from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
@@ -33,11 +36,10 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { RoomsContext } from "../contexts/RoomsProvider";
 import { Node, PDFCoordinate } from "../shared/types";
 import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
-import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
+import { saveToPolygonHistory } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { distPointToLine, getRoomId } from "../utils/utils";
 import DoorsDisplay from "./DoorsDisplay";
@@ -72,6 +74,7 @@ const FloorDisplay = ({
   const dispatch = useAppDispatch();
 
   const { data: nodes } = useGetNodesQuery(floorCode);
+  const { data: rooms } = useGetRoomsQuery(floorCode);
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeIdSelected = useAppSelector((state) =>
@@ -83,7 +86,6 @@ const FloorDisplay = ({
   const showEdges = useAppSelector((state) => state.visibility.showEdges);
   const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
 
-  const { rooms, setRooms } = useContext(RoomsContext);
   const roomIdSelected = getRoomId(nodes, nodeIdSelected);
 
   const editPolygon = useAppSelector(selectEditPolygon);
@@ -119,6 +121,10 @@ const FloorDisplay = ({
       clearInterval(intervalId);
     };
   }, [dispatch]);
+
+  if (!nodes || !rooms) {
+    return;
+  }
 
   const addNewNode = (newNode: Node) => {
     const newNodes = { ...nodes };
@@ -218,7 +224,7 @@ const FloorDisplay = ({
           setHistoryIndex,
           newPolygon
         );
-        saveToRooms(floorCode, roomIdSelected, rooms, setRooms, newPolygon);
+        // saveToRooms(floorCode, roomIdSelected, rooms, setRooms, newPolygon);
 
         dispatch(setMode(POLYGON_SELECT));
       });
@@ -249,10 +255,6 @@ const FloorDisplay = ({
     setCanPan(newCanPan);
   };
 
-  if (!nodes) {
-    return;
-  }
-
   return (
     <>
       <Stage
@@ -275,7 +277,7 @@ const FloorDisplay = ({
           {showOutline && <WallsDisplay />}
           {showOutline && <DoorsDisplay floorCode={floorCode} nodes={nodes} />}
 
-          {showPolygons && <PolygonsDisplay />}
+          {showPolygons && <PolygonsDisplay rooms={rooms} />}
 
           {showEdges && !editPolygon && !editRoomLabel && (
             <EdgesDisplay nodes={nodes} />
@@ -284,6 +286,7 @@ const FloorDisplay = ({
             <NodesDisplay
               floorCode={floorCode}
               nodes={nodes}
+              rooms={rooms}
               cursorInfoListRef={cursorInfoListRef}
               offset={offset}
               scale={scale}

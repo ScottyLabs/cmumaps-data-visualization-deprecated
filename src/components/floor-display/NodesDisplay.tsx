@@ -2,7 +2,7 @@ import Konva from "konva";
 import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 
-import React, { MutableRefObject, useContext, useState } from "react";
+import React, { MutableRefObject, useState } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -23,8 +23,14 @@ import {
   moveNodeWithCursor,
 } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { RoomsContext } from "../contexts/RoomsProvider";
-import { EdgeTypeList, Node, ID, Nodes } from "../shared/types";
+import {
+  EdgeTypeList,
+  Node,
+  ID,
+  Nodes,
+  Rooms,
+  PDFCoordinate,
+} from "../shared/types";
 import { getCursorPos, setCursor } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -34,14 +40,16 @@ import { CURSOR_INTERVAL } from "./LiveCursors";
 interface Props {
   floorCode: string;
   nodes: Nodes;
+  rooms: Rooms;
   cursorInfoListRef: MutableRefObject<CursorInfo[]>;
-  offset;
-  scale;
+  offset: PDFCoordinate;
+  scale: number;
 }
 
 const NodesDisplay = ({
   floorCode,
   nodes,
+  rooms,
   cursorInfoListRef,
   offset,
   scale,
@@ -56,8 +64,6 @@ const NodesDisplay = ({
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
-
-  const { rooms } = useContext(RoomsContext);
 
   const nodeIdHovered = useAppSelector(
     (state) => state.mouseEvent.nodeIdOnHover

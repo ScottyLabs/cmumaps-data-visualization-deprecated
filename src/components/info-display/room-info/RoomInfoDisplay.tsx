@@ -208,7 +208,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
           {renderEditNameRow()}
           {renderEditTypeRow()}
           {renderEditAliasesRow()}
-          <RoomInfoButtons nodes={nodes} />
+          <RoomInfoButtons floorCode={floorCode} nodes={nodes} />
         </tbody>
       </table>
     </>

@@ -2,18 +2,20 @@ import { Polygon } from "geojson";
 import { Util } from "konva/lib/Util";
 import { useRouter } from "next/navigation";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Path } from "react-konva";
 
 import { useAppSelector } from "../../lib/hooks";
-import { RoomsContext } from "../contexts/RoomsProvider";
+import { Rooms } from "../shared/types";
 
-const PolygonsDisplay = () => {
+interface Props {
+  rooms: Rooms;
+}
+
+const PolygonsDisplay = ({ rooms }: Props) => {
   const router = useRouter();
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
-
-  const { rooms } = useContext(RoomsContext);
 
   // get all random colors
   const [fillColors, setFillColors] = useState<string[]>([]);

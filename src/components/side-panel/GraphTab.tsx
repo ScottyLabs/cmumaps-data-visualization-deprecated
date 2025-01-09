@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-import React, { useContext } from "react";
+import React from "react";
 import { BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
 
@@ -10,6 +10,7 @@ import {
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { savingHelper } from "../../lib/apiRoutes";
 import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
+import { useGetRoomsQuery } from "../../lib/features/apiSlice";
 import { setMst, setNodes } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setDoors } from "../../lib/features/outlineSlice";
@@ -19,7 +20,6 @@ import {
   startLoading,
 } from "../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { RoomsContext } from "../contexts/RoomsProvider";
 import QuestionCircle from "../shared/QuestionCircle";
 import { calcMst, removeOverlappingsNodes } from "../utils/graphUtils";
 import { addDoorsToGraph } from "../utils/utils";
@@ -33,13 +33,13 @@ interface Props {
 const GraphTab = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { data: rooms } = useGetRoomsQuery(floorCode);
 
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const doors = useAppSelector((state) => state.outline.doors);
   const nodes = useAppSelector((state) => state.data.nodes);
-  const { rooms } = useContext(RoomsContext);
 
-  if (!doors || !nodes) {
+  if (!doors || !nodes || !rooms) {
     return;
   }
 

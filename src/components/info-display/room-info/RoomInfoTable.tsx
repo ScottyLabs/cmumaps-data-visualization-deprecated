@@ -5,6 +5,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import { DEFAULT_DENSITY } from "../../../app/api/detectWalkway/detectWalkway";
 import { AWS_API_INVOKE_URL } from "../../../lib/apiRoutes";
+import { useGetRoomsQuery } from "../../../lib/features/apiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
 import {
   GRAPH_SELECT,
@@ -22,18 +23,20 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { PolygonContext } from "../../contexts/PolygonProvider";
-import { RoomsContext } from "../../contexts/RoomsProvider";
 import { Nodes, WalkwayTypeList } from "../../shared/types";
 import { getRoomId } from "../../utils/utils";
 
 interface Props {
+  floorCode: string;
   nodes: Nodes;
 }
 
-const RoomInfoTable = ({ nodes }: Props) => {
+const RoomInfoTable = ({ floorCode, nodes }: Props) => {
   const router = useRouter();
   const { session } = useSession();
   const dispatch = useAppDispatch();
+
+  const { data: rooms } = useGetRoomsQuery(floorCode);
 
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
   const editPolygon = useAppSelector(selectEditPolygon);
@@ -42,15 +45,16 @@ const RoomInfoTable = ({ nodes }: Props) => {
     (state) => state.status.shortcutsDisabled
   );
 
-  const { rooms } = useContext(RoomsContext);
+  const { setHistory, setCoordsIndex } = useContext(PolygonContext);
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
-  const room = rooms[roomId];
-
-  const { setHistory, setCoordsIndex } = useContext(PolygonContext);
 
   const handleEditPolygonModeClick = useCallback(() => {
+    if (!rooms) {
+      return;
+    }
+
     const curPolygon = rooms[roomId].polygon;
 
     if (editPolygon) {
@@ -83,6 +87,12 @@ const RoomInfoTable = ({ nodes }: Props) => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [dispatch, editPolygon, handleEditPolygonModeClick, shortcutsDisabled]);
+
+  if (!rooms) {
+    return;
+  }
+
+  const room = rooms[roomId];
 
   const renderSetEditPolygonButton = () => {
     return (

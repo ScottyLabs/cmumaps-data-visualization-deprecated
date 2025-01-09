@@ -31,7 +31,7 @@ import { useAppDispatch, useAppSelector } from "../lib/hooks";
 const useKeyboardShortcuts = (
   floorCode: string,
   nodes: Nodes | undefined,
-  rooms: Rooms
+  rooms: Rooms | undefined
 ) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -106,7 +106,7 @@ const useKeyboardShortcuts = (
           }
           break;
         case "m":
-          if (nodes) {
+          if (nodes && rooms) {
             calcMst(nodes, rooms, router, dispatch);
           }
           break;

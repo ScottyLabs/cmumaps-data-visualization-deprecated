@@ -12,8 +12,21 @@ import { savingHelper } from "../../lib/apiRoutes";
 import {
   useGetNodesQuery,
   useGetRoomsQuery,
+  useInvalidateCacheMutation,
 } from "../../lib/features/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
+import { redo, undo } from "../../lib/features/historySlice";
+import {
+  ADD_DOOR_NODE,
+  ADD_EDGE,
+  ADD_NODE,
+  DELETE_EDGE,
+  GRAPH_SELECT,
+  POLYGON_ADD_VERTEX,
+  POLYGON_DELETE_VERTEX,
+  setMode,
+} from "../../lib/features/modeSlice";
+import { selectEditPolygon } from "../../lib/features/modeSlice";
 import {
   deselect,
   getNodeIdSelected,
@@ -27,13 +40,23 @@ import {
   LOADED,
   startLoading,
 } from "../../lib/features/statusSlice";
+import {
+  toggleShowEdges,
+  toggleShowFile,
+  toggleShowLabels,
+  toggleShowNodes,
+  toggleShowOutline,
+  toggleShowPolygons,
+} from "../../lib/features/visibilitySlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import Loader from "../common/Loader";
 import PolygonProvider from "../contexts/PolygonProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
+import { deleteNode } from "../shared/keyboardShortcuts";
 import { WalkwayTypeList } from "../shared/types";
 import SidePanel from "../side-panel/SidePanel";
+import { calcMst } from "../utils/graphUtils";
 import { getNodeIdByRoomId, getRoomIdByRoomName } from "../utils/utils";
 import ZoomPanWrapper from "../zoom-pan/ZoomPanWrapper";
 
@@ -56,6 +79,9 @@ const MainDisplay = ({ floorCode }: Props) => {
     isError: isErrorRooms,
   } = useGetRoomsQuery(floorCode);
 
+  const [invalidateCache] = useInvalidateCacheMutation();
+
+  const editPolygon = useAppSelector(selectEditPolygon);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
   );
@@ -148,8 +174,125 @@ const MainDisplay = ({ floorCode }: Props) => {
     [dispatch, floorCode]
   );
 
-  // useKeyboardShortcuts
-  useKeyboardShortcuts(floorCode, nodes, rooms);
+  // handle keyboard shortcuts
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      const toastNodeNotSelectedErr = () => toast.error("Select a node first!");
+
+      // general keyboard shortcuts
+      switch (event.key) {
+        // visibility
+        case "f":
+          dispatch(toggleShowFile());
+          break;
+        case "o":
+          dispatch(toggleShowOutline());
+          break;
+        case "g":
+          dispatch(toggleShowNodes());
+          dispatch(toggleShowEdges());
+          break;
+        case "l":
+          dispatch(toggleShowLabels());
+          break;
+        case "p":
+          dispatch(toggleShowPolygons());
+          break;
+
+        // quit
+        case "q":
+          dispatch(setMode(GRAPH_SELECT));
+          break;
+
+        // refetch data
+        case "r":
+          invalidateCache();
+          break;
+
+        // edit history
+        case "z":
+          if (event.metaKey || event.ctrlKey) {
+            if (event.shiftKey) {
+              dispatch(redo());
+            } else {
+              dispatch(undo());
+            }
+          }
+          break;
+      }
+
+      if (editPolygon) {
+        // polygon keyboard shortcuts
+        switch (event.key) {
+          case "d":
+            dispatch(setMode(POLYGON_DELETE_VERTEX));
+            break;
+          case "v":
+            dispatch(setMode(POLYGON_ADD_VERTEX));
+            break;
+        }
+      } else {
+        // graph keyboard shortcuts
+        switch (event.key) {
+          // graph
+          case "n":
+            dispatch(setMode(ADD_NODE));
+            break;
+          case "e":
+            if (nodeIdSelected) {
+              dispatch(setMode(ADD_EDGE));
+            } else {
+              toastNodeNotSelectedErr();
+            }
+            break;
+          case "d":
+            if (nodeIdSelected) {
+              dispatch(setMode(DELETE_EDGE));
+            } else {
+              toastNodeNotSelectedErr();
+            }
+            break;
+          case "m":
+            if (nodes && rooms) {
+              calcMst(nodes, rooms, router, dispatch);
+            }
+            break;
+
+          // delete or backspace to delete a node
+          case "Backspace":
+          case "Delete":
+            if (nodeIdSelected && nodes) {
+              deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
+            } else {
+              toastNodeNotSelectedErr();
+            }
+            break;
+
+          case "w":
+            dispatch(setMode(ADD_DOOR_NODE));
+            break;
+
+          // enters polygon editing mode
+          case "v":
+            if (nodeIdSelected) {
+              dispatch(setMode(POLYGON_ADD_VERTEX));
+            }
+            break;
+        }
+      }
+    },
+    [
+      dispatch,
+      editPolygon,
+      floorCode,
+      invalidateCache,
+      nodeIdSelected,
+      nodes,
+      rooms,
+      router,
+    ]
+  );
+  useKeyboardShortcuts(handleKeyDown);
 
   // fetch data
   useEffect(() => {

@@ -32,7 +32,6 @@ interface GraphPatch {
   type: typeof GRAPH_PATCH;
   nodeId: string;
   newNode: NodeInfo;
-  updatedAt: string;
   sender: string;
 }
 
@@ -45,7 +44,6 @@ interface RoomEdit {
   type: typeof ROOM_EDIT;
   roomId: string;
   newRoom: RoomInfo;
-  updatedAt: string;
   sender: string;
 }
 
@@ -77,15 +75,15 @@ const handleRoomEdit = async (
     // update timestamp
     dispatch(
       apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-        if (message.updatedAt > draft[roomId].updatedAt) {
-          draft[roomId].updatedAt = message.updatedAt;
+        if (message.newRoom.updatedAt > draft[roomId].updatedAt) {
+          draft[roomId].updatedAt = message.newRoom.updatedAt;
         }
       })
     );
 
     // toast warning about overwriting if locked or receiving an outdated edit
     const rooms = await getRooms(floorCode, getStore, dispatch);
-    if (locked || message.updatedAt < rooms[roomId].updatedAt) {
+    if (locked || message.newRoom.updatedAt < rooms[roomId].updatedAt) {
       const name = getUserName(message.sender, getStore());
       toast.warn(`You overwrote ${name}'s change on room ${roomId}`, {
         autoClose: false,
@@ -121,15 +119,15 @@ const handleGraphPatch = async (
     // update timestamp
     dispatch(
       apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-        if (message.updatedAt > draft[nodeId].updatedAt) {
-          draft[nodeId].updatedAt = message.updatedAt;
+        if (message.newNode.updatedAt > draft[nodeId].updatedAt) {
+          draft[nodeId].updatedAt = message.newNode.updatedAt;
         }
       })
     );
 
     // toast warning about overwriting if locked or receiving an outdated patch
     const nodes = await getNodes(floorCode, getStore, dispatch);
-    if (locked || message.updatedAt < nodes[nodeId].updatedAt) {
+    if (locked || message.newNode.updatedAt < nodes[nodeId].updatedAt) {
       const name = getUserName(message.sender, getStore());
       toast.warn(`You overwrote ${name}'s change on node ${nodeId}`, {
         autoClose: false,
@@ -140,7 +138,7 @@ const handleGraphPatch = async (
     // otherwise apply the change
     dispatch(
       apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-        draft[nodeId] = { ...message.newNode, updatedAt: message.updatedAt };
+        draft[nodeId] = message.newNode;
       })
     );
   } catch (e) {

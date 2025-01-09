@@ -129,7 +129,11 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
-            payload: { type: GRAPH_PATCH, nodeId, newNode, updatedAt },
+            payload: {
+              type: GRAPH_PATCH,
+              nodeId,
+              newNode: { ...newNode, updatedAt },
+            },
           };
           dispatch(graphPatchAction as unknown as UnknownAction);
         } catch (e) {

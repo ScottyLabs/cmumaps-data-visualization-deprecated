@@ -131,16 +131,15 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           dispatch(unlock(roomId));
 
           // send patch to others
-          const graphPatchAction: RoomEditMessageAction = {
+          const roomEditAction: RoomEditMessageAction = {
             type: WEBSOCKET_MESSAGE,
             payload: {
               type: ROOM_EDIT,
               roomId,
               newRoom: { ...newRoom, updatedAt },
-              updatedAt,
             },
           };
-          dispatch(graphPatchAction as unknown as UnknownAction);
+          dispatch(roomEditAction as unknown as UnknownAction);
         } catch (e) {
           toast.error("Check the Console for detailed error.");
           console.error(e);

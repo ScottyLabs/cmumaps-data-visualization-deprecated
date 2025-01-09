@@ -182,9 +182,11 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
 
   const renderEditTypeRow = () => {
     const handleChange = (setSelectedOption) => async (newValue) => {
-      setSelectedOption(newValue);
-      const newRoomInfo = { ...room, type: newValue.value };
-      handleSaveHelper(newRoomInfo);
+      if (newValue.value !== room.type) {
+        setSelectedOption(newValue);
+        const newRoomInfo = { ...room, type: newValue.value };
+        handleSaveHelper(newRoomInfo);
+      }
     };
 
     return (

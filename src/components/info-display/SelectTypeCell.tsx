@@ -14,21 +14,17 @@ interface Props {
 const EditTypeRow = ({ handleChange, typeList, value }: Props) => {
   const dispatch = useAppDispatch();
 
-  const options = typeList.map((type) => ({
-    value: type,
-    label: type,
-  }));
-
+  const options = typeList.map((type) => ({ value: type, label: type }));
+  const [valueColor, setValueColor] = useState("black");
   const [selectedOption, setSelectedOption] = useState({
     value: value,
     label: value,
   });
 
+  // update selected option when value changes (from undo/redo)
   useEffect(() => {
     setSelectedOption({ value: value, label: value });
   }, [value]);
-
-  const [valueColor, setValueColor] = useState("black");
 
   return (
     <td className="border p-2 text-black">

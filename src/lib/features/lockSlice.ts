@@ -4,31 +4,37 @@ import { ID } from "../../components/shared/types";
 
 interface LockState {
   /**
-   * 0 if unlocked, otherwise locked.
-   * The user can write to a node whenver they want.
+   * Lock for each room. 0 if unlocked, otherwise locked.
+   * The user can write to a room whenver they want.
    * `locked` is used to indicate that a WebSocket patch is being overwritten
-   * since the user edited the node without knowing the patch.
+   * since the user edited (overwrote) the room without knowing the patch.
    */
-  nodeLocks: Record<ID, number>;
+  roomLocks: Record<ID, number>;
+
+  /**
+   * global lock for graph. 0 if unlocked, otherwise locked.
+   */
+  graphLock: number;
 }
 
 const initialState: LockState = {
-  nodeLocks: {},
+  roomLocks: {},
+  graphLock: 0,
 };
 
 const lockSlice = createSlice({
   name: "lock",
   initialState,
   reducers: {
-    lock(state, action: PayloadAction<string>) {
-      state.nodeLocks[action.payload] = state.nodeLocks[action.payload] || 0;
-      state.nodeLocks[action.payload]++;
+    lockRoom(state, action: PayloadAction<string>) {
+      state.roomLocks[action.payload] = state.roomLocks[action.payload] || 0;
+      state.roomLocks[action.payload]++;
     },
-    unlock(state, action: PayloadAction<string>) {
-      state.nodeLocks[action.payload]--;
+    unlockRoom(state, action: PayloadAction<string>) {
+      state.roomLocks[action.payload]--;
     },
   },
 });
 
-export const { lock, unlock } = lockSlice.actions;
+export const { lockRoom, unlockRoom } = lockSlice.actions;
 export default lockSlice.reducer;

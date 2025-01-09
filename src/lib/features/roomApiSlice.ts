@@ -11,7 +11,7 @@ import {
 } from "../webSocketMiddleware";
 import { apiSlice, getRooms } from "./apiSlice";
 import { addEditToHistory, EditPair } from "./historySlice";
-import { lock, unlock } from "./lockSlice";
+import { lockRoom, unlockRoom } from "./lockSlice";
 
 export interface UpdateRoomArgType {
   floorCode: string;
@@ -37,8 +37,8 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
         { dispatch, getState, queryFulfilled }
       ) {
         try {
-          // lock the Room to update
-          dispatch(lock(roomId));
+          // lock the room to update
+          dispatch(lockRoom(roomId));
 
           // optimistic update
           dispatch(
@@ -127,10 +127,10 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
             })
           );
 
-          // unlock the Room after update
-          dispatch(unlock(roomId));
+          // unlock the room after update
+          dispatch(unlockRoom(roomId));
 
-          // send patch to others
+          // send edit to others
           const roomEditAction: RoomEditMessageAction = {
             type: WEBSOCKET_MESSAGE,
             payload: {

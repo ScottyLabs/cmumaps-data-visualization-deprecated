@@ -11,7 +11,7 @@ import {
 } from "../webSocketMiddleware";
 import { apiSlice, getNodes } from "./apiSlice";
 import { addEditToHistory, EditPair } from "./historySlice";
-import { lock, unlock } from "./lockSlice";
+import { lockRoom, unlockRoom } from "./lockSlice";
 
 export interface MoveNodeArgType {
   floorCode: string;
@@ -37,7 +37,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
       ) {
         try {
           // lock the node to update
-          dispatch(lock(nodeId));
+          dispatch(lockRoom(nodeId));
 
           // retrive old node
           let nodes = await getNodes(floorCode, getState, dispatch);
@@ -118,7 +118,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           );
 
           // unlock the node after update
-          dispatch(unlock(nodeId));
+          dispatch(unlockRoom(nodeId));
 
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {

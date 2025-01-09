@@ -70,7 +70,7 @@ const handleRoomEdit = async (
 ) => {
   try {
     const roomId = message.roomId;
-    const locked = !!getStore().lock.nodeLocks[roomId];
+    const locked = !!getStore().lock.roomLocks[roomId];
 
     // update timestamp
     dispatch(
@@ -114,7 +114,7 @@ const handleGraphPatch = async (
 ) => {
   try {
     const nodeId = message.nodeId;
-    const locked = !!getStore().lock.nodeLocks[nodeId];
+    const locked = !!getStore().lock.roomLocks[nodeId];
 
     // update timestamp
     dispatch(

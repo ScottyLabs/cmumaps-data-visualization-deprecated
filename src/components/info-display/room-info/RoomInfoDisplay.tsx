@@ -2,9 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 
 import React, { useContext } from "react";
 
+import { extractFloorLevel } from "../../../app/api/apiUtils";
 import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
+import { useUpdateNodeMutation } from "../../../lib/features/nodeApiSlice";
 import { useUpsertRoomMutation } from "../../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { RoomsContext } from "../../contexts/RoomsProvider";
@@ -32,6 +34,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
   const dispatch = useAppDispatch();
 
   const [upsertRoom] = useUpsertRoomMutation();
+  const [updateNode] = useUpdateNodeMutation();
 
   const { setRooms } = useContext(RoomsContext);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -41,9 +44,10 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
 
   if (!roomId) {
     const createRoom = async () => {
-      const roomId = floorCode + uuidv4();
+      const floorLevel = extractFloorLevel(floorCode);
+      const name = floorLevel + ":" + uuidv4().replace(/-/g, "");
       const newRoom: RoomInfo = {
-        name: "",
+        name,
         labelPosition: nodes[nodeId].pos,
         type: "",
         displayAlias: "",
@@ -52,13 +56,16 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
           type: "Polygon",
           coordinates: [[]],
         },
+        updatedAt: "",
       };
+      const roomId = getRoomIdFromRoomInfo(floorCode, newRoom);
       const oldRoom = rooms[roomId];
-      upsertRoom({ floorCode, roomId, newRoom, oldRoom });
+      await upsertRoom({ floorCode, roomId, newRoom, oldRoom });
 
-      // const newNodes = { ...nodes };
-      // newNodes[nodeId].roomId = newRoomId;
-      // dispatch(setNodes(newNodes));
+      const newNode = JSON.parse(JSON.stringify(nodes[nodeId]));
+      newNode.roomId = roomId;
+      const oldNode = nodes[nodeId];
+      updateNode({ floorCode, nodeId, newNode, oldNode });
     };
 
     return (

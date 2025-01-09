@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
 import { setShortcutsDisabled } from "../../lib/features/statusSlice";
@@ -6,12 +6,12 @@ import { useAppDispatch } from "../../lib/hooks";
 import { selectStyle } from "../shared/selectStyle";
 
 interface Props {
-  defaultType: string | undefined;
+  value: string | undefined;
   typeList: readonly string[];
   handleChange;
 }
 
-const EditTypeRow = ({ handleChange, typeList, defaultType }: Props) => {
+const EditTypeRow = ({ handleChange, typeList, value }: Props) => {
   const dispatch = useAppDispatch();
 
   const options = typeList.map((type) => ({
@@ -20,9 +20,13 @@ const EditTypeRow = ({ handleChange, typeList, defaultType }: Props) => {
   }));
 
   const [selectedOption, setSelectedOption] = useState({
-    value: defaultType,
-    label: defaultType,
+    value: value,
+    label: value,
   });
+
+  useEffect(() => {
+    setSelectedOption({ value: value, label: value });
+  }, [value]);
 
   const [valueColor, setValueColor] = useState("black");
 

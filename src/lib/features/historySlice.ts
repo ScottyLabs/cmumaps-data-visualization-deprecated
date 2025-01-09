@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
 import { MoveNodeArgType, nodeApiSlice } from "./nodeApiSlice";
-import { UpdateRoomArgType } from "./roomApiSlice";
+import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
 
 const MAX_UNDO_LIMIT = 50;
 
@@ -42,6 +42,9 @@ const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
   switch (edit.endpoint) {
     case "moveNode":
       dispatch(nodeApiSlice.endpoints.moveNode.initiate(edit.arg)).unwrap();
+      break;
+    case "updateRoom":
+      dispatch(RoomApiSlice.endpoints.updateRoom.initiate(edit.arg)).unwrap();
       break;
   }
 };

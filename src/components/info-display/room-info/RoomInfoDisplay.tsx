@@ -192,7 +192,7 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
         <td className="border pl-4 pr-4">Type</td>
         <EditTypeRow
           key={roomId}
-          defaultType={room.type}
+          value={room.type}
           typeList={RoomTypeList as readonly string[]}
           handleChange={handleChange}
         />

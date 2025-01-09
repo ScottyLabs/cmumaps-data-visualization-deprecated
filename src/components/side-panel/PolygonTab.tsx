@@ -5,7 +5,6 @@ import React, { useContext } from "react";
 
 import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
 import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
-import { useGetRoomsQuery } from "../../lib/features/apiSlice";
 import {
   POLYGON_ADD_VERTEX,
   POLYGON_DELETE_VERTEX,
@@ -14,6 +13,7 @@ import {
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
+import { Nodes, Rooms } from "../shared/types";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import { getRoomId } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
@@ -21,24 +21,19 @@ import NodeSizeSlider from "./SizeSlider";
 
 interface Props {
   floorCode: string;
+  rooms: Rooms;
+  nodes: Nodes;
 }
 
-const PolygonTab = ({ floorCode }: Props) => {
+const PolygonTab = ({ floorCode, rooms, nodes }: Props) => {
   const { session } = useSession();
   const dispatch = useAppDispatch();
 
-  const { data: rooms } = useGetRoomsQuery(floorCode);
   const { coordsIndex, setCoordsIndex } = useContext(PolygonContext);
-
-  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
 
   const savePolygonEdit = useSavePolygonEdit(floorCode, roomId);
-
-  if (!rooms) {
-    return;
-  }
 
   const polygon = rooms[roomId].polygon;
 

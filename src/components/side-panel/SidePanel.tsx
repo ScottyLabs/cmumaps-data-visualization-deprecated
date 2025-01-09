@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 
+import {
+  useGetNodesQuery,
+  useGetRoomsQuery,
+} from "../../lib/features/apiSlice";
 import { selectEditPolygon } from "../../lib/features/modeSlice";
 import { useAppSelector } from "../../lib/hooks";
 import GraphTab from "./GraphTab";
@@ -12,9 +16,16 @@ interface Props {
 }
 
 const SidePanel = ({ floorCode, parsePDF }: Props) => {
+  const { data: nodes } = useGetNodesQuery(floorCode);
+  const { data: rooms } = useGetRoomsQuery(floorCode);
+
   const editPolygon = useAppSelector(selectEditPolygon);
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+
+  if (!nodes || !rooms) {
+    return;
+  }
 
   const tabNames = editPolygon
     ? ["Visibility", "Polygon"]
@@ -24,7 +35,9 @@ const SidePanel = ({ floorCode, parsePDF }: Props) => {
 
   const renderGraphTab = () => <GraphTab floorCode={floorCode} />;
 
-  const renderPolygonTab = () => <PolygonTab floorCode={floorCode} />;
+  const renderPolygonTab = () => (
+    <PolygonTab floorCode={floorCode} nodes={nodes} rooms={rooms} />
+  );
 
   const tabContents = editPolygon
     ? [renderVisibilityTab, renderPolygonTab]

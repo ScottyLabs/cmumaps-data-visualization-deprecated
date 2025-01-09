@@ -3,7 +3,6 @@ import { UnknownAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 import { RoomInfoWithoutTimestamp } from "../../components/shared/types";
-import { RootState } from "../store";
 import {
   ROOM_EDIT,
   RoomEditMessageAction,
@@ -43,10 +42,9 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // optimistic update
           dispatch(
             apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-              draft[roomId] = {
-                ...newRoom,
-                updatedAt: draft[roomId].updatedAt,
-              };
+              // used the old updatedAt time
+              const updatedAt = draft[roomId].updatedAt;
+              draft[roomId] = { ...newRoom, updatedAt };
             })
           );
 
@@ -106,7 +104,6 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
 
           // very rare case of receiving a patch with a later update timestamp,
           // but this does mean that I shouldn't overwrite all changes.
-          const store = getState() as RootState;
           const rooms = await getRooms(floorCode, getState, dispatch);
           if (rooms[roomId].updatedAt > updatedAt) {
             toast.error("Very rare concurrency case!");
@@ -116,14 +113,9 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           }
 
           // update timestamp
-          // reapply change if no more change by myself
           dispatch(
             apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-              if (store.lock[roomId] === 1) {
-                draft[roomId] = { ...newRoom, updatedAt };
-              } else {
-                draft[roomId].updatedAt = updatedAt;
-              }
+              draft[roomId].updatedAt = updatedAt;
             })
           );
 

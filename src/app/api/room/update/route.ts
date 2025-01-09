@@ -2,27 +2,63 @@ import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { RoomInfo } from "../../../../components/shared/types";
-import {
-  getBuildingCodeFromRoomId,
-  getRoomNameFromRoomId,
-} from "../../../../components/utils/utils";
+import { getInfoFromRoomId } from "../../../../components/utils/utils";
 import prisma from "../../../../lib/prisma";
 
 export async function POST(request: Request) {
   try {
     const requestData = await request.json();
     const roomId = requestData.roomId;
-    const roomData: RoomInfo = requestData.roomData;
+    const room: RoomInfo = requestData.room;
+
+    const { buildingCode, roomName } = getInfoFromRoomId(roomId);
+
+    //#region Alias handling
+    const existingAliases = await prisma.alias.findMany({
+      where: {
+        buildingCode,
+        roomName,
+      },
+      select: {
+        alias: true,
+      },
+    });
+
+    const existingAliasList = existingAliases.map((a) => a.alias);
+    const aliasesToDelete = existingAliasList.filter(
+      (alias) => !room.aliases.includes(alias)
+    );
+
+    const aliasesToCreate = room.aliases.filter(
+      (alias) => !existingAliasList.includes(alias)
+    );
+    //#endregion
 
     const newRoom = await prisma.room.update({
       where: {
-        buildingCode_name: {
-          buildingCode: getBuildingCodeFromRoomId(roomId),
-          name: getRoomNameFromRoomId(roomId),
-        },
+        buildingCode_name: { buildingCode, name: roomName },
       },
       data: {
-        name: roomData.name,
+        name: room.name,
+        labelPosX: room.labelPosition.x,
+        labelPosY: room.labelPosition.y,
+        type: room.type,
+        displayAlias: room.displayAlias,
+        polygon: JSON.stringify(room.polygon),
+        aliases: {
+          deleteMany: {
+            alias: {
+              in: aliasesToDelete,
+            },
+          },
+          createMany: {
+            data: aliasesToCreate.map((alias) => ({
+              buildingCode,
+              roomName,
+              alias,
+            })),
+          },
+        },
       },
       select: {
         updatedAt: true,

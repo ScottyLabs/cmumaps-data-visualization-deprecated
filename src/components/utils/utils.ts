@@ -89,6 +89,14 @@ export const getRoomId = (nodes, nodeId: ID) => {
   return nodeId ? nodes[nodeId]?.roomId : "";
 };
 
+export const getInfoFromRoomId = (roomId: ID) => {
+  const list = roomId.split("-");
+  return {
+    buildingCode: list[0],
+    roomName: list[1],
+  };
+};
+
 export const getBuildingCodeFromRoomId = (roomId: ID) => {
   return roomId.split("-")[0];
 };

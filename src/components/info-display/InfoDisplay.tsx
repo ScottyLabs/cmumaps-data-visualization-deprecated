@@ -1,5 +1,9 @@
 import React from "react";
 
+import {
+  useGetNodesQuery,
+  useGetRoomsQuery,
+} from "../../lib/features/apiSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import {
   setEditRoomLabel,
@@ -15,12 +19,20 @@ interface Props {
 
 const InfoDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
+  const { data: nodes } = useGetNodesQuery(floorCode);
+  const { data: rooms } = useGetRoomsQuery(floorCode);
 
   const activeTabIndex = useAppSelector(
     (state) => state.ui.infoDisplayActiveTabIndex
   );
 
-  const renderRoomInfoDisplay = () => <RoomInfoDisplay floorCode={floorCode} />;
+  const renderRoomInfoDisplay = () => {
+    if (nodes && rooms) {
+      return (
+        <RoomInfoDisplay floorCode={floorCode} rooms={rooms} nodes={nodes} />
+      );
+    }
+  };
 
   const renderGraphInfoDisplay = () => (
     <GraphInfoDisplay floorCode={floorCode} />

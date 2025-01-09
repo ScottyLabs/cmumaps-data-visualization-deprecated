@@ -3,16 +3,18 @@ import { v4 as uuidv4 } from "uuid";
 import React, { useContext } from "react";
 
 import { savingHelper } from "../../../lib/apiRoutes";
-import {
-  useGetNodesQuery,
-  useGetRoomsQuery,
-} from "../../../lib/features/apiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useUpsertRoomMutation } from "../../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { RoomsContext } from "../../contexts/RoomsProvider";
-import { NodeInfo, RoomInfo, RoomTypeList } from "../../shared/types";
+import {
+  NodeInfo,
+  Nodes,
+  RoomInfo,
+  Rooms,
+  RoomTypeList,
+} from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { getRoomId, getRoomIdFromRoomInfo } from "../../utils/utils";
 import EditCell from "../EditCell";
@@ -22,21 +24,17 @@ import RoomInfoButtons from "./RoomInfoTable";
 
 interface Props {
   floorCode: string;
+  rooms: Rooms;
+  nodes: Nodes;
 }
 
-const RoomInfoDisplay = ({ floorCode }: Props) => {
+const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
   const dispatch = useAppDispatch();
-  const { data: nodes } = useGetNodesQuery(floorCode);
-  const { data: rooms } = useGetRoomsQuery(floorCode);
 
   const [upsertRoom] = useUpsertRoomMutation();
 
   const { setRooms } = useContext(RoomsContext);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-
-  if (!nodes || !rooms) {
-    return;
-  }
 
   const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];

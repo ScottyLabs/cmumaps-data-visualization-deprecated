@@ -2,7 +2,7 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { RoomInfo } from "../../components/shared/types";
+import { RoomInfoWithoutTimestamp } from "../../components/shared/types";
 import { RootState } from "../store";
 import {
   ROOM_EDIT,
@@ -16,8 +16,8 @@ import { lock, unlock } from "./lockSlice";
 export interface UpdateRoomArgType {
   floorCode: string;
   roomId: string;
-  newRoom: RoomInfo;
-  oldRoom: RoomInfo;
+  newRoom: RoomInfoWithoutTimestamp;
+  oldRoom: RoomInfoWithoutTimestamp;
   addToHistory?: boolean;
 }
 
@@ -43,7 +43,10 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // optimistic update
           dispatch(
             apiSlice.util.updateQueryData("getRooms", floorCode, (draft) => {
-              draft[roomId] = newRoom;
+              draft[roomId] = {
+                ...newRoom,
+                updatedAt: draft[roomId].updatedAt,
+              };
             })
           );
 
@@ -130,7 +133,12 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // send patch to others
           const graphPatchAction: RoomEditMessageAction = {
             type: WEBSOCKET_MESSAGE,
-            payload: { type: ROOM_EDIT, roomId, newRoom, updatedAt },
+            payload: {
+              type: ROOM_EDIT,
+              roomId,
+              newRoom: { ...newRoom, updatedAt },
+              updatedAt,
+            },
           };
           dispatch(graphPatchAction as unknown as UnknownAction);
         } catch (e) {

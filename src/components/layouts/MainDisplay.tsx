@@ -329,11 +329,11 @@ const MainDisplay = ({ floorCode }: Props) => {
         const newNodes = { ...nodes };
 
         nodeId = uuidv4();
-        newNodes[nodeId] = {
-          pos: rooms[roomId].labelPosition,
-          neighbors: {},
-          roomId: roomId,
-        };
+        // newNodes[nodeId] = {
+        //   pos: rooms[roomId].labelPosition,
+        //   neighbors: {},
+        //   roomId: roomId,
+        // };
 
         dispatch(setNodes(newNodes));
 

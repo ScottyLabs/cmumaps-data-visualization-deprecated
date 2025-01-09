@@ -68,6 +68,8 @@ export interface NodeInfo {
   updatedAt: string;
 }
 
+export type NodeInfoWithoutTimestamp = Omit<NodeInfo, "updatedAt">;
+
 /**
  * Door type
  */
@@ -163,6 +165,8 @@ export interface RoomInfo {
    */
   updatedAt: string;
 }
+
+export type RoomInfoWithoutTimestamp = Omit<RoomInfo, "updatedAt">;
 
 export type Rooms = Record<ID, RoomInfo>;
 export type Nodes = Record<ID, NodeInfo>;

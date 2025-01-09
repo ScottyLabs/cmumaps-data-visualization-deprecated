@@ -37,7 +37,7 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { NodeInfo, PDFCoordinate } from "../shared/types";
+import { NodeInfoWithoutTimestamp, PDFCoordinate } from "../shared/types";
 import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -128,11 +128,11 @@ const FloorDisplay = ({
     return;
   }
 
-  const addNewNode = (newNode: NodeInfo) => {
+  const addNewNode = (_newNode: NodeInfoWithoutTimestamp) => {
     const newNodes = { ...nodes };
 
     const newNodeId = uuidv4();
-    newNodes[newNodeId] = newNode;
+    // newNodes[newNodeId] = newNode;
 
     // create an edge between the selected node and the new node
     if (nodeIdSelected) {
@@ -205,7 +205,7 @@ const FloorDisplay = ({
 
     if (mode == ADD_NODE) {
       getCursorPos(e, offset, scale, (pos) => {
-        const newNode: NodeInfo = {
+        const newNode: NodeInfoWithoutTimestamp = {
           pos: pos,
           neighbors: {},
           roomId: findRoomId(rooms, pos),

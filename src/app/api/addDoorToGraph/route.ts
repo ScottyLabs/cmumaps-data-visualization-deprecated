@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     const graphJSON = JSON.parse(graph);
 
     for (const doorInfo of doors) {
-      const newNode: NodeInfo = {
+      const newNode = {
         pos: doorInfo.center,
         neighbors: {},
         roomId: doorInfo.roomIds[0],

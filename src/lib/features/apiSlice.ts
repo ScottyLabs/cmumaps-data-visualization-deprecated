@@ -37,7 +37,7 @@ export const apiSlice = createApi({
       transformResponse: (response: { data: string }) => response.data,
     }),
     getNodes: builder.query<Nodes, string>({
-      query: (floorCode) => `/api/getGraph?floorCode=${floorCode}`,
+      query: (floorCode) => `/api/getNodes?floorCode=${floorCode}`,
       transformResponse: (response: { data: Nodes }) => response.data,
       providesTags: ["Nodes"],
     }),

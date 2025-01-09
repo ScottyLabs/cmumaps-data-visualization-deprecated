@@ -2,12 +2,12 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 import { TfiLocationPin } from "react-icons/tfi";
-import { Group, Path, Rect } from "react-konva";
+import { Group, Path, Rect, Text } from "react-konva";
 
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppSelector } from "../../lib/hooks";
-import { Nodes, RoomInfo, Rooms } from "../shared/types";
+import { NodeInfo, Nodes, RoomInfo, Rooms } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 import { getRoomId } from "../utils/utils";
 
@@ -15,23 +15,23 @@ interface Props {
   floorCode: string;
   nodes: Nodes;
   rooms: Rooms;
-  addNewNode;
+  addNewNode: (newNode: NodeInfo) => void;
 }
 
 const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {
   const router = useRouter();
 
-  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
-  const showLabels = useAppSelector((state) => state.visibility.showLabels);
-
   const [upsertRoom] = useUpsertRoomMutation();
 
   const doors = useAppSelector((state) => state.outline.doors);
+  const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
+  const showLabels = useAppSelector((state) => state.visibility.showLabels);
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomIdSelected = getRoomId(nodes, nodeId);
 
+  // label icon
   const path = TfiLocationPin({}).props.children[1].props.d;
   const viewBox = TfiLocationPin({}).props.attr.viewBox.split(" ");
   const width = Number(viewBox[2]);
@@ -41,7 +41,7 @@ const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {
     return;
   }
 
-  return Object.entries(rooms).map(([roomId, roomInfo]) => {
+  return Object.entries(rooms).map(([roomId, room]) => {
     // selected if it is edit label mode and it is the label of the selected room
     // or the room of the label is connected by the selected door
     const selected =
@@ -49,8 +49,8 @@ const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {
       (idSelected.type == DOOR &&
         doors[idSelected.id].roomIds.includes(roomId));
 
-    // show label if in show all lables mode or "selected" (see above)
-    if (showLabels || selected) {
+    // show label if selected or when showing all labels
+    if (selected || showLabels) {
       const draggable = editRoomLabel && roomIdSelected == roomId;
 
       const handleOnDragEnd = (e) => {
@@ -74,17 +74,17 @@ const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {
           router.push(`?nodeId=${nodeInfo[0]}`);
         } else {
           addNewNode({
-            pos: roomInfo.labelPosition,
+            pos: room.labelPosition,
             neighbors: {},
-            roomId: roomId,
+            roomId,
           });
         }
       };
 
       return (
         <Group
-          x={roomInfo.labelPosition.x - width / 2}
-          y={roomInfo.labelPosition.y - height}
+          x={room.labelPosition.x - width / 2}
+          y={room.labelPosition.y - height}
           key={roomId}
           draggable={draggable}
           onClick={handleClick}
@@ -94,6 +94,7 @@ const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {
         >
           <Path fill={selected ? "orange" : "indigo"} data={path} />
           <Rect width={Number(width)} height={Number(height)} />
+          <Text text={room.name} y={height + 2} />
         </Group>
       );
     }

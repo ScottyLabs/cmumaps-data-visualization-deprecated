@@ -10,7 +10,7 @@ import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
 const MAX_UNDO_LIMIT = 50;
 
 interface UpdateRoomEdit {
-  endpoint: "updateRoom";
+  endpoint: "upsertRoom";
   arg: UpdateRoomArgType;
 }
 
@@ -43,8 +43,8 @@ const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
     case "moveNode":
       dispatch(nodeApiSlice.endpoints.moveNode.initiate(edit.arg)).unwrap();
       break;
-    case "updateRoom":
-      dispatch(RoomApiSlice.endpoints.updateRoom.initiate(edit.arg)).unwrap();
+    case "upsertRoom":
+      dispatch(RoomApiSlice.endpoints.upsertRoom.initiate(edit.arg)).unwrap();
       break;
   }
 };

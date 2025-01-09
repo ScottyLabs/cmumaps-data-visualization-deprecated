@@ -46,6 +46,7 @@ const getRooms = async (buildingCode, floorLevel) => {
         y: room.labelPosY,
       },
       polygon: room.polygon as unknown as Polygon,
+      updatedAt: room.updatedAt.toISOString(),
     };
   }
 

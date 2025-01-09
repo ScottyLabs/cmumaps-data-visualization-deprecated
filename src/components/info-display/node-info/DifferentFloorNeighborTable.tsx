@@ -126,7 +126,7 @@ const DifferentFloorNeighborTable = ({
             </Link>
           </td>
           <EditTypeRow
-            defaultType={neighbor.toFloorInfo?.type}
+            value={neighbor.toFloorInfo?.type}
             typeList={EdgeTypeList}
             handleChange={handleSaveTypeAcrossFloors(neighborId)}
           />

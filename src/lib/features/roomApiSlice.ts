@@ -24,9 +24,9 @@ export interface UpdateRoomArgType {
 export const RoomApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    updateRoom: builder.mutation<string, UpdateRoomArgType>({
+    upsertRoom: builder.mutation<string, UpdateRoomArgType>({
       query: ({ roomId, newRoom }) => ({
-        url: "/api/room/update",
+        url: "/api/room/upsert",
         method: "POST",
         body: { roomId, room: newRoom },
       }),
@@ -56,7 +56,7 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
 
           // create edit and add to history
           if (addToHistory) {
-            const endpoint = "updateRoom";
+            const endpoint = "upsertRoom";
             const edit: EditPair = {
               edit: {
                 endpoint,
@@ -141,4 +141,4 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useUpdateRoomMutation } = RoomApiSlice;
+export const { useUpsertRoomMutation } = RoomApiSlice;

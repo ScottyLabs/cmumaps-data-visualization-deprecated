@@ -42,7 +42,7 @@ export async function GET(request: Request) {
         labelPosition: { x: room.labelPosX, y: room.labelPosY },
         type: room.type as RoomType,
         displayAlias: room.displayAlias ?? undefined,
-        aliases: room.aliases.map((aliasEntry) => aliasEntry.alias),
+        aliases: room.aliases.map((a) => a.alias),
         polygon: room.polygon as unknown as Polygon,
         updatedAt: room.updatedAt.toISOString(),
       };

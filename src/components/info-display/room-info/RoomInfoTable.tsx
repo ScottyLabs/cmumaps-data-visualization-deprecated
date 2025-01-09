@@ -1,18 +1,15 @@
 import { useSession } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { DEFAULT_DENSITY } from "../../../app/api/detectWalkway/detectWalkway";
 import { AWS_API_INVOKE_URL } from "../../../lib/apiRoutes";
 import { useGetRoomsQuery } from "../../../lib/features/apiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
 import {
-  GRAPH_SELECT,
-  POLYGON_ADD_VERTEX,
-  POLYGON_SELECT,
   selectEditPolygon,
-  setMode,
+  toggleEditPolygon,
 } from "../../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { finishLoading, startLoading } from "../../../lib/features/statusSlice";
@@ -22,7 +19,6 @@ import {
 } from "../../../lib/features/uiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import ToggleSwitch from "../../common/ToggleSwitch";
-import { PolygonContext } from "../../contexts/PolygonProvider";
 import { Nodes, WalkwayTypeList } from "../../shared/types";
 import { getRoomId } from "../../utils/utils";
 
@@ -41,65 +37,21 @@ const RoomInfoTable = ({ floorCode, nodes }: Props) => {
   const showRoomSpecific = useAppSelector((state) => state.ui.showRoomSpecific);
   const editPolygon = useAppSelector(selectEditPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
-  const shortcutsDisabled = useAppSelector(
-    (state) => state.status.shortcutsDisabled
-  );
-
-  const { setHistory, setCoordsIndex } = useContext(PolygonContext);
-
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-  const roomId = getRoomId(nodes, nodeId);
-
-  const handleEditPolygonModeClick = useCallback(() => {
-    if (!rooms) {
-      return;
-    }
-
-    const curPolygon = rooms[roomId].polygon;
-
-    if (editPolygon) {
-      dispatch(setMode(GRAPH_SELECT));
-    } else {
-      dispatch(setMode(POLYGON_SELECT));
-      setHistory([curPolygon]);
-      setCoordsIndex(0);
-    }
-  }, [dispatch, editPolygon, roomId, rooms, setCoordsIndex, setHistory]);
-
-  useEffect(() => {
-    if (shortcutsDisabled) {
-      return;
-    }
-
-    // enter edit polygon mode when pressing v
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "v") {
-        if (!editPolygon) {
-          handleEditPolygonModeClick();
-          dispatch(setMode(POLYGON_ADD_VERTEX));
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [dispatch, editPolygon, handleEditPolygonModeClick, shortcutsDisabled]);
 
   if (!rooms) {
     return;
   }
 
+  const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];
 
-  const renderSetEditPolygonButton = () => {
+  const renderToggleEditPolygonButton = () => {
     return (
       <td className="text-center">
         <button
           className="my-2 w-28 rounded bg-slate-500 px-4 py-1 text-sm text-white hover:bg-slate-700"
-          onClick={handleEditPolygonModeClick}
+          onClick={() => dispatch(toggleEditPolygon())}
         >
           {editPolygon ? "Finish Editing" : "Edit Room Polygon"}
         </button>
@@ -107,7 +59,7 @@ const RoomInfoTable = ({ floorCode, nodes }: Props) => {
     );
   };
 
-  const renderSetEditLabelButton = () => {
+  const renderToggleEditLabelButton = () => {
     return (
       <td className="text-center">
         <button
@@ -205,11 +157,12 @@ const RoomInfoTable = ({ floorCode, nodes }: Props) => {
       );
     }
   };
+
   return (
     <>
       <tr>
-        {renderSetEditPolygonButton()}
-        {renderSetEditLabelButton()}
+        {renderToggleEditPolygonButton()}
+        {renderToggleEditLabelButton()}
       </tr>
       {renderRoomSpecificToggle()}
       {RenderDetectWalkwayRow()}

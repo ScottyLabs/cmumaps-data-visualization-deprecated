@@ -24,6 +24,14 @@ export const POLYGON_SELECT: Mode = "Polygon Select";
 export const POLYGON_ADD_VERTEX: Mode = "Polygon Add Vertex";
 export const POLYGON_DELETE_VERTEX: Mode = "Polygon Delete Vertex";
 
+const isEditPolygon = (mode: string) => {
+  return (
+    mode === POLYGON_SELECT ||
+    mode === POLYGON_ADD_VERTEX ||
+    mode === POLYGON_DELETE_VERTEX
+  );
+};
+
 interface ModeState {
   mode: Mode;
 }
@@ -39,14 +47,17 @@ const modeSlice = createSlice({
     setMode(state, action: PayloadAction<Mode>) {
       state.mode = action.payload;
     },
+    toggleEditPolygon(state) {
+      if (isEditPolygon(state.mode)) {
+        state.mode = GRAPH_SELECT;
+      } else {
+        state.mode = POLYGON_SELECT;
+      }
+    },
   },
   selectors: {
     selectEditPolygon(state) {
-      return (
-        state.mode === POLYGON_SELECT ||
-        state.mode === POLYGON_ADD_VERTEX ||
-        state.mode === POLYGON_DELETE_VERTEX
-      );
+      return isEditPolygon(state.mode);
     },
   },
 });
@@ -84,6 +95,6 @@ export const setModeListener = (startAppListening: AppStartListening) => {
   });
 };
 
-export const { setMode } = modeSlice.actions;
+export const { setMode, toggleEditPolygon } = modeSlice.actions;
 export const { selectEditPolygon } = modeSlice.selectors;
 export default modeSlice.reducer;

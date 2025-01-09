@@ -4,7 +4,7 @@ import { throttle } from "lodash";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Stage, Layer } from "react-konva";
 import { toast } from "react-toastify";
 
@@ -36,7 +36,6 @@ import { CursorInfo } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
-import { PolygonContext } from "../contexts/PolygonProvider";
 import { NodeInfoWithoutTimestamp, PDFCoordinate } from "../shared/types";
 import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
@@ -90,8 +89,7 @@ const FloorDisplay = ({
 
   const editPolygon = useAppSelector(selectEditPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
-
-  const { coordsIndex } = useContext(PolygonContext);
+  const ringIndex = useAppSelector((state) => state.polygon.ringIndex);
 
   // join WebSocket
   useWebSocket(floorCode);
@@ -157,13 +155,13 @@ const FloorDisplay = ({
     const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
 
     const polygon = rooms[roomIdSelected].polygon;
-    const coords = polygon.coordinates[coordsIndex];
+    const coords = polygon.coordinates[ringIndex];
     const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
     // empty polygon case
     if (coords.length == 0) {
       // first and last coordinate need to be the same
-      newPolygon.coordinates[coordsIndex].push(newVertex);
-      newPolygon.coordinates[coordsIndex].push(newVertex);
+      newPolygon.coordinates[ringIndex].push(newVertex);
+      newPolygon.coordinates[ringIndex].push(newVertex);
     }
     // insert to the closest vertices
     else {
@@ -177,7 +175,7 @@ const FloorDisplay = ({
         }
       }
       const index = indexToInsert + 1;
-      newPolygon.coordinates[coordsIndex].splice(index, 0, newVertex);
+      newPolygon.coordinates[ringIndex].splice(index, 0, newVertex);
     }
 
     savePolygonEdit(newPolygon);

@@ -1,6 +1,6 @@
 import { Polygon } from "geojson";
 
-import React, { useContext } from "react";
+import React from "react";
 import { Circle, Line } from "react-konva";
 
 import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
@@ -11,7 +11,6 @@ import {
 } from "../../lib/features/modeSlice";
 import { dragVertex, releaseVertex } from "../../lib/features/polygonSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { PolygonContext } from "../contexts/PolygonProvider";
 import { ID } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 
@@ -25,7 +24,7 @@ interface Props {
 const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector((state) => state.mode.mode);
-  const { coordsIndex } = useContext(PolygonContext);
+  const ringIndex = useAppSelector((state) => state.polygon.ringIndex);
   const savePolygonEdit = useSavePolygonEdit(floorCode, roomId);
   const vertexOnDrag = useAppSelector(
     (state) => state.polygon.vertexIndexOnDrag
@@ -33,7 +32,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
 
   const handleOnDragEnd = (e, index: number) => {
     const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
-    const coords = newPolygon.coordinates[coordsIndex];
+    const coords = newPolygon.coordinates[ringIndex];
     const newPos = [
       Number(e.target.x().toFixed(2)),
       Number(e.target.y().toFixed(2)),
@@ -50,7 +49,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const handleClick = (index: number) => {
     if (mode == POLYGON_DELETE_VERTEX) {
       const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
-      const coords = newPolygon.coordinates[coordsIndex];
+      const coords = newPolygon.coordinates[ringIndex];
       coords.splice(index, 1);
 
       // when deleting the first index
@@ -71,7 +70,7 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   };
 
   const renderLines = () => {
-    const coords = polygon.coordinates[coordsIndex];
+    const coords = polygon.coordinates[ringIndex];
     let prev = coords[0];
 
     const lines: React.JSX.Element[] = [];
@@ -106,9 +105,9 @@ const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
     <>
       {renderLines()}
       {/* first and last point are the same */}
-      {polygon.coordinates[coordsIndex].map(
+      {polygon.coordinates[ringIndex].map(
         (point, index) =>
-          index !== polygon.coordinates[coordsIndex].length - 1 && (
+          index !== polygon.coordinates[ringIndex].length - 1 && (
             <Circle
               key={index}
               x={point[0]}

@@ -1,4 +1,3 @@
-import { Polygon } from "geojson";
 import { useRouter, useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
@@ -51,7 +50,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { TEST_WALKWAYS } from "../../settings";
 import Loader from "../common/Loader";
-import PolygonProvider from "../contexts/PolygonProvider";
 import InfoDisplay from "../info-display/InfoDisplay";
 import { deleteNode } from "../shared/keyboardShortcuts";
 import { WalkwayTypeList } from "../shared/types";
@@ -86,20 +84,6 @@ const MainDisplay = ({ floorCode }: Props) => {
     getNodeIdSelected(state.mouseEvent)
   );
   const loadingStatus = useAppSelector((state) => state.status.loadingStatus);
-
-  // polygon editing history
-  const [history, setHistory] = useState<Polygon[]>([]);
-  const [historyIndex, setHistoryIndex] = useState<number>(0);
-  const [coordsIndex, setCoordsIndex] = useState<number>(0);
-
-  const polygonData = {
-    history,
-    setHistory,
-    historyIndex,
-    setHistoryIndex,
-    coordsIndex,
-    setCoordsIndex,
-  };
 
   const parsePDF = useCallback(
     async (regenerate = false) => {
@@ -393,7 +377,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   }
 
   return (
-    <PolygonProvider polygonData={polygonData}>
+    <>
       <div className="fixed top-1/2 z-50 -translate-y-1/2">
         <SidePanel floorCode={floorCode} parsePDF={parsePDF} />
       </div>
@@ -403,7 +387,7 @@ const MainDisplay = ({ floorCode }: Props) => {
           <InfoDisplay floorCode={floorCode} />
         </div>
       )}
-    </PolygonProvider>
+    </>
   );
 };
 

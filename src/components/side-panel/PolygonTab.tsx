@@ -1,7 +1,7 @@
 import { useSession } from "@clerk/nextjs";
 import { Polygon } from "geojson";
 
-import React, { useContext } from "react";
+import React from "react";
 
 import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
 import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
@@ -11,8 +11,8 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import { setRingIndex } from "../../lib/features/polygonSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { PolygonContext } from "../contexts/PolygonProvider";
 import { Nodes, Rooms } from "../shared/types";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import { getRoomId } from "../utils/utils";
@@ -29,7 +29,7 @@ const PolygonTab = ({ floorCode, rooms, nodes }: Props) => {
   const { session } = useSession();
   const dispatch = useAppDispatch();
 
-  const { coordsIndex, setCoordsIndex } = useContext(PolygonContext);
+  const ringIndex = useAppSelector((state) => state.polygon.ringIndex);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
 
@@ -46,12 +46,12 @@ const PolygonTab = ({ floorCode, rooms, nodes }: Props) => {
 
     const deleteHole = () => {
       const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
-      newPolygon.coordinates.splice(coordsIndex, 1);
-      setCoordsIndex(coordsIndex - 1);
+      newPolygon.coordinates.splice(ringIndex, 1);
+      dispatch(setRingIndex(ringIndex - 1));
       savePolygonEdit(newPolygon);
     };
 
-    if (coordsIndex == 0) {
+    if (ringIndex == 0) {
       return (
         <SidePanelButton
           text="Add Hole"
@@ -104,8 +104,8 @@ const PolygonTab = ({ floorCode, rooms, nodes }: Props) => {
     <div className="ml-2 mr-2 space-y-4">
       <div className="flex space-x-3">
         <select
-          value={coordsIndex}
-          onChange={(e) => setCoordsIndex(Number(e.target.value))}
+          value={ringIndex}
+          onChange={(e) => dispatch(setRingIndex(Number(e.target.value)))}
           className="rounded"
         >
           {polygon.coordinates.map((_, index) => (

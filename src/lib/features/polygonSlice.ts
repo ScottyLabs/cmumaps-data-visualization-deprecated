@@ -2,10 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface PolygonState {
   vertexIndexOnDrag: number | null;
+  ringIndex: number;
 }
 
 const initialState: PolygonState = {
   vertexIndexOnDrag: null,
+  ringIndex: 0,
 };
 
 const polygonSlice = createSlice({
@@ -18,8 +20,12 @@ const polygonSlice = createSlice({
     releaseVertex(state) {
       state.vertexIndexOnDrag = null;
     },
+
+    setRingIndex(state, action: PayloadAction<number>) {
+      state.ringIndex = action.payload;
+    },
   },
 });
 
-export const { dragVertex, releaseVertex } = polygonSlice.actions;
+export const { dragVertex, releaseVertex, setRingIndex } = polygonSlice.actions;
 export default polygonSlice.reducer;

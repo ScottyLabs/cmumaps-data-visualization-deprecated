@@ -3,7 +3,10 @@ import { InputJsonValue } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
 
 import { RoomInfo } from "../../../../components/shared/types";
-import { getInfoFromRoomId } from "../../../../components/utils/utils";
+import {
+  extractFloorLevelFromRoomName,
+  getInfoFromRoomId,
+} from "../../../../components/utils/utils";
 import prisma from "../../../../lib/prisma";
 
 export async function POST(request: Request) {
@@ -13,6 +16,7 @@ export async function POST(request: Request) {
     const room: RoomInfo = requestData.room;
 
     const { buildingCode, roomName } = getInfoFromRoomId(roomId);
+    const floorLevel = extractFloorLevelFromRoomName(roomName);
 
     //#region Alias handling
     const existingAliases = await prisma.alias.findMany({
@@ -35,32 +39,33 @@ export async function POST(request: Request) {
     );
     //#endregion
 
-    const newRoom = await prisma.room.update({
+    const upsertData = {
+      buildingCode,
+      floorLevel,
+      name: room.name,
+      labelPosX: room.labelPosition.x,
+      labelPosY: room.labelPosition.y,
+      type: room.type,
+      displayAlias: room.displayAlias,
+      polygon: room.polygon as unknown as InputJsonValue,
+      aliases: {
+        deleteMany: {
+          alias: {
+            in: aliasesToDelete,
+          },
+        },
+        createMany: {
+          data: aliasesToCreate.map((alias) => ({ alias })),
+        },
+      },
+    };
+
+    const newRoom = await prisma.room.upsert({
       where: {
         buildingCode_name: { buildingCode, name: roomName },
       },
-      data: {
-        name: room.name,
-        labelPosX: room.labelPosition.x,
-        labelPosY: room.labelPosition.y,
-        type: room.type,
-        displayAlias: room.displayAlias,
-        polygon: room.polygon as unknown as InputJsonValue,
-        aliases: {
-          deleteMany: {
-            alias: {
-              in: aliasesToDelete,
-            },
-          },
-          createMany: {
-            data: aliasesToCreate.map((alias) => ({
-              buildingCode,
-              roomName,
-              alias,
-            })),
-          },
-        },
-      },
+      create: upsertData,
+      update: upsertData,
       select: {
         updatedAt: true,
       },

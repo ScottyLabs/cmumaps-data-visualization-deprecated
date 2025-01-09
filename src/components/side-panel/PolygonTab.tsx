@@ -3,6 +3,7 @@ import { Polygon } from "geojson";
 
 import React, { useContext } from "react";
 
+import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
 import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
 import { useGetRoomsQuery } from "../../lib/features/apiSlice";
 import {
@@ -11,10 +12,8 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
-import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { RoomInfo } from "../shared/types";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
 import { getRoomId } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
@@ -30,24 +29,18 @@ const PolygonTab = ({ floorCode }: Props) => {
 
   const { data: rooms } = useGetRoomsQuery(floorCode);
   const { coordsIndex, setCoordsIndex } = useContext(PolygonContext);
-  const [upsertRoom] = useUpsertRoomMutation();
 
   const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
+
+  const savePolygonEdit = useSavePolygonEdit(floorCode, roomId);
 
   if (!rooms) {
     return;
   }
 
   const polygon = rooms[roomId].polygon;
-
-  const savePolygonEdit = (newPolygon: Polygon) => {
-    const oldRoom = rooms[roomId];
-    const newRoom: RoomInfo = JSON.parse(JSON.stringify(oldRoom));
-    newRoom.polygon = newPolygon;
-    upsertRoom({ floorCode, roomId, newRoom, oldRoom });
-  };
 
   const renderInteriorButton = () => {
     const addHole = () => {

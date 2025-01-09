@@ -3,16 +3,15 @@ import { Polygon } from "geojson";
 import React, { useContext, useState } from "react";
 import { Circle, Line } from "react-konva";
 
-import { useGetRoomsQuery } from "../../lib/features/apiSlice";
+import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
 import {
   POLYGON_DELETE_VERTEX,
   POLYGON_SELECT,
   setMode,
 } from "../../lib/features/modeSlice";
-import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { ID, RoomInfo } from "../shared/types";
+import { ID } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 
 interface Props {
@@ -24,22 +23,10 @@ interface Props {
 
 const PolygonEditor = ({ floorCode, roomId, polygon, nodeSize }: Props) => {
   const dispatch = useAppDispatch();
-  const { data: rooms } = useGetRoomsQuery(floorCode);
-  const [upsertRoom] = useUpsertRoomMutation();
   const mode = useAppSelector((state) => state.mode.mode);
-
   const { coordsIndex } = useContext(PolygonContext);
-
   const [vertexOnDrag, setVertexOnDrag] = useState<number>(-1);
-
-  const savePolygonEdit = (newPolygon: Polygon) => {
-    if (rooms) {
-      const oldRoom = rooms[roomId];
-      const newRoom: RoomInfo = JSON.parse(JSON.stringify(oldRoom));
-      newRoom.polygon = newPolygon;
-      upsertRoom({ floorCode, roomId, newRoom, oldRoom });
-    }
-  };
+  const savePolygonEdit = useSavePolygonEdit(floorCode, roomId);
 
   const handleOnDragEnd = (e, index: number) => {
     const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));

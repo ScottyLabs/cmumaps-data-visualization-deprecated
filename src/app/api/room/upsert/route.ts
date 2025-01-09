@@ -51,8 +51,6 @@ export async function POST(request: Request) {
       polygon: newRoom.polygon as unknown as InputJsonValue,
     };
 
-    console.log(oldRoom);
-
     const dbRoom = await prisma.room.upsert({
       where: {
         buildingCode_name: { buildingCode, name: oldRoom?.name || "" },

@@ -27,6 +27,7 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import {
   setEditRoomLabel,
   setShowRoomSpecific,
@@ -36,10 +37,9 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { NodeInfo, PDFCoordinate } from "../shared/types";
+import { NodeInfo, PDFCoordinate, RoomInfo } from "../shared/types";
 import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
-import { saveToPolygonHistory } from "../utils/polygonUtils";
 import { findRoomId } from "../utils/roomUtils";
 import { distPointToLine, getRoomId } from "../utils/utils";
 import DoorsDisplay from "./DoorsDisplay";
@@ -76,6 +76,8 @@ const FloorDisplay = ({
   const { data: nodes } = useGetNodesQuery(floorCode);
   const { data: rooms } = useGetRoomsQuery(floorCode);
 
+  const [upsertRoom] = useUpsertRoomMutation();
+
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeIdSelected = useAppSelector((state) =>
     getNodeIdSelected(state.mouseEvent)
@@ -91,8 +93,7 @@ const FloorDisplay = ({
   const editPolygon = useAppSelector(selectEditPolygon);
   const editRoomLabel = useAppSelector((state) => state.ui.editRoomLabel);
 
-  const { history, setHistory, historyIndex, setHistoryIndex, coordsIndex } =
-    useContext(PolygonContext);
+  const { coordsIndex } = useContext(PolygonContext);
 
   // join WebSocket
   useWebSocket(floorCode);
@@ -151,6 +152,43 @@ const FloorDisplay = ({
     );
   };
 
+  const addNewVertex = (pos: PDFCoordinate) => {
+    const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
+
+    const createNewPolygon = () => {
+      const polygon = rooms[roomIdSelected].polygon;
+      const coords = polygon.coordinates[coordsIndex];
+      const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
+      if (coords.length == 0) {
+        // first and last coordinate need to be the same
+        newPolygon.coordinates[coordsIndex].push(newVertex);
+        newPolygon.coordinates[coordsIndex].push(newVertex);
+      } else {
+        let minDist = distPointToLine(newVertex, coords[0], coords[1]);
+        let indexToInsert = 0;
+        for (let i = 0; i < coords.length - 1; i++) {
+          const curDist = distPointToLine(newVertex, coords[i], coords[i + 1]);
+          if (curDist < minDist) {
+            indexToInsert = i;
+            minDist = curDist;
+          }
+        }
+
+        newPolygon.coordinates[coordsIndex].splice(
+          indexToInsert + 1,
+          0,
+          newVertex
+        );
+      }
+      return newPolygon;
+    };
+
+    const oldRoom = rooms[roomIdSelected];
+    const newRoom: RoomInfo = JSON.parse(JSON.stringify(oldRoom));
+    newRoom.polygon = createNewPolygon();
+    upsertRoom({ floorCode, roomId: roomIdSelected, newRoom, oldRoom });
+  };
+
   const handleStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const clickedOnStage = e.target == e.target.getStage();
 
@@ -183,49 +221,7 @@ const FloorDisplay = ({
       });
     } else if (mode == POLYGON_ADD_VERTEX) {
       getCursorPos(e, offset, scale, (pos) => {
-        const newVertex = [Number(pos.x.toFixed(2)), Number(pos.y.toFixed(2))];
-
-        const polygon = rooms[roomIdSelected].polygon;
-
-        const coords = polygon.coordinates[coordsIndex];
-
-        const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
-
-        if (coords.length == 0) {
-          // first and last coordinate need to be the same
-          newPolygon.coordinates[coordsIndex].push(newVertex);
-          newPolygon.coordinates[coordsIndex].push(newVertex);
-        } else {
-          let minDist = distPointToLine(newVertex, coords[0], coords[1]);
-          let indexToInsert = 0;
-          for (let i = 0; i < coords.length - 1; i++) {
-            const curDist = distPointToLine(
-              newVertex,
-              coords[i],
-              coords[i + 1]
-            );
-            if (curDist < minDist) {
-              indexToInsert = i;
-              minDist = curDist;
-            }
-          }
-
-          newPolygon.coordinates[coordsIndex].splice(
-            indexToInsert + 1,
-            0,
-            newVertex
-          );
-        }
-
-        saveToPolygonHistory(
-          history,
-          setHistory,
-          historyIndex,
-          setHistoryIndex,
-          newPolygon
-        );
-        // saveToRooms(floorCode, roomIdSelected, rooms, setRooms, newPolygon);
-
+        addNewVertex(pos);
         dispatch(setMode(POLYGON_SELECT));
       });
     }

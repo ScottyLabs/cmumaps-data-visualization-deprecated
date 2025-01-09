@@ -4,17 +4,18 @@ import { Polygon } from "geojson";
 import React, { useContext } from "react";
 
 import { AWS_API_INVOKE_URL } from "../../lib/apiRoutes";
+import { useGetRoomsQuery } from "../../lib/features/apiSlice";
 import {
   POLYGON_ADD_VERTEX,
   POLYGON_DELETE_VERTEX,
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { PolygonContext } from "../contexts/PolygonProvider";
-import { RoomsContext } from "../contexts/RoomsProvider";
+import { RoomInfo } from "../shared/types";
 import { RED_BUTTON_STYLE } from "../utils/displayUtils";
-import { saveToPolygonHistory, saveToRooms } from "../utils/polygonUtils";
 import { getRoomId } from "../utils/utils";
 import SidePanelButton from "./SidePanelButton";
 import NodeSizeSlider from "./SizeSlider";
@@ -27,51 +28,39 @@ const PolygonTab = ({ floorCode }: Props) => {
   const { session } = useSession();
   const dispatch = useAppDispatch();
 
-  const { rooms, setRooms } = useContext(RoomsContext);
-  const {
-    history,
-    setHistory,
-    historyIndex,
-    setHistoryIndex,
-    coordsIndex,
-    setCoordsIndex,
-  } = useContext(PolygonContext);
+  const { data: rooms } = useGetRoomsQuery(floorCode);
+  const { coordsIndex, setCoordsIndex } = useContext(PolygonContext);
+  const [upsertRoom] = useUpsertRoomMutation();
 
   const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
   const roomId = getRoomId(nodes, nodeId);
+
+  if (!rooms) {
+    return;
+  }
+
   const polygon = rooms[roomId].polygon;
+
+  const savePolygonEdit = (newPolygon: Polygon) => {
+    const oldRoom = rooms[roomId];
+    const newRoom: RoomInfo = JSON.parse(JSON.stringify(oldRoom));
+    newRoom.polygon = newPolygon;
+    upsertRoom({ floorCode, roomId, newRoom, oldRoom });
+  };
 
   const renderInteriorButton = () => {
     const addHole = () => {
       const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
       newPolygon.coordinates.push([]);
-
-      saveToPolygonHistory(
-        history,
-        setHistory,
-        historyIndex,
-        setHistoryIndex,
-        newPolygon
-      );
-
-      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
+      savePolygonEdit(newPolygon);
     };
 
     const deleteHole = () => {
       const newPolygon: Polygon = JSON.parse(JSON.stringify(polygon));
       newPolygon.coordinates.splice(coordsIndex, 1);
       setCoordsIndex(coordsIndex - 1);
-
-      saveToPolygonHistory(
-        history,
-        setHistory,
-        historyIndex,
-        setHistoryIndex,
-        newPolygon
-      );
-
-      saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
+      savePolygonEdit(newPolygon);
     };
 
     if (coordsIndex == 0) {
@@ -112,14 +101,7 @@ const PolygonTab = ({ floorCode }: Props) => {
     }
 
     const newPolygon: Polygon = JSON.parse(body);
-    saveToPolygonHistory(
-      history,
-      setHistory,
-      historyIndex,
-      setHistoryIndex,
-      newPolygon
-    );
-    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
+    savePolygonEdit(newPolygon);
   };
 
   const deletePolygon = async () => {
@@ -127,14 +109,7 @@ const PolygonTab = ({ floorCode }: Props) => {
       type: "Polygon",
       coordinates: [[]],
     };
-    saveToPolygonHistory(
-      history,
-      setHistory,
-      historyIndex,
-      setHistoryIndex,
-      newPolygon
-    );
-    saveToRooms(floorCode, roomId, rooms, setRooms, newPolygon);
+    savePolygonEdit(newPolygon);
   };
 
   return (

@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { InputJsonValue } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
 
 import { RoomInfo } from "../../../../components/shared/types";
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
         labelPosY: room.labelPosition.y,
         type: room.type,
         displayAlias: room.displayAlias,
-        polygon: JSON.stringify(room.polygon),
+        polygon: room.polygon as unknown as InputJsonValue,
         aliases: {
           deleteMany: {
             alias: {

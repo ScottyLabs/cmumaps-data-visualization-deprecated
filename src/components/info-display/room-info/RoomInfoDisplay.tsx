@@ -9,6 +9,7 @@ import {
 } from "../../../lib/features/apiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
+import { useUpdateRoomMutation } from "../../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { RoomsContext } from "../../contexts/RoomsProvider";
 import { NodeInfo, RoomInfo, RoomTypeList } from "../../shared/types";
@@ -27,6 +28,8 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
   const dispatch = useAppDispatch();
   const { data: nodes } = useGetNodesQuery(floorCode);
   const { data: rooms } = useGetRoomsQuery(floorCode);
+
+  const [updateRoom] = useUpdateRoomMutation();
 
   const { setRooms } = useContext(RoomsContext);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -100,6 +103,15 @@ const RoomInfoDisplay = ({ floorCode }: Props) => {
   };
 
   const handleSaveHelper = async (roomInfo: RoomInfo) => {
+    updateRoom({
+      floorCode,
+      roomId,
+      newRoom: roomInfo,
+      oldRoom: rooms[roomId],
+    });
+
+    return;
+
     // frontend update
     const newRooms = { ...rooms };
     const newRoomId = getRoomIdFromRoomInfo(floorCode, roomInfo);

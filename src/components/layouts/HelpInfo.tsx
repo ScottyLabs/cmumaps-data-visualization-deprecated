@@ -41,14 +41,14 @@ const HelpInfo = () => {
       <div>
         <h1 className="font-bold">Graph</h1>
         <p>Press 'n' to add a node.</p>
-        <p>Press 'backspace' or 'delete' or 'esc' to delete a node.</p>
+        <p>Press 'backspace' or 'delete' to delete a node.</p>
         <p>Press 'e' to add an edge by clicking.</p>
         <p>Press 'd' to delete a edge by clicking.</p>
         <p>Press 'w' to add a door node.</p>
       </div>
       <div>
         <h1 className="font-bold">Polygon</h1>
-        <p>Press 'v' to enter polygon editing mode and add a vertex.</p>
+        <p>Press 'v' to add a vertex.</p>
         <p>Press 'd' to delete a vertex.</p>
       </div>
       <div>

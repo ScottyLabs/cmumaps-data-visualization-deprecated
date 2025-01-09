@@ -246,7 +246,7 @@ const MainDisplay = ({ floorCode }: Props) => {
   }
 
   if (isFetchingNodes || isFetchingRooms) {
-    return <Loader loadingText="Fetching Graph" />;
+    return <Loader loadingText="Fetching Data" />;
   }
 
   return (

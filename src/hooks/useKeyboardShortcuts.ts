@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { deleteNode } from "../components/shared/keyboardShortcuts";
 import { Nodes, Rooms } from "../components/shared/types";
 import { calcMst } from "../components/utils/graphUtils";
-import { useInvalidateNodesCacheMutation } from "../lib/features/apiSlice";
+import { useInvalidateCacheMutation } from "../lib/features/apiSlice";
 import { redo, undo } from "../lib/features/historySlice";
 import {
   ADD_DOOR_NODE,
@@ -38,7 +38,7 @@ const useKeyboardShortcuts = (
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const [invalidateNodesCache] = useInvalidateNodesCacheMutation();
+  const [invalidateCache] = useInvalidateCacheMutation();
 
   const idSelected = useAppSelector((state) => state.mouseEvent.idSelected);
   const nodeIdSelected = useAppSelector((state) =>
@@ -83,7 +83,7 @@ const useKeyboardShortcuts = (
 
         // refetch data
         case "r":
-          invalidateNodesCache();
+          invalidateCache();
           break;
 
         // edit history
@@ -135,10 +135,9 @@ const useKeyboardShortcuts = (
             }
             break;
 
-          // delete or backspace or escape
+          // delete or backspace to delete a node
           case "Backspace":
           case "Delete":
-          case "Escape":
             if (nodeIdSelected && nodes) {
               deleteNode(nodes, nodeIdSelected, floorCode, router, dispatch);
             } else {
@@ -148,6 +147,13 @@ const useKeyboardShortcuts = (
 
           case "w":
             dispatch(setMode(ADD_DOOR_NODE));
+            break;
+
+          // enters polygon editing mode
+          case "v":
+            if (nodeIdSelected) {
+              dispatch(setMode(POLYGON_ADD_VERTEX));
+            }
             break;
         }
       }
@@ -167,7 +173,7 @@ const useKeyboardShortcuts = (
     nodeIdSelected,
     rooms,
     nodes,
-    invalidateNodesCache,
+    invalidateCache,
   ]);
 };
 

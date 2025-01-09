@@ -23,7 +23,7 @@ export default function RootLayout({
           <head>
             <script>const global = globalThis;</script>
           </head>
-          <body className="bg-gray-100">
+          <body className="bg-gray-300">
             <div id="root">{children}</div>
           </body>
         </html>

@@ -1,12 +1,12 @@
 import { Polygon } from "geojson";
-import { Util } from "konva/lib/Util";
 import { useRouter } from "next/navigation";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Path } from "react-konva";
 
 import { useAppSelector } from "../../lib/hooks";
 import { Rooms } from "../shared/types";
+import { getRoomTypeDetails } from "../utils/colorUtils";
 
 interface Props {
   rooms: Rooms;
@@ -15,17 +15,6 @@ interface Props {
 const PolygonsDisplay = ({ rooms }: Props) => {
   const router = useRouter();
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
-  const showPolygons = useAppSelector((state) => state.visibility.showPolygons);
-
-  // get all random colors
-  const [fillColors, setFillColors] = useState<string[]>([]);
-
-  const fillColorsLength = Object.keys(rooms).length;
-  useEffect(() => {
-    setFillColors(
-      [...Array(fillColorsLength)].map(() => Util.getRandomColor())
-    );
-  }, [fillColorsLength, showPolygons]);
 
   // Convert GeoJSON polygon to SVG path string
   const geojsonToPath = (polygon: Polygon): string => {
@@ -58,15 +47,16 @@ const PolygonsDisplay = ({ rooms }: Props) => {
     return pathString;
   };
 
-  return Object.entries(rooms).map(([roomId, room], colorIndex) => {
+  return Object.entries(rooms).map(([roomId, room]) => {
+    const roomColor = getRoomTypeDetails(room.type);
     return (
       <Path
         key={roomId}
         data={geojsonToPath(room.polygon)}
-        stroke="black"
+        stroke={roomColor.border}
         strokeWidth={nodeSize / 2}
         closed
-        fill={fillColors[colorIndex]}
+        fill={roomColor.background}
         onClick={() => router.push(`?roomId=${roomId}`)}
       />
     );

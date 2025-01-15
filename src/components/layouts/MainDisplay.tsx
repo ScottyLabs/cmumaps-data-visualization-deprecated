@@ -1,3 +1,4 @@
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
@@ -70,11 +71,13 @@ const MainDisplay = ({ floorCode }: Props) => {
     data: nodes,
     isFetching: isFetchingNodes,
     isError: isErrorNodes,
+    error: nodesError,
   } = useGetNodesQuery(floorCode);
   const {
     data: rooms,
     isFetching: isFetchingRooms,
     isError: isErrorRooms,
+    error: roomsError,
   } = useGetRoomsQuery(floorCode);
 
   const [invalidateCache] = useInvalidateCacheMutation();
@@ -359,6 +362,16 @@ const MainDisplay = ({ floorCode }: Props) => {
   ]);
 
   if (isErrorNodes || isErrorRooms) {
+    if (isErrorNodes) {
+      const error = nodesError as FetchBaseQueryError;
+      console.error((error.data as { error: string }).error);
+    }
+
+    if (isErrorRooms) {
+      const error = roomsError as FetchBaseQueryError;
+      console.error((error.data as { error: string }).error);
+    }
+
     return (
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2">
         <p className="text-nowrap text-3xl text-red-500">

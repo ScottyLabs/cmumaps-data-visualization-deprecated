@@ -5,8 +5,8 @@ import React from "react";
 import { extractFloorLevel } from "../../../app/api/apiUtils";
 import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
+import { useUpdateNodeMutation } from "../../../lib/features/graphApiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
-import { useUpdateNodeMutation } from "../../../lib/features/nodeApiSlice";
 import { useUpsertRoomMutation } from "../../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import {

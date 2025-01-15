@@ -14,6 +14,7 @@ import {
   useGetNodesQuery,
   useGetRoomsQuery,
 } from "../../lib/features/apiSlice";
+import { useAddNodeMutation } from "../../lib/features/graphApiSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -26,7 +27,6 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
-import { useAddNodeMutation } from "../../lib/features/nodeApiSlice";
 import {
   setEditRoomLabel,
   setShowRoomSpecific,

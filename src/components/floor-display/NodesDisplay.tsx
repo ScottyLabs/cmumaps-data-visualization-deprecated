@@ -7,6 +7,11 @@ import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
 import {
+  useAddEdgeMutation,
+  useDeleteEdgeMutation,
+  useUpdateNodeMutation,
+} from "../../lib/features/graphApiSlice";
+import {
   ADD_DOOR_NODE,
   ADD_EDGE,
   DELETE_EDGE,
@@ -18,11 +23,6 @@ import {
   getNodeIdSelected,
   releaseNode,
 } from "../../lib/features/mouseEventSlice";
-import {
-  useAddEdgeMutation,
-  useDeleteEdgeMutation,
-  useUpdateNodeMutation,
-} from "../../lib/features/nodeApiSlice";
 import {
   CursorInfo,
   CursorInfoOnDragNode,

@@ -9,7 +9,7 @@ import {
   MoveNodeArgType,
   EdgeArgType,
   nodeApiSlice,
-} from "./nodeApiSlice";
+} from "./graphApiSlice";
 import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
 
 const MAX_UNDO_LIMIT = 50;

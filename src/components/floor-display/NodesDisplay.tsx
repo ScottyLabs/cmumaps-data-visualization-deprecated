@@ -6,8 +6,6 @@ import React, { MutableRefObject } from "react";
 import { Circle } from "react-konva";
 import { toast } from "react-toastify";
 
-import { savingHelper } from "../../lib/apiRoutes";
-import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -22,6 +20,7 @@ import {
 } from "../../lib/features/mouseEventSlice";
 import {
   useAddEdgeMutation,
+  useDeleteEdgeMutation,
   useUpdateNodeMutation,
 } from "../../lib/features/nodeApiSlice";
 import {
@@ -66,6 +65,7 @@ const NodesDisplay = ({
 
   const [moveNode] = useUpdateNodeMutation();
   const [addEdge] = useAddEdgeMutation();
+  const [deleteEdge] = useDeleteEdgeMutation();
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
@@ -163,43 +163,31 @@ const NodesDisplay = ({
     dispatch(setMode(GRAPH_SELECT));
   };
 
+  const handleDeleteEdge = (nodeId: ID) => {
+    //#region validation
+    if (!nodeIdSelected) {
+      // this line should never run because we check that idSelected is
+      // selected before setting mode to ADD_EDGE
+      toast.error("Please select a node first!");
+      return;
+    }
+
+    if (!Object.keys(nodes[nodeId].neighbors).includes(nodeIdSelected)) {
+      toast.error("No edge exist between these two nodes!");
+      return;
+    }
+    //#endregion
+    deleteEdge({ floorCode, inNodeId: nodeId, outNodeId: nodeIdSelected });
+    dispatch(setMode(GRAPH_SELECT));
+  };
+
   const handleNodeClick = (nodeId: ID) => {
     if (mode == GRAPH_SELECT) {
       router.push(`?nodeId=${nodeId}`);
     } else if (mode == ADD_EDGE) {
       handleAddEdge(nodeId);
     } else if (mode == DELETE_EDGE) {
-      if (!nodeIdSelected) {
-        // this line should never run because we check that idSelected is
-        // selected before setting mode to ADD_EDGE
-        toast.error("Please select a node first!");
-        return;
-      }
-
-      if (!Object.keys(nodes[nodeId].neighbors).includes(nodeIdSelected)) {
-        toast.error("No edge exist between these two nodes!");
-        return;
-      }
-
-      const newNodes = { ...nodes };
-      const newNode = JSON.parse(JSON.stringify(newNodes[nodeIdSelected]));
-
-      delete newNodes[nodeId].neighbors[nodeIdSelected];
-
-      delete newNode.neighbors[nodeId];
-      newNodes[nodeIdSelected] = newNode;
-
-      dispatch(setNodes(newNodes));
-
-      savingHelper(
-        "/api/updateGraph",
-        JSON.stringify({
-          floorCode: floorCode,
-          newGraph: JSON.stringify(newNodes),
-        })
-      );
-
-      dispatch(setMode(GRAPH_SELECT));
+      handleDeleteEdge(nodeId);
     } else if (mode == ADD_DOOR_NODE) {
       addDoorNodeErrToast();
     }

@@ -263,8 +263,75 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    deleteEdge: builder.mutation<string, EdgeArgType>({
+      query: ({ inNodeId, outNodeId }) => ({
+        url: "/api/neighbor",
+        method: "DELETE",
+        body: { inNodeId, outNodeId },
+      }),
+      transformResponse: (response: { updatedAt: string }) =>
+        response.updatedAt,
+      async onQueryStarted(
+        { floorCode, inNodeId, outNodeId, addToHistory = true },
+        { dispatch, queryFulfilled }
+      ) {
+        try {
+          // optimistic update
+          const { patches } = dispatch(
+            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
+              delete draft[inNodeId].neighbors[outNodeId];
+              delete draft[outNodeId].neighbors[inNodeId];
+            })
+          );
+
+          // create edit and add to history
+          if (addToHistory) {
+            const arg = {
+              floorCode,
+              inNodeId,
+              outNodeId,
+              addToHistory: false,
+            };
+
+            const edit: EditPair = {
+              edit: { endpoint: "deleteNeighbor", arg },
+              reverseEdit: { endpoint: "addNeighbor", arg },
+            };
+            dispatch(addEditToHistory(edit));
+          }
+
+          // different error handling for queryFulfilled
+          try {
+            await queryFulfilled;
+          } catch (e) {
+            toast.error(
+              "Failed to save! Check the Console for detailed error."
+            );
+            const error = e as { error: { data: { error: string } } };
+            console.error(error.error.data.error);
+          }
+
+          // send patch to others
+          const graphPatchAction: GraphPatchMessageAction = {
+            type: WEBSOCKET_MESSAGE,
+            payload: {
+              type: GRAPH_PATCH,
+              patches,
+            },
+          };
+          dispatch(graphPatchAction as unknown as UnknownAction);
+        } catch (e) {
+          toast.error("Check the Console for detailed error.");
+          console.error(e);
+        }
+      },
+    }),
   }),
 });
 
-export const { useUpdateNodeMutation, useAddNodeMutation, useAddEdgeMutation } =
-  nodeApiSlice;
+export const {
+  useUpdateNodeMutation,
+  useAddNodeMutation,
+  useAddEdgeMutation,
+  useDeleteEdgeMutation,
+} = nodeApiSlice;

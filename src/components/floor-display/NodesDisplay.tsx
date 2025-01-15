@@ -20,7 +20,10 @@ import {
   getNodeIdSelected,
   releaseNode,
 } from "../../lib/features/mouseEventSlice";
-import { useUpdateNodeMutation } from "../../lib/features/nodeApiSlice";
+import {
+  useAddEdgeMutation,
+  useUpdateNodeMutation,
+} from "../../lib/features/nodeApiSlice";
 import {
   CursorInfo,
   CursorInfoOnDragNode,
@@ -38,7 +41,7 @@ import {
 import { getCursorPos, setCursor } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
-import { dist, getRoomId } from "../utils/utils";
+import { getRoomId } from "../utils/utils";
 import { CURSOR_INTERVAL } from "./LiveCursors";
 
 interface Props {
@@ -62,6 +65,7 @@ const NodesDisplay = ({
   const dispatch = useAppDispatch();
 
   const [moveNode] = useUpdateNodeMutation();
+  const [addEdge] = useAddEdgeMutation();
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
@@ -134,56 +138,36 @@ const NodesDisplay = ({
     };
   };
 
+  const handleAddEdge = (nodeId: ID) => {
+    //#region validation
+    if (!nodeIdSelected) {
+      // this line should never run because we check that idSelected is
+      // selected before setting mode to ADD_EDGE
+      toast.error("Please select a node first!");
+      return;
+    }
+
+    // Check for self-loop
+    if (nodeIdSelected == nodeId) {
+      toast.error("No self-loop allowed!");
+      return;
+    }
+
+    // Check for multi-edge
+    if (Object.keys(nodes[nodeId].neighbors).includes(nodeIdSelected)) {
+      toast.error("Edge already existed!");
+      return false;
+    }
+    //#endregion
+    addEdge({ floorCode, inNodeId: nodeId, outNodeId: nodeIdSelected });
+    dispatch(setMode(GRAPH_SELECT));
+  };
+
   const handleNodeClick = (nodeId: ID) => {
     if (mode == GRAPH_SELECT) {
       router.push(`?nodeId=${nodeId}`);
     } else if (mode == ADD_EDGE) {
-      if (!nodeIdSelected) {
-        // this line should never run because we check that idSelected is
-        // selected before setting mode to ADD_EDGE
-        toast.error("Please select a node first!");
-        return;
-      }
-
-      if (nodeIdSelected == nodeId) {
-        toast.error("No self edge allowed!");
-        return;
-      }
-
-      const addEdge = (nodeId, neighborID, newNodes) => {
-        if (Object.keys(newNodes[nodeId].neighbors).includes(neighborID)) {
-          toast.error("Edge already existed!");
-          return false;
-        }
-
-        const newNode = JSON.parse(JSON.stringify(newNodes[nodeId]));
-
-        newNode.neighbors[neighborID] = {
-          dist: dist(newNodes[nodeId].pos, newNodes[neighborID].pos),
-        };
-
-        newNodes[nodeId] = newNode;
-
-        return true;
-      };
-
-      const newNodes = { ...nodes };
-
-      if (addEdge(nodeId, nodeIdSelected, newNodes)) {
-        addEdge(nodeIdSelected, nodeId, newNodes);
-      }
-
-      dispatch(setNodes(newNodes));
-
-      savingHelper(
-        "/api/updateGraph",
-        JSON.stringify({
-          floorCode: floorCode,
-          newGraph: JSON.stringify(newNodes),
-        })
-      );
-
-      dispatch(setMode(GRAPH_SELECT));
+      handleAddEdge(nodeId);
     } else if (mode == DELETE_EDGE) {
       if (!nodeIdSelected) {
         // this line should never run because we check that idSelected is

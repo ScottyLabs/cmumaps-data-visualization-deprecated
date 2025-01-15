@@ -27,7 +27,7 @@ export interface AddNodeArgType {
   addToHistory?: boolean;
 }
 
-export interface NeighborArgType {
+export interface EdgeArgType {
   floorCode: string;
   inNodeId: ID;
   outNodeId: ID;
@@ -191,7 +191,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    addNeighbor: builder.mutation<string, NeighborArgType>({
+    addEdge: builder.mutation<string, EdgeArgType>({
       query: ({ inNodeId, outNodeId }) => ({
         url: "/api/neighbor",
         method: "PUT",
@@ -266,4 +266,5 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useUpdateNodeMutation, useAddNodeMutation } = nodeApiSlice;
+export const { useUpdateNodeMutation, useAddNodeMutation, useAddEdgeMutation } =
+  nodeApiSlice;

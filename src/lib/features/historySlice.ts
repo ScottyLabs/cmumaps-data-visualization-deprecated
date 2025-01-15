@@ -7,7 +7,7 @@ import { createAppAsyncThunk } from "../withTypes";
 import {
   AddNodeArgType,
   MoveNodeArgType,
-  NeighborArgType,
+  EdgeArgType,
   nodeApiSlice,
 } from "./nodeApiSlice";
 import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
@@ -36,12 +36,12 @@ interface DeleteNodeEdit {
 
 interface AddNeighborEdit {
   endpoint: "addNeighbor";
-  arg: NeighborArgType;
+  arg: EdgeArgType;
 }
 
 interface DeleteNeighborEdit {
   endpoint: "deleteNeighbor";
-  arg: NeighborArgType;
+  arg: EdgeArgType;
 }
 
 interface DeleteRoomEdit {

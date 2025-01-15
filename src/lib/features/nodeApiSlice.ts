@@ -11,7 +11,7 @@ import {
 } from "../webSocketMiddleware";
 import { apiSlice, getNodes } from "./apiSlice";
 import { addEditToHistory, EditPair } from "./historySlice";
-import { lockGraph, unlockGraph } from "./lockSlice";
+import { lockGraph, unlockGraph, updateGraphUpdatedAt } from "./lockSlice";
 
 export interface MoveNodeArgType {
   floorCode: string;
@@ -44,7 +44,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           const oldNode = nodes[nodeId];
 
           // optimistic update
-          dispatch(
+          const { patches } = dispatch(
             apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
               draft[nodeId] = newNode;
             })
@@ -94,18 +94,14 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             return;
           }
 
-          // update timestamp
-          // reapply change if no more change by myself
+          // update timestamp if not outdated
           const store = getState() as RootState;
-          dispatch(
-            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-              if (store.lock[nodeId] === 1) {
-                draft[nodeId] = { ...newNode, updatedAt };
-              } else {
-                draft[nodeId].updatedAt = updatedAt;
-              }
-            })
-          );
+          const graphUpdatedAt = store.lock.graphUpdatedAt;
+          if (graphUpdatedAt && graphUpdatedAt < updatedAt) {
+            toast.warn("You change on the graph might have been overwritten");
+          } else {
+            dispatch(updateGraphUpdatedAt(updatedAt));
+          }
 
           // unlock the graph after update
           dispatch(unlockGraph());
@@ -115,8 +111,8 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             type: WEBSOCKET_MESSAGE,
             payload: {
               type: GRAPH_PATCH,
-              nodeId,
-              newNode: { ...newNode, updatedAt },
+              patches,
+              updatedAt,
             },
           };
           dispatch(graphPatchAction as unknown as UnknownAction);

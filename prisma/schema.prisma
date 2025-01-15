@@ -48,8 +48,6 @@ model Node {
   roomName     String
   room         Room?  @relation(fields: [buildingCode, roomName], references: [buildingCode, name], onUpdate: Cascade)
 
-  updatedAt DateTime @updatedAt
-
   outNeighbors Neighbor[] @relation("OutNeighbors")
   inNeighbors  Neighbor[] @relation("InNeighbors")
 

@@ -80,7 +80,6 @@ export async function GET(request: Request) {
         pos: { x: node.posX, y: node.posY },
         neighbors,
         roomId,
-        updatedAt: node.updatedAt.toISOString(),
       };
     }
 

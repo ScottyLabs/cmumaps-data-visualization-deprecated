@@ -1,8 +1,9 @@
 import { Action, Middleware } from "@reduxjs/toolkit";
+import { Patch } from "immer";
 
 import { toast } from "react-toastify";
 
-import { NodeInfo, RoomInfo } from "../components/shared/types";
+import { RoomInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice, getRooms } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
@@ -31,8 +32,8 @@ interface WebSocketConnectAction {
 
 interface GraphPatch {
   type: typeof GRAPH_PATCH;
-  nodeId: string;
-  newNode: NodeInfo;
+  patches: Patch[];
+  updatedAt: string;
   sender: string;
 }
 
@@ -114,31 +115,25 @@ const handleGraphPatch = async (
   dispatch: AppDispatch
 ) => {
   try {
-    const nodeId = message.nodeId;
     const locked = !!getStore().lock.graphLock;
     const graphUpdatedAt = getStore().lock.graphUpdatedAt;
-    const outdated =
-      graphUpdatedAt && message.newNode.updatedAt < graphUpdatedAt;
+    const outdated = graphUpdatedAt && message.updatedAt < graphUpdatedAt;
 
     // update timestamp
     if (!outdated) {
-      dispatch(updateGraphUpdatedAt(message.newNode.updatedAt));
+      dispatch(updateGraphUpdatedAt(message.updatedAt));
     }
 
     // toast warning about overwriting if locked or receiving an outdated patch
     if (locked || outdated) {
       const name = getUserName(message.sender, getStore());
-      toast.warn(`You might have overwrote ${name}'s change on the graph`, {
-        autoClose: false,
-      });
+      toast.warn(`You might have overwrote ${name}'s change on the graph`);
       return;
     }
 
     // otherwise apply the change
     dispatch(
-      apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-        draft[nodeId] = message.newNode;
-      })
+      apiSlice.util.patchQueryData("getNodes", floorCode, message.patches)
     );
   } catch (e) {
     toast.error("Error handling graph patch!");

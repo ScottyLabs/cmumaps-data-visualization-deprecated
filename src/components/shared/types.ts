@@ -61,14 +61,7 @@ export interface NodeInfo {
    * ${buildingCode}-${roomName}
    */
   roomId: ID;
-
-  /**
-   * Most recent update timestamp as a string value in ISO format.
-   */
-  updatedAt: string;
 }
-
-export type NodeInfoWithoutTimestamp = Omit<NodeInfo, "updatedAt">;
 
 /**
  * Door type

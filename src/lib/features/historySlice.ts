@@ -34,13 +34,13 @@ interface DeleteNodeEdit {
   // arg: AddNodeArgType;
 }
 
-interface AddNeighborEdit {
-  endpoint: "addNeighbor";
+interface AddEdgeEdit {
+  endpoint: "addEdge";
   arg: EdgeArgType;
 }
 
-interface DeleteNeighborEdit {
-  endpoint: "deleteNeighbor";
+interface DeleteEdgeEdit {
+  endpoint: "deleteEdge";
   arg: EdgeArgType;
 }
 
@@ -58,8 +58,8 @@ type Edit =
   | CreateRoomEdit
   | AddNodeEdit
   | DeleteNodeEdit
-  | AddNeighborEdit
-  | DeleteNeighborEdit;
+  | AddEdgeEdit
+  | DeleteEdgeEdit;
 
 export interface EditPair {
   edit: Edit;
@@ -85,6 +85,12 @@ const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
       break;
     case "upsertRoom":
       dispatch(RoomApiSlice.endpoints.upsertRoom.initiate(edit.arg)).unwrap();
+      break;
+    case "addEdge":
+      dispatch(nodeApiSlice.endpoints.addEdge.initiate(edit.arg)).unwrap();
+      break;
+    case "deleteEdge":
+      dispatch(nodeApiSlice.endpoints.deleteEdge.initiate(edit.arg)).unwrap();
       break;
     case "deleteRoom":
       toast.warn("Can't undo create room!");

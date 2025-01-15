@@ -214,25 +214,16 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
 
           // create edit and add to history
           if (addToHistory) {
+            const arg = {
+              floorCode,
+              inNodeId,
+              outNodeId,
+              addToHistory: false,
+            };
+
             const edit: EditPair = {
-              edit: {
-                endpoint: "addNeighbor",
-                arg: {
-                  floorCode,
-                  inNodeId,
-                  outNodeId,
-                  addToHistory: false,
-                },
-              },
-              reverseEdit: {
-                endpoint: "deleteNeighbor",
-                arg: {
-                  floorCode,
-                  inNodeId,
-                  outNodeId,
-                  addToHistory: false,
-                },
-              },
+              edit: { endpoint: "addEdge", arg },
+              reverseEdit: { endpoint: "deleteEdge", arg },
             };
             dispatch(addEditToHistory(edit));
           }
@@ -294,8 +285,8 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             };
 
             const edit: EditPair = {
-              edit: { endpoint: "deleteNeighbor", arg },
-              reverseEdit: { endpoint: "addNeighbor", arg },
+              edit: { endpoint: "deleteEdge", arg },
+              reverseEdit: { endpoint: "addEdge", arg },
             };
             dispatch(addEditToHistory(edit));
           }

@@ -38,7 +38,7 @@ export interface ToFloorInfo {
 /**
  * Graph types
  */
-export interface Edge {
+export interface EdgeInfo {
   toFloorInfo?: ToFloorInfo;
 }
 
@@ -54,7 +54,7 @@ export interface NodeInfo {
   /**
    * (neighbor's id to the edge) for each neighbor of the node
    */
-  neighbors: Record<ID, Edge>;
+  neighbors: Record<ID, EdgeInfo>;
 
   /**
    * the ID of the Room the node belongs to

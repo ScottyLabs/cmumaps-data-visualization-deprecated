@@ -2,7 +2,7 @@ import { savingHelper } from "../../lib/apiRoutes";
 import { setNodes } from "../../lib/features/dataSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import { deselect } from "../../lib/features/mouseEventSlice";
-import { Edge, Nodes } from "./types";
+import { EdgeInfo, Nodes } from "./types";
 
 export const deleteNode = async (
   nodes: Nodes,
@@ -33,7 +33,7 @@ export const deleteNode = async (
 
   // delete the edge to another floor
   for (const neighborId in newNodes[nodeId].neighbors) {
-    const neighbor: Edge = newNodes[nodeId].neighbors[neighborId];
+    const neighbor: EdgeInfo = newNodes[nodeId].neighbors[neighborId];
     if (neighbor.toFloorInfo) {
       const response = await fetch("/api/updateEdgeAcrossFloors", {
         method: "POST",

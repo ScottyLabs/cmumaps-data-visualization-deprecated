@@ -6,14 +6,14 @@ import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { NodeInfo, Edge, EdgeTypeList } from "../../shared/types";
+import { NodeInfo, EdgeInfo, EdgeTypeList } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import EditTypeRow from "../SelectTypeCell";
 
 interface Props {
   floorCode: string;
-  neighbors: Record<string, Edge>;
-  differentFloorNeighbors: Record<string, Edge>;
+  neighbors: Record<string, EdgeInfo>;
+  differentFloorNeighbors: Record<string, EdgeInfo>;
 }
 
 const DifferentFloorNeighborTable = ({
@@ -27,7 +27,7 @@ const DifferentFloorNeighborTable = ({
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const renderDifferentFloorNeighbors = (
-    differentFloorNeighbors: Record<string, Edge>
+    differentFloorNeighbors: Record<string, EdgeInfo>
   ) => {
     const calculatePath = (neighborId) => {
       const toFloorInfo = neighbors[neighborId].toFloorInfo;

@@ -10,13 +10,13 @@ import {
   unHoverNode,
 } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { Edge } from "../../shared/types";
+import { EdgeInfo } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { dist } from "../../utils/utils";
 
 interface Props {
   floorCode: string;
-  sameFloorNeighbors: Record<string, Edge>;
+  sameFloorNeighbors: Record<string, EdgeInfo>;
 }
 
 const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
@@ -66,7 +66,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   );
 
   const renderSameFloorNeighbors = (
-    sameFloorNeighbors: Record<string, Edge>
+    sameFloorNeighbors: Record<string, EdgeInfo>
   ) => {
     return Object.keys(sameFloorNeighbors).map((neighborID) => {
       const selectHandleClick = () => {

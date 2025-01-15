@@ -7,12 +7,7 @@ import { Group, Path, Rect, Text } from "react-konva";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
 import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppSelector } from "../../lib/hooks";
-import {
-  NodeInfoWithoutTimestamp,
-  Nodes,
-  RoomInfo,
-  Rooms,
-} from "../shared/types";
+import { NodeInfo, Nodes, RoomInfo, Rooms } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";
 import { getRoomId } from "../utils/utils";
 
@@ -20,7 +15,7 @@ interface Props {
   floorCode: string;
   nodes: Nodes;
   rooms: Rooms;
-  addNewNode: (newNode: NodeInfoWithoutTimestamp) => void;
+  addNewNode: (newNode: NodeInfo) => void;
 }
 
 const LabelsDisplay = ({ floorCode, nodes, rooms, addNewNode }: Props) => {

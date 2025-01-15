@@ -7,7 +7,6 @@ import { RoomInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
 import { apiSlice, getRooms } from "./features/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
-import { updateGraphUpdatedAt } from "./features/lockSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";
 import { getUserName } from "./utils/overwriteUtils";
@@ -33,7 +32,6 @@ interface WebSocketConnectAction {
 interface GraphPatch {
   type: typeof GRAPH_PATCH;
   patches: Patch[];
-  updatedAt: string;
   sender: string;
 }
 
@@ -111,27 +109,10 @@ const handleRoomEdit = async (
 const handleGraphPatch = async (
   message: GraphPatch,
   floorCode: string,
-  getStore: () => RootState,
   dispatch: AppDispatch
 ) => {
   try {
-    const locked = !!getStore().lock.graphLock;
-    const graphUpdatedAt = getStore().lock.graphUpdatedAt;
-    const outdated = graphUpdatedAt && message.updatedAt < graphUpdatedAt;
-
-    // update timestamp
-    if (!outdated) {
-      dispatch(updateGraphUpdatedAt(message.updatedAt));
-    }
-
-    // toast warning about overwriting if locked or receiving an outdated patch
-    if (locked || outdated) {
-      const name = getUserName(message.sender, getStore());
-      toast.warn(`You might have overwrote ${name}'s change on the graph`);
-      return;
-    }
-
-    // otherwise apply the change
+    // apply the patch
     dispatch(
       apiSlice.util.patchQueryData("getNodes", floorCode, message.patches)
     );
@@ -177,7 +158,7 @@ const handleWebSocketJoin = (
 
     switch (message.type) {
       case GRAPH_PATCH:
-        handleGraphPatch(message, floorCode, getStore, dispatch);
+        handleGraphPatch(message, floorCode, dispatch);
         break;
 
       case ROOM_EDIT:

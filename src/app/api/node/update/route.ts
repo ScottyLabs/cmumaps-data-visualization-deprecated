@@ -25,25 +25,15 @@ export async function POST(request: Request) {
       delete updateData.roomName;
     }
 
-    const newNode = await prisma.node.update({
+    await prisma.node.update({
       where: {
         id: nodeId,
       },
       data: updateData,
-      select: {
-        updatedAt: true,
-      },
     });
 
-    const updatedAt = newNode.updatedAt;
-
     // good response
-    return new NextResponse(
-      JSON.stringify({
-        status: 200,
-        updatedAt,
-      })
-    );
+    return new NextResponse(JSON.stringify({ status: 200 }));
   } catch (e) {
     // Javascript Error Message
     // console.log(e);

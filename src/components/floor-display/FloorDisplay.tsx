@@ -36,7 +36,7 @@ import { CursorInfo } from "../../lib/features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { CURSOR, WEBSOCKET_MESSAGE } from "../../lib/webSocketMiddleware";
 import { LIVE_CURSORS_ENABLED } from "../../settings";
-import { NodeInfoWithoutTimestamp, PDFCoordinate } from "../shared/types";
+import { NodeInfo, PDFCoordinate } from "../shared/types";
 import { getCursorPos } from "../utils/canvasUtils";
 import { addDoorNodeErrToast } from "../utils/graphUtils";
 import { findRoomId } from "../utils/roomUtils";
@@ -126,7 +126,7 @@ const FloorDisplay = ({
     return;
   }
 
-  const addNewNode = (_newNode: NodeInfoWithoutTimestamp) => {
+  const addNewNode = (_newNode: NodeInfo) => {
     const newNodes = { ...nodes };
 
     const newNodeId = uuidv4();
@@ -203,7 +203,7 @@ const FloorDisplay = ({
 
     if (mode == ADD_NODE) {
       getCursorPos(e, offset, scale, (pos) => {
-        const newNode: NodeInfoWithoutTimestamp = {
+        const newNode: NodeInfo = {
           pos: pos,
           neighbors: {},
           roomId: findRoomId(rooms, pos),

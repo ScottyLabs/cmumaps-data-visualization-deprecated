@@ -3,7 +3,6 @@ import { UnknownAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 import { NodeInfo } from "../../components/shared/types";
-import { RootState } from "../store";
 import {
   GRAPH_PATCH,
   GraphPatchMessageAction,
@@ -11,7 +10,6 @@ import {
 } from "../webSocketMiddleware";
 import { apiSlice, getNodes } from "./apiSlice";
 import { addEditToHistory, EditPair } from "./historySlice";
-import { lockGraph, unlockGraph, updateGraphUpdatedAt } from "./lockSlice";
 
 export interface MoveNodeArgType {
   floorCode: string;
@@ -36,9 +34,6 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         { dispatch, getState, queryFulfilled }
       ) {
         try {
-          // lock the graph to update
-          dispatch(lockGraph());
-
           // retrive old node
           const nodes = await getNodes(floorCode, getState, dispatch);
           const oldNode = nodes[nodeId];
@@ -77,10 +72,8 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           }
 
           // different error handling for queryFulfilled
-          let updatedAt: string;
           try {
-            const res = await queryFulfilled;
-            updatedAt = res.data;
+            await queryFulfilled;
           } catch (e) {
             toast.error(
               "Failed to save! Check the Console for detailed error."
@@ -94,25 +87,12 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             return;
           }
 
-          // update timestamp if not outdated
-          const store = getState() as RootState;
-          const graphUpdatedAt = store.lock.graphUpdatedAt;
-          if (graphUpdatedAt && graphUpdatedAt < updatedAt) {
-            toast.warn("You change on the graph might have been overwritten");
-          } else {
-            dispatch(updateGraphUpdatedAt(updatedAt));
-          }
-
-          // unlock the graph after update
-          dispatch(unlockGraph());
-
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
             payload: {
               type: GRAPH_PATCH,
               patches,
-              updatedAt,
             },
           };
           dispatch(graphPatchAction as unknown as UnknownAction);

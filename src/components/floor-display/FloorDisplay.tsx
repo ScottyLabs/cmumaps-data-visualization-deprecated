@@ -10,12 +10,10 @@ import { toast } from "react-toastify";
 
 import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
 import useWebSocket from "../../hooks/useWebSocket";
-import { savingHelper } from "../../lib/apiRoutes";
 import {
   useGetNodesQuery,
   useGetRoomsQuery,
 } from "../../lib/features/apiSlice";
-import { setNodes } from "../../lib/features/dataSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,
@@ -28,6 +26,7 @@ import {
   setMode,
 } from "../../lib/features/modeSlice";
 import { getNodeIdSelected } from "../../lib/features/mouseEventSlice";
+import { useAddNodeMutation } from "../../lib/features/nodeApiSlice";
 import {
   setEditRoomLabel,
   setShowRoomSpecific,
@@ -74,6 +73,8 @@ const FloorDisplay = ({
 
   const { data: nodes } = useGetNodesQuery(floorCode);
   const { data: rooms } = useGetRoomsQuery(floorCode);
+
+  const [addNode] = useAddNodeMutation();
 
   const mode = useAppSelector((state) => state.mode.mode);
   const nodeIdSelected = useAppSelector((state) =>
@@ -126,29 +127,10 @@ const FloorDisplay = ({
     return;
   }
 
-  const addNewNode = (_newNode: NodeInfo) => {
-    const newNodes = { ...nodes };
-
-    const newNodeId = uuidv4();
-    // newNodes[newNodeId] = newNode;
-
-    // create an edge between the selected node and the new node
-    if (nodeIdSelected) {
-      newNodes[newNodeId].neighbors[nodeIdSelected] = {};
-      newNodes[nodeIdSelected].neighbors[newNodeId] = {};
-    }
-
-    router.push(`?nodeId=${newNodeId}`);
-
-    dispatch(setNodes(newNodes));
-
-    savingHelper(
-      "/api/updateGraph",
-      JSON.stringify({
-        floorCode: floorCode,
-        newGraph: JSON.stringify(newNodes),
-      })
-    );
+  const addNewNode = async (newNode: NodeInfo) => {
+    const nodeId = uuidv4();
+    await addNode({ floorCode, nodeId, newNode });
+    router.push(`?nodeId=${nodeId}`);
   };
 
   const addNewVertex = (pos: PDFCoordinate) => {

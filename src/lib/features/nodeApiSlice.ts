@@ -193,8 +193,8 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
     }),
     addNeighbor: builder.mutation<string, NeighborArgType>({
       query: ({ inNodeId, outNodeId }) => ({
-        url: "/api/neighbor/add",
-        method: "POST",
+        url: "/api/neighbor",
+        method: "PUT",
         body: { inNodeId, outNodeId },
       }),
       transformResponse: (response: { updatedAt: string }) =>

@@ -4,7 +4,12 @@ import { toast } from "react-toastify";
 
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
-import { AddNodeArgType, MoveNodeArgType, nodeApiSlice } from "./nodeApiSlice";
+import {
+  AddNodeArgType,
+  MoveNodeArgType,
+  NeighborArgType,
+  nodeApiSlice,
+} from "./nodeApiSlice";
 import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
 
 const MAX_UNDO_LIMIT = 50;
@@ -29,6 +34,16 @@ interface DeleteNodeEdit {
   // arg: AddNodeArgType;
 }
 
+interface AddNeighborEdit {
+  endpoint: "addNeighbor";
+  arg: NeighborArgType;
+}
+
+interface DeleteNeighborEdit {
+  endpoint: "deleteNeighbor";
+  arg: NeighborArgType;
+}
+
 interface DeleteRoomEdit {
   endpoint: "deleteRoom";
 }
@@ -42,7 +57,9 @@ type Edit =
   | DeleteRoomEdit
   | CreateRoomEdit
   | AddNodeEdit
-  | DeleteNodeEdit;
+  | DeleteNodeEdit
+  | AddNeighborEdit
+  | DeleteNeighborEdit;
 
 export interface EditPair {
   edit: Edit;

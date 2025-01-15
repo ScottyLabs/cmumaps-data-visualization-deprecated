@@ -2,7 +2,7 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { NodeInfo } from "../../components/shared/types";
+import { ID, NodeInfo } from "../../components/shared/types";
 import { RootState } from "../store";
 import {
   GRAPH_PATCH,
@@ -15,15 +15,22 @@ import { getNodeIdSelected } from "./mouseEventSlice";
 
 export interface MoveNodeArgType {
   floorCode: string;
-  nodeId: string;
+  nodeId: ID;
   newNode: NodeInfo;
   addToHistory?: boolean;
 }
 
 export interface AddNodeArgType {
   floorCode: string;
-  nodeId: string;
+  nodeId: ID;
   newNode: NodeInfo;
+  addToHistory?: boolean;
+}
+
+export interface NeighborArgType {
+  floorCode: string;
+  inNodeId: ID;
+  outNodeId: ID;
   addToHistory?: boolean;
 }
 
@@ -153,6 +160,78 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
               },
               reverseEdit: {
                 endpoint: "deleteNode",
+              },
+            };
+            dispatch(addEditToHistory(edit));
+          }
+
+          // different error handling for queryFulfilled
+          try {
+            await queryFulfilled;
+          } catch (e) {
+            toast.error(
+              "Failed to save! Check the Console for detailed error."
+            );
+            const error = e as { error: { data: { error: string } } };
+            console.error(error.error.data.error);
+          }
+
+          // send patch to others
+          const graphPatchAction: GraphPatchMessageAction = {
+            type: WEBSOCKET_MESSAGE,
+            payload: {
+              type: GRAPH_PATCH,
+              patches,
+            },
+          };
+          dispatch(graphPatchAction as unknown as UnknownAction);
+        } catch (e) {
+          toast.error("Check the Console for detailed error.");
+          console.error(e);
+        }
+      },
+    }),
+    addNeighbor: builder.mutation<string, NeighborArgType>({
+      query: ({ inNodeId, outNodeId }) => ({
+        url: "/api/neighbor/add",
+        method: "POST",
+        body: { inNodeId, outNodeId },
+      }),
+      transformResponse: (response: { updatedAt: string }) =>
+        response.updatedAt,
+      async onQueryStarted(
+        { floorCode, inNodeId, outNodeId, addToHistory = true },
+        { dispatch, queryFulfilled }
+      ) {
+        try {
+          // optimistic update
+          const { patches } = dispatch(
+            apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
+              draft[inNodeId].neighbors[outNodeId] = {};
+              draft[outNodeId].neighbors[inNodeId] = {};
+            })
+          );
+
+          // create edit and add to history
+          if (addToHistory) {
+            const edit: EditPair = {
+              edit: {
+                endpoint: "addNeighbor",
+                arg: {
+                  floorCode,
+                  inNodeId,
+                  outNodeId,
+                  addToHistory: false,
+                },
+              },
+              reverseEdit: {
+                endpoint: "deleteNeighbor",
+                arg: {
+                  floorCode,
+                  inNodeId,
+                  outNodeId,
+                  addToHistory: false,
+                },
               },
             };
             dispatch(addEditToHistory(edit));

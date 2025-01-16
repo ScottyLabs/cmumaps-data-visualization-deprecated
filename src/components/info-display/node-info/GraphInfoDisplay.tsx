@@ -14,30 +14,25 @@ interface Props {
 
 const GraphInfoDisplay = ({ floorCode }: Props) => {
   const { data: nodes } = useGetNodesQuery(floorCode);
-
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-
   const neighbors = nodes ? nodes[nodeId].neighbors : null;
 
   const { sameFloorNeighbors, differentFloorNeighbors } = useMemo(() => {
-    const sameFloor = {};
-    const differentFloor = {};
+    const sameFloorNeighbors = {};
+    const differentFloorNeighbors = {};
 
     for (const neighborId in neighbors) {
       if (neighbors[neighborId].toFloorInfo) {
-        differentFloor[neighborId] = neighbors[neighborId];
+        differentFloorNeighbors[neighborId] = neighbors[neighborId];
       } else {
-        sameFloor[neighborId] = neighbors[neighborId];
+        sameFloorNeighbors[neighborId] = neighbors[neighborId];
       }
     }
 
-    return {
-      sameFloorNeighbors: sameFloor,
-      differentFloorNeighbors: differentFloor,
-    };
+    return { sameFloorNeighbors, differentFloorNeighbors };
   }, [neighbors]);
 
-  if (!neighbors) {
+  if (!neighbors || !nodes) {
     return;
   }
 
@@ -55,7 +50,7 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
           differentFloorNeighbors={differentFloorNeighbors}
         />
         {!floorCode.includes("outside") && (
-          <AddEdgeAcrossFloorsSection floorCode={floorCode} />
+          <AddEdgeAcrossFloorsSection floorCode={floorCode} nodes={nodes} />
         )}
       </div>
     </>

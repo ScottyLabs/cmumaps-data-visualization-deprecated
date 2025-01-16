@@ -9,18 +9,18 @@ import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { connectedBuildings } from "../../shared/buildings";
+import { Nodes } from "../../shared/types";
 
 interface Props {
   floorCode: string;
+  nodes: Nodes;
 }
 
-const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
+const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
   const dispatch = useAppDispatch();
 
   const floorLevels = useAppSelector((state) => state.floor.floorLevels);
-  const nodeIdSelected = useAppSelector((state) =>
-    getNodeIdSelected(state.mouseEvent)
-  );
+  const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const [toFloorCode, setToFloorCode] = useState("");
   const nodeIdRef = useRef<HTMLInputElement | null>(null);
@@ -63,76 +63,64 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   }, [floorCode, floorLevels]);
 
   const addEdgeWithID = async () => {
-    const outNodeId = nodeIdRef.current?.value;
-    if (!outNodeId) {
-      toast.error("Please input node id!");
-      return;
-    }
-
-    const node = await getNode(outNodeId);
-
-    if (!node) {
-      toast.error("Invalid node id!");
-      return;
-    }
-
-    const room = node.room;
-    if (!room) {
-      toast.error("Given node doesn't belong to a room!");
-      return;
-    }
-
-    // if a room doesn't have a floor level, then it belongs to outside
-    let floorLevel = "outside";
-    if (room.floorLevel) {
-      floorLevel = room.buildingCode + "-" + room.floorLevel;
-    }
-
-    if (!toFloorCode) {
-      toast.error("Select a Floor!");
-      return;
-    }
-
-    if (floorLevel !== toFloorCode) {
-      toast.error(
-        `Given node belongs to floor ${floorLevel} instead of ${toFloorCode}!`
-      );
-      return;
-    }
-
-    return;
-
-    const response = await fetch("/api/addEdgeAcrossFloors", {
-      method: "POST",
-      body: JSON.stringify({
-        floorCode1: floorCode,
-        floorCode2: toFloorCode,
-        nodeId1: nodeIdSelected,
-        nodeId2: nodeIdRef.current?.value,
-      }),
-    });
-
-    const body = await response.json();
-
-    // handle error
-    if (!response.ok) {
-      if (response.status == 500) {
-        console.error(body.error);
-      } else if (response.status == 400) {
-        toast.error(body.error);
+    const validate = async () => {
+      const outNodeId = nodeIdRef.current?.value;
+      if (!outNodeId) {
+        return { valid: false, error: "Please input node id!" };
       }
+
+      // check multi-edge
+      if (outNodeId in nodes[nodeId].neighbors) {
+        return { valid: false, error: "Edge already existed!" };
+      }
+
+      // get node by node id
+      const outNode = await getNode(outNodeId);
+      if (!outNode) {
+        return { valid: false, error: "Invalid node id!" };
+      }
+
+      const room = outNode.room;
+      if (!room) {
+        return { valid: false, error: "Given node doesn't belong to a room!" };
+      }
+
+      // if a room doesn't have a floor level, then it belongs to outside
+      let floorLevel = "outside";
+      if (room.floorLevel) {
+        floorLevel = `${room.buildingCode}-${room.floorLevel}`;
+      }
+
+      if (!toFloorCode) {
+        return { valid: false, error: "Select a Floor!" };
+      }
+
+      // check floor matches
+      if (floorLevel !== toFloorCode) {
+        return {
+          valid: false,
+          error: `Given node belongs to floor ${floorLevel} instead of ${toFloorCode}!`,
+        };
+      }
+
+      return { valid: true, outNodeId, outNode, floorLevel };
+    };
+
+    const res = await validate();
+    if (!res.valid) {
+      toast.error(res.error);
       return;
     }
 
-    toast.info(body.message);
+    const { outNodeId, outNode } = res;
 
-    dispatch(setNodes(body.newGraph));
+    console.log(outNode, outNodeId);
 
     // clear inputs
-    setToFloorCode("");
-    if (nodeIdRef.current) {
-      nodeIdRef.current.value = "";
-    }
+    // setToFloorCode("");
+    // if (nodeIdRef.current) {
+    //   nodeIdRef.current.value = "";
+    // }
   };
 
   const renderFloorSelector = () => {
@@ -173,7 +161,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
         body: JSON.stringify({
           floorCode1: floorCode,
           floorCode2: toFloorCode,
-          nodeId1: nodeIdSelected,
+          nodeId1: nodeId,
         }),
       });
 

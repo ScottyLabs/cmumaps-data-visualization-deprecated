@@ -5,19 +5,23 @@ import buildings from "../../../../public/cmumaps-data/buildings.json";
 import { extractBuildingCode } from "../../../app/api/apiUtils";
 import { getNode } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
+import { useAddEdgeMutation } from "../../../lib/features/graphApiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { connectedBuildings } from "../../shared/buildings";
-import { Nodes } from "../../shared/types";
+import { EdgeType, EdgeTypeList, Nodes, Rooms } from "../../shared/types";
 
 interface Props {
   floorCode: string;
+  rooms: Rooms;
   nodes: Nodes;
 }
 
-const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
+const AddEdgeAcrossFloorsSection = ({ floorCode, rooms, nodes }: Props) => {
   const dispatch = useAppDispatch();
+
+  const [addEdge] = useAddEdgeMutation();
 
   const floorLevels = useAppSelector((state) => state.floor.floorLevels);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -64,52 +68,52 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
 
   const addEdgeWithID = async () => {
     const validate = async () => {
-      if (!nodeId) {
+      const inNodeId = nodeId;
+      if (!inNodeId) {
         // This case should be impossible because graph info is only displayed
         // when a node is selected
-        return { valid: false, error: "Please select a node first!" };
+        return { error: "Please select a node first!" };
       }
 
       const outNodeId = nodeIdRef.current?.value;
       if (!outNodeId) {
-        return { valid: false, error: "Please input node id!" };
+        return { error: "Please input node id!" };
       }
 
       // check multi-edge
       if (outNodeId in nodes[nodeId].neighbors) {
-        return { valid: false, error: "Edge already existed!" };
+        return { error: "Edge already existed!" };
       }
 
       // get node by node id
       const outNode = await getNode(outNodeId);
       if (!outNode) {
-        return { valid: false, error: "Invalid node id!" };
+        return { error: "Invalid node id!" };
       }
 
-      const room = outNode.room;
-      if (!room) {
-        return { valid: false, error: "Given node doesn't belong to a room!" };
+      const outRoom = outNode.room;
+      if (!outRoom) {
+        return { error: "Given node doesn't belong to a room!" };
       }
 
       // if a room doesn't have a floor level, then it belongs to outside
       let floorLevel = "outside";
-      if (room.floorLevel) {
-        floorLevel = `${room.buildingCode}-${room.floorLevel}`;
+      if (outRoom.floorLevel) {
+        floorLevel = `${outRoom.buildingCode}-${outRoom.floorLevel}`;
       }
 
       if (!toFloorCode) {
-        return { valid: false, error: "Select a Floor!" };
+        return { error: "Select a Floor!" };
       }
 
       // check floor matches
       if (floorLevel !== toFloorCode) {
         return {
-          valid: false,
           error: `Given node belongs to floor ${floorLevel} instead of ${toFloorCode}!`,
         };
       }
 
-      return { valid: true, outNodeId, outNode, floorLevel };
+      return { valid: true, inNodeId, outNodeId, outRoom };
     };
 
     const validateRes = await validate();
@@ -118,9 +122,28 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
       return;
     }
 
-    const { outNodeId, outNode } = validateRes;
+    const { inNodeId, outNodeId, outRoom } = validateRes;
 
-    console.log(outNode, outNodeId);
+    // type non empty iff the two rooms share a type that is an edge type
+    const getType = () => {
+      if (outRoom.type == rooms[nodes[inNodeId].roomId].type) {
+        if (EdgeTypeList.includes(outRoom.type)) {
+          return outRoom.type as EdgeType;
+        }
+      }
+
+      return "";
+    };
+
+    const type = getType();
+    const outEdgeInfo = {
+      toFloorInfo: {
+        toFloor: `${outRoom.buildingCode}-${outRoom.floorLevel}`,
+        type,
+      },
+    };
+    const inEdgeInfo = { toFloorInfo: { toFloor: floorCode, type } };
+    addEdge({ floorCode, inNodeId, outEdgeInfo, outNodeId, inEdgeInfo });
 
     // clear inputs
     // setToFloorCode("");

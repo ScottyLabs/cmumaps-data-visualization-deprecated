@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 
-import { useGetNodesQuery } from "../../../lib/features/apiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
+import { Nodes, Rooms } from "../../shared/types";
 import AddEdgeAcrossFloorsSection from "./AddEdgeAcrossFloorsSection";
 import DifferentFloorNeighborTable from "./DifferentFloorNeighborTable";
 import GraphInfoButtons from "./GraphInfoButtons";
@@ -10,10 +10,11 @@ import SameFloorNeighborTable from "./SameFloorNeighborTable";
 
 interface Props {
   floorCode: string;
+  rooms: Rooms;
+  nodes: Nodes;
 }
 
-const GraphInfoDisplay = ({ floorCode }: Props) => {
-  const { data: nodes } = useGetNodesQuery(floorCode);
+const GraphInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   // get neighbors of the node
@@ -58,7 +59,11 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
           differentFloorNeighbors={differentFloorNeighbors}
         />
         {!floorCode.includes("outside") && (
-          <AddEdgeAcrossFloorsSection floorCode={floorCode} nodes={nodes} />
+          <AddEdgeAcrossFloorsSection
+            floorCode={floorCode}
+            rooms={rooms}
+            nodes={nodes}
+          />
         )}
       </div>
     </>

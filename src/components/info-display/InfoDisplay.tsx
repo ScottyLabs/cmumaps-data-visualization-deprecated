@@ -34,9 +34,13 @@ const InfoDisplay = ({ floorCode }: Props) => {
     }
   };
 
-  const renderGraphInfoDisplay = () => (
-    <GraphInfoDisplay floorCode={floorCode} />
-  );
+  const renderGraphInfoDisplay = () => {
+    if (nodes && rooms) {
+      return (
+        <GraphInfoDisplay floorCode={floorCode} rooms={rooms} nodes={nodes} />
+      );
+    }
+  };
 
   const tabNames = ["Room Info", "Graph Info"];
   const tabContents = [renderRoomInfoDisplay, renderGraphInfoDisplay];

@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
+import buildings from "../../../../public/cmumaps-data/buildings.json";
+import { extractBuildingCode } from "../../../app/api/apiUtils";
 import { getNode } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { connectedBuildings } from "../../shared/buildings";
-import { Floor } from "../../shared/types";
 
 interface Props {
   floorCode: string;
@@ -23,43 +24,43 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
 
   const [floorCode2, setFloorCode2] = useState("");
   const nodeIdRef = useRef<HTMLInputElement | null>(null);
-  const [additionalFloors, setAdditionalFloors] = useState<Floor[]>([]);
 
-  // get the additional floors this building can connect to
-  useEffect(() => {
-    const buildingCode = floorCode.split("-")[0];
-    const connectedBuilding = connectedBuildings[buildingCode];
-
-    if (connectedBuilding) {
-      const promises = connectedBuilding.map(async (connectedBuilding) => {
-        const response = await fetch(
-          `/api/getFloorCodes?buildingCode=${connectedBuilding}`,
-          {
-            method: "GET",
-          }
-        );
-
-        const body = await response.json();
-
-        // handle error
-        if (!response.ok) {
-          console.error(body.error);
-          return [];
-        }
-        return body.newFloorLevels.map(
-          (floorLevel: string) => connectedBuilding + "-" + floorLevel
-        );
-      });
-
-      Promise.all(promises).then((response) =>
-        setAdditionalFloors(response.flat())
-      );
+  const connectedFloors = useMemo(() => {
+    if (!floorLevels) {
+      return [];
     }
-  }, [floorCode]);
+    const buildingCode = extractBuildingCode(floorCode);
+    const connectedFloors: string[] = [];
 
-  if (!floorLevels) {
-    return;
-  }
+    // include floor above and below if possible
+    const floorsArr = floorCode.split("-");
+    const floorIndex = floorLevels.indexOf(floorsArr[floorsArr.length - 1]);
+    const prefix = buildingCode + "-";
+    if (floorIndex != floorLevels.length - 1) {
+      connectedFloors.push(prefix + floorLevels[floorIndex + 1]);
+    }
+    if (floorIndex != 0) {
+      connectedFloors.push(prefix + floorLevels[floorIndex - 1]);
+    }
+
+    // always include outside
+    connectedFloors.push("outside");
+
+    // add connected buildings
+    const connectedBuilding: string[] = connectedBuildings[buildingCode];
+    if (connectedBuilding) {
+      const allAdditionalFloors: string[][] = connectedBuilding.map(
+        (buildingCode) =>
+          buildings[buildingCode].floors.map(
+            (floor: string) => `${buildingCode}-${floor}`
+          )
+      );
+
+      connectedFloors.push(...allAdditionalFloors.flat());
+    }
+
+    return connectedFloors;
+  }, [floorCode, floorLevels]);
 
   const addEdgeWithID = async () => {
     const outNodeId = nodeIdRef.current?.value;
@@ -118,10 +119,6 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   };
 
   const renderFloorSelector = () => {
-    const floorsArr = floorCode.split("-");
-    const floorIndex = floorLevels.indexOf(floorsArr[floorsArr.length - 1]);
-    const prefix = floorsArr[0] + "-";
-
     const handleChange = (event) => {
       setFloorCode2(event.target.value);
     };
@@ -138,18 +135,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
           <option value="" disabled>
             --Please choose a floor--
           </option>
-          {floorIndex != floorLevels.length - 1 && (
-            <option value={prefix + floorLevels[floorIndex + 1]}>
-              {prefix + floorLevels[floorIndex + 1]}
-            </option>
-          )}
-          {floorIndex != 0 && (
-            <option value={prefix + floorLevels[floorIndex - 1]}>
-              {prefix + floorLevels[floorIndex - 1]}
-            </option>
-          )}
-          <option value="outside-1">Campus Outside</option>
-          {additionalFloors.map((floor) => (
+          {connectedFloors.map((floor) => (
             <option key={floor} value={floor}>
               {floor}
             </option>

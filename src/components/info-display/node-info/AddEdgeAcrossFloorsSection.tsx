@@ -22,7 +22,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
     getNodeIdSelected(state.mouseEvent)
   );
 
-  const [floorCode2, setFloorCode2] = useState("");
+  const [toFloorCode, setToFloorCode] = useState("");
   const nodeIdRef = useRef<HTMLInputElement | null>(null);
 
   const connectedFloors = useMemo(() => {
@@ -76,20 +76,37 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
       return;
     }
 
-    console.log(node.room);
+    const room = node.room;
+    if (!room) {
+      toast.error("Given node doesn't belong to a room!");
+      return;
+    }
 
-    return;
+    // if a room doesn't have a floor level, then it belongs to outside
+    let floorLevel = "outside";
+    if (room.floorLevel) {
+      floorLevel = room.buildingCode + "-" + room.floorLevel;
+    }
 
-    if (!floorCode2) {
+    if (!toFloorCode) {
       toast.error("Select a Floor!");
       return;
     }
+
+    if (floorLevel !== toFloorCode) {
+      toast.error(
+        `Given node belongs to floor ${floorLevel} instead of ${toFloorCode}!`
+      );
+      return;
+    }
+
+    return;
 
     const response = await fetch("/api/addEdgeAcrossFloors", {
       method: "POST",
       body: JSON.stringify({
         floorCode1: floorCode,
-        floorCode2: floorCode2,
+        floorCode2: toFloorCode,
         nodeId1: nodeIdSelected,
         nodeId2: nodeIdRef.current?.value,
       }),
@@ -112,7 +129,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
     dispatch(setNodes(body.newGraph));
 
     // clear inputs
-    setFloorCode2("");
+    setToFloorCode("");
     if (nodeIdRef.current) {
       nodeIdRef.current.value = "";
     }
@@ -120,7 +137,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
 
   const renderFloorSelector = () => {
     const handleChange = (event) => {
-      setFloorCode2(event.target.value);
+      setToFloorCode(event.target.value);
     };
 
     return (
@@ -129,7 +146,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
           name="floor"
           id="floor"
           className="rounded text-black"
-          value={floorCode2}
+          value={toFloorCode}
           onChange={handleChange}
         >
           <option value="" disabled>
@@ -147,7 +164,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
 
   const renderAutoDetectButton = () => {
     const autoDetect = async () => {
-      if (!floorCode2) {
+      if (!toFloorCode) {
         toast.error("Select a Floor!");
         return;
       }
@@ -155,7 +172,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
         method: "POST",
         body: JSON.stringify({
           floorCode1: floorCode,
-          floorCode2: floorCode2,
+          floorCode2: toFloorCode,
           nodeId1: nodeIdSelected,
         }),
       });
@@ -177,7 +194,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
       dispatch(setNodes(body.newGraph));
 
       // clear inputs
-      setFloorCode2("");
+      setToFloorCode("");
       if (nodeIdRef.current) {
         nodeIdRef.current.value = "";
       }
@@ -195,18 +212,24 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
     );
   };
 
+  const renderAddButton = () => {
+    return (
+      <div>
+        <button
+          className="my-1 rounded bg-slate-500 px-2 py-1 text-sm text-white hover:bg-slate-700"
+          onClick={addEdgeWithID}
+        >
+          Add
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="flex items-center space-x-3">
         <p>Add Edge across Floors</p>
-        <div>
-          <button
-            className="my-1 rounded bg-slate-500 px-2 py-1 text-sm text-white hover:bg-slate-700"
-            onClick={addEdgeWithID}
-          >
-            Add
-          </button>
-        </div>
+        {renderAddButton()}
       </div>
       <div className="space-y-2">
         {renderFloorSelector()}

@@ -79,7 +79,7 @@ const EdgesDisplay = ({ nodes, cursorInfoListRef }: Props) => {
         if (curId === nodeIdOnDrag) {
           const cursorPos =
             cursorInfoListRef.current[cursorInfoListRef.current.length - 1];
-          if ("nodePos" in cursorPos) {
+          if (cursorPos && "nodePos" in cursorPos) {
             line[0] = cursorPos.nodePos.x;
             line[1] = cursorPos.nodePos.y;
           }
@@ -87,7 +87,7 @@ const EdgesDisplay = ({ nodes, cursorInfoListRef }: Props) => {
         if (neighborId === nodeIdOnDrag) {
           const cursorPos =
             cursorInfoListRef.current[cursorInfoListRef.current.length - 1];
-          if ("nodePos" in cursorPos) {
+          if (cursorPos && "nodePos" in cursorPos) {
             line[2] = cursorPos.nodePos.x;
             line[3] = cursorPos.nodePos.y;
           }

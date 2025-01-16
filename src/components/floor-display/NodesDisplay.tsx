@@ -143,33 +143,33 @@ const NodesDisplay = ({
       if (!nodeIdSelected) {
         // this line should never run because we check that idSelected is
         // selected before setting mode to ADD_EDGE
-        toast.error("Please select a node first!");
-        return false;
+        return { error: "Please select a node first!" };
       }
 
       // Check for self-loop
       if (nodeIdSelected == nodeId) {
-        toast.error("No self-loop allowed!");
-        return false;
+        return { error: "No self-loop allowed!" };
       }
 
       // Check for multi-edge
       if (Object.keys(nodes[nodeId].neighbors).includes(nodeIdSelected)) {
-        toast.error("Edge already existed!");
-        return false;
+        return { error: "Edge already existed!" };
       }
 
-      return true;
+      return { valid: true, outNodeId: nodeIdSelected };
     };
 
-    if (!validate) {
+    const validateRes = validate();
+    if (!validateRes.valid) {
+      toast.error(validateRes.error);
       return;
     }
 
-    const inNode = nodeId;
-    const outNode = nodeIdSelected;
-
-    addEdge({ floorCode, inNodeId: nodeId, outNodeId: nodeIdSelected });
+    const inNodeId = nodeId;
+    const outEdgeInfo = {};
+    const outNodeId = validateRes.outNodeId;
+    const inEdgeInfo = {};
+    addEdge({ floorCode, inNodeId, outEdgeInfo, outNodeId, inEdgeInfo });
     dispatch(setMode(GRAPH_SELECT));
   };
 

@@ -67,7 +67,7 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
       if (!nodeId) {
         // This case should be impossible because graph info is only displayed
         // when a node is selected
-        return { valid: false, error: "Please select a node!" };
+        return { valid: false, error: "Please select a node first!" };
       }
 
       const outNodeId = nodeIdRef.current?.value;
@@ -112,13 +112,13 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
       return { valid: true, outNodeId, outNode, floorLevel };
     };
 
-    const res = await validate();
-    if (!res.valid) {
-      toast.error(res.error);
+    const validateRes = await validate();
+    if (!validateRes.valid) {
+      toast.error(validateRes.error);
       return;
     }
 
-    const { outNodeId, outNode } = res;
+    const { outNodeId, outNode } = validateRes;
 
     console.log(outNode, outNodeId);
 

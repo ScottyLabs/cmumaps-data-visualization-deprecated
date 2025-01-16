@@ -39,7 +39,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     updateNode: builder.mutation<string, MoveNodeArgType>({
       query: ({ nodeId, newNode }) => ({
-        url: "/api/node/update",
+        url: "/api/node",
         method: "POST",
         body: { nodeId, node: newNode },
       }),

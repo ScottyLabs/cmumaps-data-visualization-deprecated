@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { NodeInfo } from "../../../../components/shared/types";
+import { NodeInfo } from "../../../components/shared/types";
 import {
   getBuildingCodeFromRoomId,
   getRoomNameFromRoomId,
-} from "../../../../components/utils/utils";
-import prisma from "../../../../lib/prisma";
+} from "../../../components/utils/utils";
+import prisma from "../../../lib/prisma";
 
 export async function POST(request: Request) {
   try {

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { NodeInfo } from "../../../components/shared/types";
 import {
@@ -7,7 +7,38 @@ import {
 } from "../../../components/utils/utils";
 import prisma from "../../../lib/prisma";
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const nodeId = searchParams.get("nodeId");
+
+    if (!nodeId) {
+      return new NextResponse(
+        JSON.stringify({ error: "Please include node id!" }),
+        { status: 400 }
+      );
+    }
+
+    const node = await prisma.node.findUnique({ where: { id: nodeId } });
+
+    // good response
+    return new NextResponse(JSON.stringify({ status: 200, node }));
+  } catch (e) {
+    // Javascript Error Message
+    // console.log(e);
+    return new NextResponse(
+      JSON.stringify({
+        error: String(e),
+        // error: String(e.stack),
+      }),
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
   try {
     const requestData = await request.json();
     const nodeId = requestData.nodeId;

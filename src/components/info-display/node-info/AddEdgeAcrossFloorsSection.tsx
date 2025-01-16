@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
+import { getNode } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
@@ -61,6 +62,11 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   }
 
   const addEdgeWithID = async () => {
+    const node = getNode(nodeIdRef.current?.value);
+    console.log(node);
+
+    return;
+
     if (!floorCode2) {
       toast.error("Select a Floor!");
       return;

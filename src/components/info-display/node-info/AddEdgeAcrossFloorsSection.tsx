@@ -64,6 +64,12 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, nodes }: Props) => {
 
   const addEdgeWithID = async () => {
     const validate = async () => {
+      if (!nodeId) {
+        // This case should be impossible because graph info is only displayed
+        // when a node is selected
+        return { valid: false, error: "Please select a node!" };
+      }
+
       const outNodeId = nodeIdRef.current?.value;
       if (!outNodeId) {
         return { valid: false, error: "Please input node id!" };

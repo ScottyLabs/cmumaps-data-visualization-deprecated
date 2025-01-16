@@ -26,7 +26,7 @@ const GraphInfoButtons = ({ floorCode }: Props) => {
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
-  if (!nodes) {
+  if (!nodes || !nodeId) {
     return;
   }
 

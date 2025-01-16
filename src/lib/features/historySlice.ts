@@ -5,9 +5,10 @@ import { toast } from "react-toastify";
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
 import {
+  AddEdgeArgType,
   AddNodeArgType,
+  DeleteEdgeArgType,
   MoveNodeArgType,
-  EdgeArgType,
   nodeApiSlice,
 } from "./graphApiSlice";
 import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
@@ -36,12 +37,12 @@ interface DeleteNodeEdit {
 
 interface AddEdgeEdit {
   endpoint: "addEdge";
-  arg: EdgeArgType;
+  arg: AddEdgeArgType;
 }
 
 interface DeleteEdgeEdit {
   endpoint: "deleteEdge";
-  arg: EdgeArgType;
+  arg: DeleteEdgeArgType;
 }
 
 interface DeleteRoomEdit {

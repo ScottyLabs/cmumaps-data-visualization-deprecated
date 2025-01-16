@@ -26,6 +26,10 @@ const DifferentFloorNeighborTable = ({
   const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
+  if (!nodeId) {
+    return;
+  }
+
   const renderDifferentFloorNeighbors = (
     differentFloorNeighbors: Record<string, EdgeInfo>
   ) => {

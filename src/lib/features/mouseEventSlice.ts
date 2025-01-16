@@ -58,12 +58,12 @@ const mouseEventSlice = createSlice({
 
 export const getNodeIdSelected = (state: MouseEventState) => {
   const idSelected = state.idSelected;
-  return idSelected.type == NODE ? idSelected.id : "";
+  return idSelected.type == NODE ? idSelected.id : null;
 };
 
 export const getDoorIdSelected = (state: MouseEventState) => {
   const idSelected = state.idSelected;
-  return idSelected.type == DOOR ? idSelected.id : "";
+  return idSelected.type == DOOR ? idSelected.id : null;
 };
 
 export const {

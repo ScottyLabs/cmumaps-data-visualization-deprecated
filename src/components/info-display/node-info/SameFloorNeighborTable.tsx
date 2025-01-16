@@ -26,7 +26,7 @@ const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
   const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
-  if (!nodes) {
+  if (!nodes || !nodeId) {
     return;
   }
 

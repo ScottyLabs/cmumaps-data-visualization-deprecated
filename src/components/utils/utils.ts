@@ -85,8 +85,8 @@ export const dist = (p1: PDFCoordinate, p2: PDFCoordinate) => {
 };
 
 // variable getters
-export const getRoomId = (nodes, nodeId: ID) => {
-  return nodeId ? nodes[nodeId]?.roomId : "";
+export const getRoomId = (nodes, nodeId: ID | null) => {
+  return nodeId ? nodes[nodeId]?.roomId : null;
 };
 
 export const getInfoFromRoomId = (roomId: ID) => {

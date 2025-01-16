@@ -2,7 +2,7 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { ID, NodeInfo } from "../../components/shared/types";
+import { EdgeInfo, ID, NodeInfo } from "../../components/shared/types";
 import { RootState } from "../store";
 import {
   GRAPH_PATCH,
@@ -27,7 +27,16 @@ export interface AddNodeArgType {
   addToHistory?: boolean;
 }
 
-export interface EdgeArgType {
+export interface AddEdgeArgType {
+  floorCode: string;
+  inNodeId: ID;
+  outEdgeInfo: EdgeInfo;
+  outNodeId: ID;
+  inEdgeInfo: EdgeInfo;
+  addToHistory?: boolean;
+}
+
+export interface DeleteEdgeArgType {
   floorCode: string;
   inNodeId: ID;
   outNodeId: ID;
@@ -191,7 +200,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    addEdge: builder.mutation<string, EdgeArgType>({
+    addEdge: builder.mutation<string, AddEdgeArgType>({
       query: ({ inNodeId, outNodeId }) => ({
         url: "/api/neighbor",
         method: "PUT",
@@ -200,15 +209,22 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response: { updatedAt: string }) =>
         response.updatedAt,
       async onQueryStarted(
-        { floorCode, inNodeId, outNodeId, addToHistory = true },
+        {
+          floorCode,
+          inNodeId,
+          outEdgeInfo,
+          outNodeId,
+          inEdgeInfo,
+          addToHistory = true,
+        },
         { dispatch, queryFulfilled }
       ) {
         try {
           // optimistic update
           const { patches } = dispatch(
             apiSlice.util.updateQueryData("getNodes", floorCode, (draft) => {
-              draft[inNodeId].neighbors[outNodeId] = {};
-              draft[outNodeId].neighbors[inNodeId] = {};
+              draft[inNodeId].neighbors[outNodeId] = outEdgeInfo;
+              draft[outNodeId].neighbors[inNodeId] = inEdgeInfo;
             })
           );
 
@@ -222,7 +238,10 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             };
 
             const edit: EditPair = {
-              edit: { endpoint: "addEdge", arg },
+              edit: {
+                endpoint: "addEdge",
+                arg: { ...arg, inEdgeInfo, outEdgeInfo },
+              },
               reverseEdit: { endpoint: "deleteEdge", arg },
             };
             dispatch(addEditToHistory(edit));
@@ -254,7 +273,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    deleteEdge: builder.mutation<string, EdgeArgType>({
+    deleteEdge: builder.mutation<string, DeleteEdgeArgType>({
       query: ({ inNodeId, outNodeId }) => ({
         url: "/api/neighbor",
         method: "DELETE",

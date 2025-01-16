@@ -37,6 +37,10 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
+  if (!nodeId) {
+    return;
+  }
+
   const roomId = getRoomId(nodes, nodeId);
   const room = rooms[roomId];
 

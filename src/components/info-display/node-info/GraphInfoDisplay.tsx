@@ -15,8 +15,16 @@ interface Props {
 const GraphInfoDisplay = ({ floorCode }: Props) => {
   const { data: nodes } = useGetNodesQuery(floorCode);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-  const neighbors = nodes ? nodes[nodeId].neighbors : null;
 
+  // get neighbors of the node
+  const neighbors = useMemo(() => {
+    if (nodeId && nodes) {
+      return nodes[nodeId]?.neighbors || {};
+    }
+    return {};
+  }, [nodeId, nodes]);
+
+  // calculate the same floor neighbors and different floor neighbors
   const { sameFloorNeighbors, differentFloorNeighbors } = useMemo(() => {
     const sameFloorNeighbors = {};
     const differentFloorNeighbors = {};
@@ -32,7 +40,7 @@ const GraphInfoDisplay = ({ floorCode }: Props) => {
     return { sameFloorNeighbors, differentFloorNeighbors };
   }, [neighbors]);
 
-  if (!neighbors || !nodes) {
+  if (!nodes) {
     return;
   }
 

@@ -139,26 +139,36 @@ const NodesDisplay = ({
   };
 
   const handleAddEdge = (nodeId: ID) => {
-    //#region validation
-    if (!nodeIdSelected) {
-      // this line should never run because we check that idSelected is
-      // selected before setting mode to ADD_EDGE
-      toast.error("Please select a node first!");
+    const validate = () => {
+      if (!nodeIdSelected) {
+        // this line should never run because we check that idSelected is
+        // selected before setting mode to ADD_EDGE
+        toast.error("Please select a node first!");
+        return false;
+      }
+
+      // Check for self-loop
+      if (nodeIdSelected == nodeId) {
+        toast.error("No self-loop allowed!");
+        return false;
+      }
+
+      // Check for multi-edge
+      if (Object.keys(nodes[nodeId].neighbors).includes(nodeIdSelected)) {
+        toast.error("Edge already existed!");
+        return false;
+      }
+
+      return true;
+    };
+
+    if (!validate) {
       return;
     }
 
-    // Check for self-loop
-    if (nodeIdSelected == nodeId) {
-      toast.error("No self-loop allowed!");
-      return;
-    }
+    const inNode = nodeId;
+    const outNode = nodeIdSelected;
 
-    // Check for multi-edge
-    if (Object.keys(nodes[nodeId].neighbors).includes(nodeIdSelected)) {
-      toast.error("Edge already existed!");
-      return false;
-    }
-    //#endregion
     addEdge({ floorCode, inNodeId: nodeId, outNodeId: nodeIdSelected });
     dispatch(setMode(GRAPH_SELECT));
   };

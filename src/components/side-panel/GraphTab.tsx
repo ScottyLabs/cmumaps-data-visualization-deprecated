@@ -10,7 +10,10 @@ import {
 } from "../../app/api/addDoorToGraph/addDoorToGraphTypes";
 import { savingHelper } from "../../lib/apiRoutes";
 import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
-import { useGetRoomsQuery } from "../../lib/features/apiSlice";
+import {
+  useGetNodesQuery,
+  useGetRoomsQuery,
+} from "../../lib/features/apiSlice";
 import { setMst, setNodes } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setDoors } from "../../lib/features/outlineSlice";
@@ -34,10 +37,10 @@ const GraphTab = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { data: rooms } = useGetRoomsQuery(floorCode);
+  const { data: nodes } = useGetNodesQuery(floorCode);
 
   const nodeSize = useAppSelector((state) => state.ui.nodeSize);
   const doors = useAppSelector((state) => state.outline.doors);
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   if (!doors || !nodes || !rooms) {
     return;

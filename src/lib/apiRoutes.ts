@@ -1,7 +1,8 @@
+import { Prisma } from "@prisma/client";
+
 import { toast } from "react-toastify";
 
 import { buildingCodeToName } from "../components/shared/buildings";
-import { NodeInfo } from "../components/shared/types";
 
 export const AWS_API_INVOKE_URL = `${process.env.NEXT_PUBLIC_AWS_API_INVOKE_URL}/${process.env.NODE_ENV}`;
 
@@ -95,14 +96,13 @@ export const relinkDoorsAndRooms = async (floorCode: string) => {
 };
 
 /**
- * GEET `/api/node` with error handling.
- *
- * @param nodeId
- * @returns The node corresponding to the input `nodeId`
+ * GET `/api/node` with error handling.
+ * Returns the node corresponding to the input `nodeId`
+ * and the room that the node belongs to.
  */
 export const getNode = async (
-  nodeId: string | undefined
-): Promise<NodeInfo | null> => {
+  nodeId: string
+): Promise<Prisma.NodeGetPayload<{ include: { room: true } }> | null> => {
   try {
     const response = await fetch(`/api/node?nodeId=${nodeId}`, {
       method: "GET",
@@ -114,7 +114,7 @@ export const getNode = async (
       return null;
     }
 
-    return body.node;
+    return body.data.node;
   } catch (e) {
     console.error("Check the Network tab for more details:", e);
     return null;

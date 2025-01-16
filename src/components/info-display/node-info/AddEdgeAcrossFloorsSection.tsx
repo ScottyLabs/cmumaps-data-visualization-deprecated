@@ -62,8 +62,20 @@ const AddEdgeAcrossFloorsSection = ({ floorCode }: Props) => {
   }
 
   const addEdgeWithID = async () => {
-    const node = getNode(nodeIdRef.current?.value);
-    console.log(node);
+    const outNodeId = nodeIdRef.current?.value;
+    if (!outNodeId) {
+      toast.error("Please input node id!");
+      return;
+    }
+
+    const node = await getNode(outNodeId);
+
+    if (!node) {
+      toast.error("Invalid node id!");
+      return;
+    }
+
+    console.log(node.room);
 
     return;
 

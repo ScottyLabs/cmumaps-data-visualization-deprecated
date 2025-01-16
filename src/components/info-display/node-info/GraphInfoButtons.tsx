@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import React from "react";
 import { toast } from "react-toastify";
 
+import { useGetNodesQuery } from "../../../lib/features/apiSlice";
 import {
   ADD_EDGE,
   DELETE_EDGE,
@@ -21,9 +22,9 @@ interface Props {
 const GraphInfoButtons = ({ floorCode }: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { data: nodes } = useGetNodesQuery(floorCode);
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
-  const nodes = useAppSelector((state) => state.data.nodes);
 
   if (!nodes) {
     return;

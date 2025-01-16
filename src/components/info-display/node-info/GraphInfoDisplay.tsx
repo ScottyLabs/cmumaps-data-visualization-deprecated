@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 
+import { useGetNodesQuery } from "../../../lib/features/apiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppSelector } from "../../../lib/hooks";
 import AddEdgeAcrossFloorsSection from "./AddEdgeAcrossFloorsSection";
@@ -12,7 +13,8 @@ interface Props {
 }
 
 const GraphInfoDisplay = ({ floorCode }: Props) => {
-  const nodes = useAppSelector((state) => state.data.nodes);
+  const { data: nodes } = useGetNodesQuery(floorCode);
+
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   const neighbors = nodes ? nodes[nodeId].neighbors : null;

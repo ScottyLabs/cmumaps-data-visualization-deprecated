@@ -19,10 +19,13 @@ export async function GET(request: Request) {
       );
     }
 
-    const node = await prisma.node.findUnique({ where: { id: nodeId } });
+    const node = await prisma.node.findUnique({
+      where: { id: nodeId },
+      include: { room: true },
+    });
 
     // good response
-    return new NextResponse(JSON.stringify({ status: 200, node }));
+    return new NextResponse(JSON.stringify({ status: 200, data: { node } }));
   } catch (e) {
     // Javascript Error Message
     // console.log(e);

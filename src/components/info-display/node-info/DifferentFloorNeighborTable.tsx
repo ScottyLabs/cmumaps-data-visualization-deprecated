@@ -4,9 +4,16 @@ import React from "react";
 
 import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
+import { useDeleteEdgeAcrossFloorsMutation } from "../../../lib/features/graphApiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { NodeInfo, EdgeInfo, EdgeTypeList, Nodes } from "../../shared/types";
+import {
+  NodeInfo,
+  EdgeInfo,
+  EdgeTypeList,
+  Nodes,
+  ID,
+} from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import EditTypeCell from "../EditTypeCell";
 
@@ -26,6 +33,7 @@ const DifferentFloorNeighborTable = ({
   const dispatch = useAppDispatch();
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
+  const [deleteEdge] = useDeleteEdgeAcrossFloorsMutation();
 
   if (!nodeId) {
     return;
@@ -90,33 +98,20 @@ const DifferentFloorNeighborTable = ({
         );
       };
 
-    const deleteEdgeAcrossFloors = (neighborId) => {
-      const newNodes: Record<string, NodeInfo> = JSON.parse(
-        JSON.stringify(nodes)
-      );
+    const deleteEdgeAcrossFloors = (neighborId: ID) => {
+      const outFloorCode = neighbors[neighborId].toFloorInfo?.toFloor;
 
-      delete newNodes[nodeId].neighbors[neighborId];
+      // this should never happen
+      if (!outFloorCode) {
+        return;
+      }
 
-      dispatch(setNodes(newNodes));
-
-      // update this floor's graph json
-      savingHelper(
-        "/api/updateGraph",
-        JSON.stringify({
-          floorCode: floorCode,
-          newGraph: JSON.stringify(newNodes),
-        })
-      );
-
-      // update neighbor floor's graph json
-      savingHelper(
-        "/api/updateEdgeAcrossFloors",
-        JSON.stringify({
-          floorCode: neighbors[neighborId].toFloorInfo?.toFloor,
-          nodeId: neighborId,
-          neighborId: nodeId,
-        })
-      );
+      deleteEdge({
+        inFloorCode: floorCode,
+        inNodeId: nodeId,
+        outFloorCode,
+        outNodeId: neighborId,
+      });
     };
 
     return Object.entries(differentFloorNeighbors).map(

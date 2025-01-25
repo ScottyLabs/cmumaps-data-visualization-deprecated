@@ -460,7 +460,9 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           let outEdgeInfo: EdgeInfo = {};
           const { patches: inPatches } = dispatch(
             apiSlice.util.updateQueryData("getNodes", inFloorCode, (draft) => {
-              outEdgeInfo = draft[inNodeId].neighbors[outNodeId];
+              outEdgeInfo = JSON.parse(
+                JSON.stringify(draft[inNodeId].neighbors[outNodeId])
+              );
               delete draft[inNodeId].neighbors[outNodeId];
             })
           );
@@ -468,7 +470,9 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           let inEdgeInfo: EdgeInfo = {};
           const { patches: outPatches } = dispatch(
             apiSlice.util.updateQueryData("getNodes", outFloorCode, (draft) => {
-              inEdgeInfo = draft[outNodeId].neighbors[inNodeId];
+              inEdgeInfo = JSON.parse(
+                JSON.stringify(draft[outNodeId].neighbors[inNodeId])
+              );
               delete draft[outNodeId].neighbors[inNodeId];
             })
           );
@@ -539,4 +543,5 @@ export const {
   useAddEdgeMutation,
   useAddEdgeAcrossFloorsMutation,
   useDeleteEdgeMutation,
+  useDeleteEdgeAcrossFloorsMutation,
 } = nodeApiSlice;

@@ -51,10 +51,12 @@ const GraphInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
         <GraphInfoButtons floorCode={floorCode} />
         <SameFloorNeighborTable
           floorCode={floorCode}
+          nodes={nodes}
           sameFloorNeighbors={sameFloorNeighbors}
         />
         <DifferentFloorNeighborTable
           floorCode={floorCode}
+          nodes={nodes}
           neighbors={neighbors}
           differentFloorNeighbors={differentFloorNeighbors}
         />

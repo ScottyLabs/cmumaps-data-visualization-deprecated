@@ -10,23 +10,26 @@ import {
   unHoverNode,
 } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { EdgeInfo } from "../../shared/types";
+import { EdgeInfo, Nodes } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { dist } from "../../utils/utils";
 
 interface Props {
   floorCode: string;
+  nodes: Nodes;
   sameFloorNeighbors: Record<string, EdgeInfo>;
 }
 
-const SameFloorNeighborTable = ({ floorCode, sameFloorNeighbors }: Props) => {
+const SameFloorNeighborTable = ({
+  floorCode,
+  nodes,
+  sameFloorNeighbors,
+}: Props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
-  if (!nodes || !nodeId) {
+  if (!nodeId) {
     return;
   }
 

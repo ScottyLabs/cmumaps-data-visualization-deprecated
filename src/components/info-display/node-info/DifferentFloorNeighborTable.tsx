@@ -6,24 +6,25 @@ import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { NodeInfo, EdgeInfo, EdgeTypeList } from "../../shared/types";
+import { NodeInfo, EdgeInfo, EdgeTypeList, Nodes } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import EditTypeRow from "../SelectTypeCell";
 
 interface Props {
   floorCode: string;
+  nodes: Nodes;
   neighbors: Record<string, EdgeInfo>;
   differentFloorNeighbors: Record<string, EdgeInfo>;
 }
 
 const DifferentFloorNeighborTable = ({
   floorCode,
+  nodes,
   neighbors,
   differentFloorNeighbors,
 }: Props) => {
   const dispatch = useAppDispatch();
 
-  const nodes = useAppSelector((state) => state.data.nodes);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
   if (!nodeId) {

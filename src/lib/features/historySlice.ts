@@ -5,8 +5,10 @@ import { toast } from "react-toastify";
 import { AppDispatch } from "../store";
 import { createAppAsyncThunk } from "../withTypes";
 import {
+  AddEdgeAcrossFloorsArgType,
   AddEdgeArgType,
   AddNodeArgType,
+  DeleteEdgeAcrossFloorsArgType,
   DeleteEdgeArgType,
   MoveNodeArgType,
   nodeApiSlice,
@@ -40,9 +42,19 @@ interface AddEdgeEdit {
   arg: AddEdgeArgType;
 }
 
+interface AddEdgeAcrossFloorsEdit {
+  endpoint: "addEdgeAcrossFloors";
+  arg: AddEdgeAcrossFloorsArgType;
+}
+
 interface DeleteEdgeEdit {
   endpoint: "deleteEdge";
   arg: DeleteEdgeArgType;
+}
+
+interface DeleteEdgeAcrossFloorsEdit {
+  endpoint: "deleteEdgeAcrossFloors";
+  arg: DeleteEdgeAcrossFloorsArgType;
 }
 
 interface DeleteRoomEdit {
@@ -60,7 +72,9 @@ type Edit =
   | AddNodeEdit
   | DeleteNodeEdit
   | AddEdgeEdit
-  | DeleteEdgeEdit;
+  | AddEdgeAcrossFloorsEdit
+  | DeleteEdgeEdit
+  | DeleteEdgeAcrossFloorsEdit;
 
 export interface EditPair {
   edit: Edit;
@@ -90,8 +104,18 @@ const applyEdit = (edit: Edit, dispatch: AppDispatch) => {
     case "addEdge":
       dispatch(nodeApiSlice.endpoints.addEdge.initiate(edit.arg)).unwrap();
       break;
+    case "addEdgeAcrossFloors":
+      dispatch(
+        nodeApiSlice.endpoints.addEdgeAcrossFloors.initiate(edit.arg)
+      ).unwrap();
+      break;
     case "deleteEdge":
       dispatch(nodeApiSlice.endpoints.deleteEdge.initiate(edit.arg)).unwrap();
+      break;
+    case "deleteEdgeAcrossFloors":
+      dispatch(
+        nodeApiSlice.endpoints.deleteEdgeAcrossFloors.initiate(edit.arg)
+      ).unwrap();
       break;
     case "deleteRoom":
       toast.warn("Can't undo create room!");

@@ -41,13 +41,21 @@ export interface DeleteEdgeArgType {
   addToHistory?: boolean;
 }
 
-export interface AddEdgeAcrossFloorArgType {
+export interface AddEdgeAcrossFloorsArgType {
   inFloorCode: string;
   inNodeId: ID;
   outEdgeInfo: EdgeInfo;
   outFloorCode: string;
   outNodeId: ID;
   inEdgeInfo: EdgeInfo;
+  addToHistory?: boolean;
+}
+
+export interface DeleteEdgeAcrossFloorsArgType {
+  inFloorCode: string;
+  inNodeId: ID;
+  outFloorCode: string;
+  outNodeId: ID;
   addToHistory?: boolean;
 }
 
@@ -277,7 +285,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    addEdgeAcrossFloors: builder.mutation<string, AddEdgeAcrossFloorArgType>({
+    addEdgeAcrossFloors: builder.mutation<string, AddEdgeAcrossFloorsArgType>({
       query: ({ inNodeId, outNodeId }) => ({
         url: "/api/neighbor",
         method: "PUT",
@@ -312,23 +320,24 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           );
 
           // create edit and add to history
-          // if (addToHistory) {
-          //   const arg = {
-          //     floorCode,
-          //     inNodeId,
-          //     outNodeId,
-          //     addToHistory: false,
-          //   };
+          if (addToHistory) {
+            const arg = {
+              inFloorCode,
+              inNodeId,
+              outFloorCode,
+              outNodeId,
+              addToHistory: false,
+            };
 
-          //   const edit: EditPair = {
-          //     edit: {
-          //       endpoint: "addEdge",
-          //       arg: { ...arg, inEdgeInfo, outEdgeInfo },
-          //     },
-          //     reverseEdit: { endpoint: "deleteEdge", arg },
-          //   };
-          //   dispatch(addEditToHistory(edit));
-          // }
+            const edit: EditPair = {
+              edit: {
+                endpoint: "addEdgeAcrossFloors",
+                arg: { ...arg, inEdgeInfo, outEdgeInfo },
+              },
+              reverseEdit: { endpoint: "deleteEdgeAcrossFloors", arg },
+            };
+            dispatch(addEditToHistory(edit));
+          }
 
           // different error handling for queryFulfilled
           try {
@@ -425,6 +434,96 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
             },
           };
           dispatch(graphPatchAction as unknown as UnknownAction);
+        } catch (e) {
+          toast.error("Check the Console for detailed error.");
+          console.error(e);
+        }
+      },
+    }),
+    deleteEdgeAcrossFloors: builder.mutation<
+      string,
+      DeleteEdgeAcrossFloorsArgType
+    >({
+      query: ({ inNodeId, outNodeId }) => ({
+        url: "/api/neighbor",
+        method: "DELETE",
+        body: { inNodeId, outNodeId },
+      }),
+      transformResponse: (response: { updatedAt: string }) =>
+        response.updatedAt,
+      async onQueryStarted(
+        { inFloorCode, inNodeId, outFloorCode, outNodeId, addToHistory = true },
+        { dispatch, queryFulfilled }
+      ) {
+        try {
+          // optimistic update
+          let outEdgeInfo: EdgeInfo = {};
+          const { patches: inPatches } = dispatch(
+            apiSlice.util.updateQueryData("getNodes", inFloorCode, (draft) => {
+              outEdgeInfo = draft[inNodeId].neighbors[outNodeId];
+              delete draft[inNodeId].neighbors[outNodeId];
+            })
+          );
+
+          let inEdgeInfo: EdgeInfo = {};
+          const { patches: outPatches } = dispatch(
+            apiSlice.util.updateQueryData("getNodes", outFloorCode, (draft) => {
+              inEdgeInfo = draft[outNodeId].neighbors[inNodeId];
+              delete draft[outNodeId].neighbors[inNodeId];
+            })
+          );
+
+          // create edit and add to history
+          if (addToHistory) {
+            const arg = {
+              inFloorCode,
+              inNodeId,
+              outFloorCode,
+              outNodeId,
+              addToHistory: false,
+            };
+
+            const edit: EditPair = {
+              edit: { endpoint: "deleteEdgeAcrossFloors", arg },
+              reverseEdit: {
+                endpoint: "addEdgeAcrossFloors",
+                arg: { ...arg, inEdgeInfo, outEdgeInfo },
+              },
+            };
+            dispatch(addEditToHistory(edit));
+          }
+
+          // different error handling for queryFulfilled
+          try {
+            await queryFulfilled;
+          } catch (e) {
+            toast.error(
+              "Failed to save! Check the Console for detailed error."
+            );
+            const error = e as { error: { data: { error: string } } };
+            console.error(error.error.data.error);
+          }
+
+          // send patch to others
+          const inGraphPatchAction: GraphPatchMessageAction = {
+            type: WEBSOCKET_MESSAGE,
+            floorCode: inFloorCode,
+            payload: {
+              type: GRAPH_PATCH,
+              patches: inPatches,
+            },
+          };
+          dispatch(inGraphPatchAction as unknown as UnknownAction);
+
+          const outGraphPatchAction: GraphPatchMessageAction = {
+            type: WEBSOCKET_MESSAGE,
+            floorCode: outFloorCode,
+            payload: {
+              type: GRAPH_PATCH,
+              patches: outPatches,
+            },
+          };
+          dispatch(outGraphPatchAction as unknown as UnknownAction);
         } catch (e) {
           toast.error("Check the Console for detailed error.");
           console.error(e);

@@ -138,15 +138,16 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, rooms, nodes }: Props) => {
     const type = getType();
     const outEdgeInfo = {
       toFloorInfo: {
-        toFloor: `${outRoom.buildingCode}-${outRoom.floorLevel}`,
+        toFloor: toFloorCode,
         type,
       },
     };
     const inEdgeInfo = { toFloorInfo: { toFloor: floorCode, type } };
     addEdgeAcrossFloors({
-      floorCode,
+      inFloorCode: floorCode,
       inNodeId,
       outEdgeInfo,
+      outFloorCode: toFloorCode,
       outNodeId,
       inEdgeInfo,
     });

@@ -68,11 +68,13 @@ const InfoDisplay = ({ floorCode }: Props) => {
   };
 
   return (
-    <div className="max-h-96 w-fit overflow-auto rounded-lg bg-gray-600 px-2 pb-2 text-white shadow-lg">
+    <div className="flex max-h-96 w-fit flex-col rounded-lg bg-gray-600 px-2 pb-2 text-white shadow-lg">
       <ul className="flex text-sm">
         {tabNames.map((tabName, index) => renderTabHeader(tabName, index))}
       </ul>
-      {tabContents[activeTabIndex]()}
+      <div className="flex overflow-y-auto">
+        {tabContents[activeTabIndex]()}
+      </div>
     </div>
   );
 };

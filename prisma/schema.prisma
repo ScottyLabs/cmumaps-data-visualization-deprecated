@@ -17,41 +17,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Room {
-  buildingCode String
+model Building {
+  buildingCode String @id @default(uuid())
+
   name         String
+  osmId        String
+  defaultFloor String
 
+  labelLatitude  Float
+  labelLongitude Float
+
+  shape  Json
+  hitbox Json
+
+  floors Floor[]
+}
+
+model Floor {
+  buildingCode String
   floorLevel   String
-  type         String
-  displayAlias String?
-  aliases      Alias[]
 
-  updatedAt DateTime @updatedAt
+  centerLatitude  Float
+  centerLongitude Float
+  scale           Float
+  angle           Float
+  altitude        Float
 
-  node Node[]
+  building Building  @relation(fields: [buildingCode], references: [buildingCode])
+  elements Element[]
 
-  labelPosX Float
-  labelPosY Float
+  @@id([buildingCode, floorLevel])
+}
 
-  polygon Json
+model Element {
+  elementId      String @id
+  labelLatitude  Float
+  labelLongitude Float
+  type           String
 
-  @@id([buildingCode, name])
+  buildingCode String?
+  floorLevel   String?
+  floor        Floor?  @relation(fields: [buildingCode, floorLevel], references: [buildingCode, floorLevel])
+
+  nodes Node[]
+  poi   Poi?
+  room  Room?
+
   @@index([buildingCode, floorLevel])
 }
 
-model Node {
-  id   String @id @default(uuid())
-  posX Float
-  posY Float
+model Poi {
+  elementId String  @id
+  element   Element @relation(fields: [elementId], references: [elementId])
+}
 
-  buildingCode String
-  roomName     String
-  room         Room?  @relation(fields: [buildingCode, roomName], references: [buildingCode, name], onUpdate: Cascade)
+model Room {
+  elementId String  @id
+  element   Element @relation(fields: [elementId], references: [elementId])
+
+  name         String
+  displayAlias String?
+  aliases      Alias[]
+
+  polygon Json
+
+  updatedAt DateTime @updatedAt
+}
+
+model Node {
+  id        String @id @default(uuid())
+  latitude  Float
+  longitude Float
 
   outNeighbors Neighbor[] @relation("OutNeighbors")
   inNeighbors  Neighbor[] @relation("InNeighbors")
 
-  @@index([buildingCode])
+  elementId String
+  element   Element @relation(fields: [elementId], references: [elementId])
 }
 
 model Neighbor {
@@ -65,11 +107,10 @@ model Neighbor {
 }
 
 model Alias {
-  buildingCode String
-  roomName     String
-  alias        String
+  alias String
 
-  room Room @relation(fields: [buildingCode, roomName], references: [buildingCode, name])
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [elementId])
 
-  @@id([buildingCode, roomName, alias])
+  @@id([roomId, alias])
 }

@@ -166,10 +166,8 @@ const NodesDisplay = ({
     }
 
     const inNodeId = nodeId;
-    const outEdgeInfo = {};
     const outNodeId = validateRes.outNodeId;
-    const inEdgeInfo = {};
-    addEdge({ floorCode, inNodeId, outEdgeInfo, outNodeId, inEdgeInfo });
+    addEdge({ floorCode, inNodeId, outNodeId });
     dispatch(setMode(GRAPH_SELECT));
   };
 

@@ -5,7 +5,7 @@ import buildings from "../../../../public/cmumaps-data/buildings.json";
 import { extractBuildingCode } from "../../../app/api/apiUtils";
 import { getNode } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
-import { useAddEdgeMutation } from "../../../lib/features/graphApiSlice";
+import { useAddEdgeAcrossFloorsMutation } from "../../../lib/features/graphApiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { setShortcutsDisabled } from "../../../lib/features/statusSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
@@ -21,7 +21,7 @@ interface Props {
 const AddEdgeAcrossFloorsSection = ({ floorCode, rooms, nodes }: Props) => {
   const dispatch = useAppDispatch();
 
-  const [addEdge] = useAddEdgeMutation();
+  const [addEdgeAcrossFloors] = useAddEdgeAcrossFloorsMutation();
 
   const floorLevels = useAppSelector((state) => state.floor.floorLevels);
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
@@ -143,7 +143,13 @@ const AddEdgeAcrossFloorsSection = ({ floorCode, rooms, nodes }: Props) => {
       },
     };
     const inEdgeInfo = { toFloorInfo: { toFloor: floorCode, type } };
-    addEdge({ floorCode, inNodeId, outEdgeInfo, outNodeId, inEdgeInfo });
+    addEdgeAcrossFloors({
+      floorCode,
+      inNodeId,
+      outEdgeInfo,
+      outNodeId,
+      inEdgeInfo,
+    });
 
     // clear inputs
     // setToFloorCode("");

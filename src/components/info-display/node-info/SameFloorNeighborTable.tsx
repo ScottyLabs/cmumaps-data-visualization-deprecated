@@ -2,15 +2,14 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 
-import { savingHelper } from "../../../lib/apiRoutes";
-import { setNodes } from "../../../lib/features/dataSlice";
+import { useDeleteEdgeMutation } from "../../../lib/features/graphApiSlice";
 import {
   getNodeIdSelected,
   hoverNode,
   unHoverNode,
 } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
-import { EdgeInfo, Nodes } from "../../shared/types";
+import { EdgeInfo, ID, Nodes } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
 import { dist } from "../../utils/utils";
 
@@ -29,30 +28,15 @@ const SameFloorNeighborTable = ({
   const dispatch = useAppDispatch();
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
+  const [deleteEdge] = useDeleteEdgeMutation();
+
   if (!nodeId) {
     return;
   }
 
-  const deleteEdge = (nodeId, neighborID) => {
+  const handleDeleteEdge = (nodeId: ID, neighborId: ID) => () => {
     dispatch(unHoverNode());
-
-    const newNodes = { ...nodes };
-    const newNode = JSON.parse(JSON.stringify(newNodes[nodeId]));
-
-    delete newNode.neighbors[neighborID];
-    newNodes[nodeId] = newNode;
-
-    delete newNodes[neighborID].neighbors[nodeId];
-
-    dispatch(setNodes(newNodes));
-
-    savingHelper(
-      "/api/updateGraph",
-      JSON.stringify({
-        floorCode: floorCode,
-        newGraph: JSON.stringify(newNodes),
-      })
-    );
+    deleteEdge({ floorCode, inNodeId: nodeId, outNodeId: neighborId });
   };
 
   const renderButtonCell = (text: string, neighborID, handleClick) => (
@@ -75,16 +59,17 @@ const SameFloorNeighborTable = ({
       const selectHandleClick = () => {
         router.push(`?nodeId=${neighborID}`);
       };
-
-      const deleteHandleClick = () => deleteEdge(nodeId, neighborID);
-
       return (
         <tr key={neighborID}>
           {renderButtonCell("select", neighborID, selectHandleClick)}
           <td className="border p-2">
             {dist(nodes[nodeId].pos, nodes[neighborID].pos).toPrecision(3)}
           </td>
-          {renderButtonCell("delete", neighborID, deleteHandleClick)}
+          {renderButtonCell(
+            "delete",
+            neighborID,
+            handleDeleteEdge(nodeId, neighborID)
+          )}
         </tr>
       );
     });

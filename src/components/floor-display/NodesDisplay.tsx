@@ -172,7 +172,6 @@ const NodesDisplay = ({
   };
 
   const handleDeleteEdge = (nodeId: ID) => {
-    //#region validation
     if (!nodeIdSelected) {
       // this line should never run because we check that idSelected is
       // selected before setting mode to ADD_EDGE
@@ -184,7 +183,7 @@ const NodesDisplay = ({
       toast.error("No edge exist between these two nodes!");
       return;
     }
-    //#endregion
+
     deleteEdge({ floorCode, inNodeId: nodeId, outNodeId: nodeIdSelected });
     dispatch(setMode(GRAPH_SELECT));
   };

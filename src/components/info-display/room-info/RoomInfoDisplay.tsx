@@ -19,7 +19,7 @@ import {
 import { renderCell } from "../../utils/displayUtils";
 import { getRoomId, getRoomIdFromRoomInfo } from "../../utils/utils";
 import EditCell from "../EditCell";
-import EditTypeRow from "../SelectTypeCell";
+import EditTypeCell from "../EditTypeCell";
 import AliasesMultiSelect from "./AliasesMultiSelect";
 import RoomInfoButtons from "./RoomInfoTable";
 
@@ -178,7 +178,7 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
     return (
       <tr>
         <td className="border pl-4 pr-4">Type</td>
-        <EditTypeRow
+        <EditTypeCell
           key={roomId}
           value={room.type}
           typeList={RoomTypeList as readonly string[]}

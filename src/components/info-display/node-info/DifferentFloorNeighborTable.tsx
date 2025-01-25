@@ -8,7 +8,7 @@ import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import { NodeInfo, EdgeInfo, EdgeTypeList, Nodes } from "../../shared/types";
 import { renderCell } from "../../utils/displayUtils";
-import EditTypeRow from "../SelectTypeCell";
+import EditTypeCell from "../EditTypeCell";
 
 interface Props {
   floorCode: string;
@@ -130,7 +130,7 @@ const DifferentFloorNeighborTable = ({
               {neighbor.toFloorInfo?.toFloor}
             </Link>
           </td>
-          <EditTypeRow
+          <EditTypeCell
             value={neighbor.toFloorInfo?.type}
             typeList={EdgeTypeList}
             handleChange={handleSaveTypeAcrossFloors(neighborId)}

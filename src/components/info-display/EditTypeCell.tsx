@@ -11,7 +11,7 @@ interface Props {
   handleChange;
 }
 
-const EditTypeRow = ({ handleChange, typeList, value }: Props) => {
+const EditTypeCell = ({ handleChange, typeList, value }: Props) => {
   const dispatch = useAppDispatch();
 
   const options = typeList.map((type) => ({ value: type, label: type }));
@@ -54,4 +54,4 @@ const EditTypeRow = ({ handleChange, typeList, value }: Props) => {
   );
 };
 
-export default EditTypeRow;
+export default EditTypeCell;

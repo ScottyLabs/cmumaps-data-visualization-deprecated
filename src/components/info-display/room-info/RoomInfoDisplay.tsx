@@ -1,11 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-
 import React from "react";
 
-import { extractFloorLevel } from "../../../app/api/apiUtils";
 import { savingHelper } from "../../../lib/apiRoutes";
 import { setNodes } from "../../../lib/features/dataSlice";
-import { useUpdateNodeMutation } from "../../../lib/features/graphApiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useUpsertRoomMutation } from "../../../lib/features/roomApiSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
@@ -21,6 +17,7 @@ import { getRoomId, getRoomIdFromRoomInfo } from "../../utils/utils";
 import EditCell from "../EditCell";
 import EditTypeCell from "../EditTypeCell";
 import AliasesMultiSelect from "./AliasesMultiSelect";
+import CreateRoomDisplay from "./CreateRoomDisplay";
 import RoomInfoButtons from "./RoomInfoTable";
 
 interface Props {
@@ -33,7 +30,6 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
   const dispatch = useAppDispatch();
 
   const [upsertRoom] = useUpsertRoomMutation();
-  const [updateNode] = useUpdateNodeMutation();
 
   const nodeId = useAppSelector((state) => getNodeIdSelected(state.mouseEvent));
 
@@ -45,37 +41,8 @@ const RoomInfoDisplay = ({ floorCode, rooms, nodes }: Props) => {
   const room = rooms[roomId];
 
   if (!roomId) {
-    const createRoom = async () => {
-      const floorLevel = extractFloorLevel(floorCode);
-      const name = floorLevel + ":" + uuidv4().replace(/-/g, "");
-      const newRoom: RoomInfo = {
-        name,
-        labelPosition: nodes[nodeId].pos,
-        type: "",
-        displayAlias: "",
-        aliases: [],
-        polygon: {
-          type: "Polygon",
-          coordinates: [[]],
-        },
-        updatedAt: new Date().toISOString(),
-      };
-      const roomId = getRoomIdFromRoomInfo(floorCode, newRoom);
-      const oldRoom = null;
-      await upsertRoom({ floorCode, roomId, newRoom, oldRoom });
-
-      const newNode = JSON.parse(JSON.stringify(nodes[nodeId]));
-      newNode.roomId = roomId;
-      updateNode({ floorCode, nodeId, newNode });
-    };
-
     return (
-      <button
-        className="mr-2 rounded bg-red-500 p-1 text-sm text-white hover:bg-red-700"
-        onClick={createRoom}
-      >
-        Create Room
-      </button>
+      <CreateRoomDisplay floorCode={floorCode} nodes={nodes} nodeId={nodeId} />
     );
   }
 

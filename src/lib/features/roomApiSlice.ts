@@ -134,6 +134,7 @@ export const RoomApiSlice = apiSlice.injectEndpoints({
           // send edit to others
           const roomEditAction: RoomEditMessageAction = {
             type: WEBSOCKET_MESSAGE,
+            floorCode,
             payload: {
               type: ROOM_EDIT,
               roomId,

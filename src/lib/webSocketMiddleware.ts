@@ -37,6 +37,7 @@ interface GraphPatch {
 
 export interface GraphPatchMessageAction {
   type: typeof WEBSOCKET_MESSAGE;
+  floorCode: string;
   payload: Omit<GraphPatch, "sender">;
 }
 
@@ -49,13 +50,13 @@ interface RoomEdit {
 
 export interface RoomEditMessageAction {
   type: typeof WEBSOCKET_MESSAGE;
+  floorCode: string;
   payload: Omit<RoomEdit, "sender">;
 }
 
-interface WebSocketMessageAction {
-  type: string;
-  payload;
-}
+// WebSocketMessageAction is the action dispatched
+// when you want to send a message to other users on this floor
+type WebSocketMessageAction = GraphPatchMessageAction | RoomEditMessageAction;
 
 let socket: WebSocket | null = null;
 
@@ -226,8 +227,7 @@ export const socketMiddleware: Middleware = (params) => (next) => (action) => {
 
     case WEBSOCKET_MESSAGE:
       if (socket && socket.readyState === WebSocket.OPEN) {
-        const { payload } = action as WebSocketMessageAction;
-        const floorCode = getState().floor.floorCode;
+        const { floorCode, payload } = action as WebSocketMessageAction;
         socket.send(JSON.stringify({ action: "message", floorCode, payload }));
       } else {
         console.error("WebSocket is not open. Cannot send message.");

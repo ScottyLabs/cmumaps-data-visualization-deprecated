@@ -115,6 +115,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
+            floorCode,
             payload: {
               type: GRAPH_PATCH,
               patches,
@@ -188,6 +189,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
+            floorCode,
             payload: {
               type: GRAPH_PATCH,
               patches,
@@ -261,6 +263,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
+            floorCode,
             payload: {
               type: GRAPH_PATCH,
               patches,
@@ -324,6 +327,7 @@ export const nodeApiSlice = apiSlice.injectEndpoints({
           // send patch to others
           const graphPatchAction: GraphPatchMessageAction = {
             type: WEBSOCKET_MESSAGE,
+            floorCode,
             payload: {
               type: GRAPH_PATCH,
               patches,

@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 
-import { useDeleteEdgeMutation } from "../../../lib/features/graphApiSlice";
+import { useDeleteEdgeMutation } from "../../../lib/features/api/graphApiSlice";
 import {
   getNodeIdSelected,
   hoverNode,

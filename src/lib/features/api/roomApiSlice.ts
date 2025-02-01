@@ -2,15 +2,15 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { RoomInfo } from "../../components/shared/types";
+import { RoomInfo } from "../../../components/shared/types";
 import {
   ROOM_EDIT,
   RoomEditMessageAction,
   WEBSOCKET_MESSAGE,
-} from "../webSocketMiddleware";
+} from "../../webSocketMiddleware";
+import { addEditToHistory, EditPair } from "../historySlice";
+import { lockRoom, unlockRoom } from "../lockSlice";
 import { apiSlice, getRooms } from "./apiSlice";
-import { addEditToHistory, EditPair } from "./historySlice";
-import { lockRoom, unlockRoom } from "./lockSlice";
 
 export interface UpdateRoomArgType {
   floorCode: string;

@@ -3,8 +3,8 @@ import Link from "next/link";
 import React from "react";
 
 import { savingHelper } from "../../../lib/apiRoutes";
+import { useDeleteEdgeAcrossFloorsMutation } from "../../../lib/features/api/graphApiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
-import { useDeleteEdgeAcrossFloorsMutation } from "../../../lib/features/graphApiSlice";
 import { getNodeIdSelected } from "../../../lib/features/mouseEventSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks";
 import {

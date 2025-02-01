@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import React from "react";
 
 import { extractFloorLevel } from "../../../app/api/apiUtils";
-import { useUpdateNodeMutation } from "../../../lib/features/graphApiSlice";
-import { useUpsertRoomMutation } from "../../../lib/features/roomApiSlice";
+import { useUpdateNodeMutation } from "../../../lib/features/api/graphApiSlice";
+import { useUpsertRoomMutation } from "../../../lib/features/api/roomApiSlice";
 import { ID, Nodes, RoomInfo } from "../../shared/types";
 import { getRoomIdFromRoomInfo } from "../../utils/utils";
 

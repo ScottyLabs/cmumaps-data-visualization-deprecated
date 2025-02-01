@@ -2,16 +2,16 @@ import { UnknownAction } from "@reduxjs/toolkit";
 
 import { toast } from "react-toastify";
 
-import { EdgeInfo, ID, NodeInfo } from "../../components/shared/types";
-import { RootState } from "../store";
+import { EdgeInfo, ID, NodeInfo } from "../../../components/shared/types";
+import { RootState } from "../../store";
 import {
   GRAPH_PATCH,
   GraphPatchMessageAction,
   WEBSOCKET_MESSAGE,
-} from "../webSocketMiddleware";
+} from "../../webSocketMiddleware";
+import { addEditToHistory, EditPair } from "../historySlice";
+import { getNodeIdSelected } from "../mouseEventSlice";
 import { apiSlice, getNodes } from "./apiSlice";
-import { addEditToHistory, EditPair } from "./historySlice";
-import { getNodeIdSelected } from "./mouseEventSlice";
 
 export interface MoveNodeArgType {
   floorCode: string;

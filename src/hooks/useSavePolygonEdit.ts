@@ -1,8 +1,8 @@
 import { Polygon } from "geojson";
 
 import { RoomInfo } from "../components/shared/types";
+import { useUpsertRoomMutation } from "../lib/features/api/roomApiSlice";
 import { useGetRoomsQuery } from "../lib/features/apiSlice";
-import { useUpsertRoomMutation } from "../lib/features/roomApiSlice";
 
 const useSavePolygonEdit = (floorCode: string, roomId: string) => {
   const { data: rooms } = useGetRoomsQuery(floorCode);

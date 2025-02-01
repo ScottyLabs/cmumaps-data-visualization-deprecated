@@ -4,8 +4,8 @@ import React from "react";
 import { TfiLocationPin } from "react-icons/tfi";
 import { Group, Path, Rect, Text } from "react-konva";
 
+import { useUpsertRoomMutation } from "../../lib/features/api/roomApiSlice";
 import { DOOR, getNodeIdSelected } from "../../lib/features/mouseEventSlice";
-import { useUpsertRoomMutation } from "../../lib/features/roomApiSlice";
 import { useAppSelector } from "../../lib/hooks";
 import { NodeInfo, Nodes, RoomInfo, Rooms } from "../shared/types";
 import { setCursor } from "../utils/canvasUtils";

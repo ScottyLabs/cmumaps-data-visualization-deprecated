@@ -10,7 +10,7 @@ import {
   useAddEdgeMutation,
   useDeleteEdgeMutation,
   useUpdateNodeMutation,
-} from "../../lib/features/graphApiSlice";
+} from "../../lib/features/api/graphApiSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,

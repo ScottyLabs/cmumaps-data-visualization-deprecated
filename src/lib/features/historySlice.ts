@@ -12,8 +12,8 @@ import {
   DeleteEdgeArgType,
   MoveNodeArgType,
   nodeApiSlice,
-} from "./graphApiSlice";
-import { RoomApiSlice, UpdateRoomArgType } from "./roomApiSlice";
+} from "./api/graphApiSlice";
+import { RoomApiSlice, UpdateRoomArgType } from "./api/roomApiSlice";
 
 const MAX_UNDO_LIMIT = 50;
 

@@ -8,10 +8,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// generator pyClient {
-//   provider = "prisma-client-py"
-// }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -21,7 +17,7 @@ model Building {
   buildingCode String @id @default(uuid())
 
   name         String
-  osmId        String
+  osmId        String?
   defaultFloor String
 
   labelLatitude  Float
@@ -41,7 +37,7 @@ model Floor {
   centerLongitude Float
   scale           Float
   angle           Float
-  altitude        Float
+  altitude        Float?
 
   building Building  @relation(fields: [buildingCode], references: [buildingCode])
   elements Element[]

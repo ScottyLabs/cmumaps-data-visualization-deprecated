@@ -26,18 +26,22 @@ export async function GET(request: Request) {
     // fetch all nodes from the database for this floor
     const dbNodes = await prisma.node.findMany({
       where: {
-        room: {
+        element: {
           buildingCode: buildingCode,
           floorLevel: floorLevel,
         },
       },
       include: {
-        room: true,
+        element: {
+          include: {
+            room: true,
+          },
+        },
         outNeighbors: {
           include: {
             outNode: {
               include: {
-                room: true,
+                element: true,
               },
             },
           },
@@ -57,27 +61,27 @@ export async function GET(request: Request) {
 
         // Check if the node and neighbor are on different floors
         if (
-          node.room?.buildingCode !== outNode.room?.buildingCode ||
-          node.room?.floorLevel !== outNode.room?.floorLevel
+          node.element.buildingCode !== outNode.element.buildingCode ||
+          node.element.floorLevel !== outNode.element.floorLevel
         ) {
           let toFloorType = "";
-          if (node.room?.type === outNode.room?.type) {
-            toFloorType = node.room?.type || "";
+          if (node.element.type === outNode.element.type) {
+            toFloorType = node.element.type || "";
           }
           neighbors[outNode.id].toFloorInfo = {
-            toFloor: `${outNode.room?.buildingCode}-${outNode.room?.floorLevel}`,
+            toFloor: `${outNode.element.buildingCode}-${outNode.element.floorLevel}`,
             type: toFloorType,
           };
         }
       }
 
       let roomId = "";
-      if (node.room) {
-        roomId = getRoomId(node.room);
+      if (node.element.room) {
+        roomId = getRoomId(node.element.room);
       }
 
       nodes[node.id] = {
-        pos: { x: node.posX, y: node.posY },
+        pos: { x: node.latitude, y: node.longitude },
         neighbors,
         roomId,
       };

@@ -27,10 +27,13 @@ export async function GET(request: Request) {
     // fetch all nodes from the database for this floor
     const dbRooms = await prisma.room.findMany({
       where: {
-        buildingCode: buildingCode,
-        floorLevel: floorLevel,
+        element: {
+          buildingCode: buildingCode,
+          floorLevel: floorLevel,
+        },
       },
       include: {
+        element: true,
         aliases: true,
       },
     });
@@ -39,8 +42,11 @@ export async function GET(request: Request) {
     for (const room of dbRooms) {
       rooms[getRoomId(room)] = {
         name: room.name,
-        labelPosition: { x: room.labelPosX, y: room.labelPosY },
-        type: room.type as RoomType,
+        labelPosition: {
+          x: room.element.labelLatitude,
+          y: room.element.labelLongitude,
+        },
+        type: room.element.type as RoomType,
         displayAlias: room.displayAlias ?? undefined,
         aliases: room.aliases.map((a) => a.alias),
         polygon: room.polygon as unknown as Polygon,

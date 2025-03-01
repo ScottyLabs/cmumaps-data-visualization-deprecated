@@ -21,10 +21,13 @@ import {
 const getRooms = async (buildingCode, floorLevel) => {
   const dbRooms = await prisma.room.findMany({
     where: {
-      buildingCode,
-      floorLevel,
+      element: {
+        buildingCode,
+        floorLevel,
+      },
     },
     include: {
+      element: true,
       aliases: true,
     },
   });
@@ -38,12 +41,12 @@ const getRooms = async (buildingCode, floorLevel) => {
 
     rooms[roomId] = {
       name: room.name,
-      type: room.type as RoomType,
+      type: room.element.type as RoomType,
       displayAlias: room.displayAlias || "",
       aliases,
       labelPosition: {
-        x: room.labelPosX,
-        y: room.labelPosY,
+        x: room.element.labelLatitude,
+        y: room.element.labelLongitude,
       },
       polygon: room.polygon as unknown as Polygon,
       updatedAt: room.updatedAt.toISOString(),

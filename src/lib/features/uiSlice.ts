@@ -48,7 +48,6 @@ export const {
   toggleShowRoomSpecific,
   setEditRoomLabel,
   toggleEditRoomLabel,
-
-  ize,
+  setNodeSize,
 } = UISlice.actions;
 export default UISlice.reducer;

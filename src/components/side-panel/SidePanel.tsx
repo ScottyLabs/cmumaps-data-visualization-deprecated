@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import {
   useGetNodesQuery,
   useGetRoomsQuery,
-} from "../../lib/features/apiSlice";
+} from "../../lib/features/api/apiSlice";
 import { selectEditPolygon } from "../../lib/features/modeSlice";
 import { useAppSelector } from "../../lib/hooks";
 import GraphTab from "./GraphTab";

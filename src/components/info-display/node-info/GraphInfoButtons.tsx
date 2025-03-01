@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 import React from "react";
 import { toast } from "react-toastify";
 
-import { useGetNodesQuery } from "../../../lib/features/apiSlice";
+import { useGetNodesQuery } from "../../../lib/features/api/apiSlice";
 import {
   ADD_EDGE,
   DELETE_EDGE,

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import { RoomInfo } from "../components/shared/types";
 import { WEBSOCKET_ENABLED } from "../settings";
-import { apiSlice, getRooms } from "./features/apiSlice";
+import { apiSlice, getRooms } from "./features/api/apiSlice";
 import { setFloorCode } from "./features/floorSlice";
 import { setOtherUsers, updateCursorInfoList } from "./features/usersSlice";
 import { AppDispatch, RootState } from "./store";

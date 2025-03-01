@@ -3,7 +3,7 @@ import React from "react";
 import {
   useGetNodesQuery,
   useGetRoomsQuery,
-} from "../../lib/features/apiSlice";
+} from "../../lib/features/api/apiSlice";
 import { GRAPH_SELECT, setMode } from "../../lib/features/modeSlice";
 import {
   setEditRoomLabel,

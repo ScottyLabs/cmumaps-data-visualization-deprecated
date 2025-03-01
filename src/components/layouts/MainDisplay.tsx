@@ -13,7 +13,7 @@ import {
   useGetNodesQuery,
   useGetRoomsQuery,
   useInvalidateCacheMutation,
-} from "../../lib/features/apiSlice";
+} from "../../lib/features/api/apiSlice";
 import { setNodes } from "../../lib/features/dataSlice";
 import { redo, undo } from "../../lib/features/historySlice";
 import {

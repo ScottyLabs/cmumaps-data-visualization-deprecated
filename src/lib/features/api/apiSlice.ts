@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-import { Nodes, Rooms } from "../../components/shared/types";
-import { AWS_API_INVOKE_URL } from "../apiRoutes";
+import { Nodes, Rooms } from "../../../components/shared/types";
+import { AWS_API_INVOKE_URL } from "../../apiRoutes";
 
 interface GetFileArgType {
   filePath: string;
@@ -48,6 +48,10 @@ export const apiSlice = createApi({
       }),
       transformResponse: (response: { data: string }) => response.data,
     }),
+    getBuildings: builder.query<Nodes, string>({
+      query: () => `/api/buildings`,
+      transformResponse: (response: { data: Nodes }) => response.data,
+    }),
     getNodes: builder.query<Nodes, string>({
       query: (floorCode) => `/api/getNodes?floorCode=${floorCode}`,
       transformResponse: (response: { data: Nodes }) => response.data,
@@ -67,6 +71,7 @@ export const apiSlice = createApi({
 
 export const {
   useGetFileQuery,
+  useGetBuildingsQuery,
   useGetNodesQuery,
   useGetRoomsQuery,
   useInvalidateCacheMutation,

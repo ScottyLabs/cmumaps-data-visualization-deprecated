@@ -13,7 +13,7 @@ import { relinkDoorsAndRooms } from "../../lib/apiRoutes";
 import {
   useGetNodesQuery,
   useGetRoomsQuery,
-} from "../../lib/features/apiSlice";
+} from "../../lib/features/api/apiSlice";
 import { setMst, setNodes } from "../../lib/features/dataSlice";
 import { ADD_DOOR_NODE, ADD_NODE, setMode } from "../../lib/features/modeSlice";
 import { setDoors } from "../../lib/features/outlineSlice";

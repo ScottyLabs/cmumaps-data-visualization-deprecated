@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { ID, PDFCoordinate } from "../../components/shared/types";
 import { createAppAsyncThunk } from "../withTypes";
-import { apiSlice } from "./apiSlice";
+import { apiSlice } from "./api/apiSlice";
 
 export interface User {
   userName: string;

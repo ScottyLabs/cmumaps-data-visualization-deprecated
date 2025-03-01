@@ -10,11 +10,11 @@ import { toast } from "react-toastify";
 
 import useSavePolygonEdit from "../../hooks/useSavePolygonEdit";
 import useWebSocket from "../../hooks/useWebSocket";
-import { useAddNodeMutation } from "../../lib/features/api/graphApiSlice";
 import {
   useGetNodesQuery,
   useGetRoomsQuery,
-} from "../../lib/features/apiSlice";
+} from "../../lib/features/api/apiSlice";
+import { useAddNodeMutation } from "../../lib/features/api/graphApiSlice";
 import {
   ADD_DOOR_NODE,
   ADD_EDGE,

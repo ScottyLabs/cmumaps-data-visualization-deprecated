@@ -9,7 +9,7 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 
 import { extractBuildingCode } from "../../app/api/apiUtils";
 import useClerkToken from "../../hooks/useClerkToken";
-import { useGetFileQuery } from "../../lib/features/apiSlice";
+import { useGetFileQuery } from "../../lib/features/api/apiSlice";
 import { DEFAULT_PDF_SCALE_INDEX } from "../../settings";
 import { PDFCoordinate } from "../shared/types";
 

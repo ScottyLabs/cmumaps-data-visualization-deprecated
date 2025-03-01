@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 import { DEFAULT_DENSITY } from "../../../app/api/detectWalkway/detectWalkway";
 import { AWS_API_INVOKE_URL } from "../../../lib/apiRoutes";
-import { useGetRoomsQuery } from "../../../lib/features/apiSlice";
+import { useGetRoomsQuery } from "../../../lib/features/api/apiSlice";
 import { setNodes } from "../../../lib/features/dataSlice";
 import {
   selectEditPolygon,
